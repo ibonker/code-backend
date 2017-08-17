@@ -47,11 +47,13 @@ configurations {
 dependencies {
     compile "org.springframework.boot:spring-boot-starter"
     compile "org.springframework.boot:spring-boot-starter-web"
-  	compile 'org.springframework.data:spring-data-rest-webmvc'
 	compile "org.springframework.boot:spring-boot-starter-aop"
 	compile "org.springframework.boot:spring-boot-starter-actuator"
+	compile "org.springframework.boot:spring-boot-starter-data-jpa"
 	
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jackson_version}"
+    compile "io.springfox:springfox-swagger2:2.7.0"
+  	compile "io.springfox:springfox-swagger-ui:2.7.0"
 	
 	compile "com.alibaba:druid-spring-boot-starter:1.1.0"
     compile "mysql:mysql-connector-java"
@@ -69,6 +71,11 @@ dependencies {
     testCompile "org.powermock:powermock-api-mockito"
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "com.changan:titan-dependencies:${titan_version}"
+    }
+}
 
 task wrapper(type: Wrapper) {
   gradleVersion = '3.1'

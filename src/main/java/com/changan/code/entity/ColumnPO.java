@@ -27,8 +27,8 @@ public class ColumnPO extends BaseEntity {
   private String javaType; // JAVA类型
   private String javaField; // JAVA字段名
   private String isPk; // 是否主键（1：主键）
-  private String isNull; // 是否可为空（1：可为空；0：不为空）
-  private String readOnly; // 是否只读
+  private String notNull; // 是否可为空（1：不为空；0：可为空）
+  private String readOnly; // 是否只读（1：只读；0：可修改）
   private String pattern; // 正则表达式
   private Integer lengthMin; // 字符串最小长度
   private Integer lengthMax; // 字符串最大长度

@@ -1,4 +1,5 @@
 spring:
+  profiles: local
   datasource:
     druid:
       driverClassName: com.mysql.jdbc.Driver

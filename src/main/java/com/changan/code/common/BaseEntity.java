@@ -6,7 +6,16 @@ package com.changan.code.common;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.anywhere.common.persistence.json.JsonDateSerializer;
 import com.changan.anywhere.common.utils.IdGen;
@@ -16,10 +25,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 /**
+ * 数据库表实体基类
+ * 
  * @author wenxing
  *
  */
 @Data
+@EntityListeners(value = {AuditingEntityListener.class})
 public class BaseEntity implements Serializable {
   
   /**
@@ -27,17 +39,25 @@ public class BaseEntity implements Serializable {
    */
   private static final long serialVersionUID = -59244562124078745L;
 
+  @Id
+  @GenericGenerator(name = "uuidGenerator", strategy = "uuid2")
+  @GeneratedValue(generator = "uuidGenerator")
   @JsonProperty("id")
   private String id;
   
+  @Column(name = "created_at", nullable = false)
   @JsonProperty("createdAt")
+  @CreatedDate
   @JsonSerialize(using = JsonDateSerializer.class)
   protected LocalDateTime createdAt;
   
+  @Column(name = "updated_at", nullable = false)
   @JsonProperty("updatedAt")
+  @LastModifiedDate
   @JsonSerialize(using = JsonDateSerializer.class)
   protected LocalDateTime updatedAt;
 
+  @Column(name = "del_flag")
   @JsonProperty("delFlag")
   private String delFlag = Constants.DATA_IS_NORMAL;
   
