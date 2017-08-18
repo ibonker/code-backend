@@ -4,5 +4,8 @@ built
 /.gradle/
 lib
 bin
-build.gradle
-gradle.properties
+.git
+.settings
+.classpath
+.gitignore
+.project

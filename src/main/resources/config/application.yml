@@ -13,3 +13,6 @@ spring:
     name: titan-code2
   profiles:
     active: ${PRO_ENV:local}
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false

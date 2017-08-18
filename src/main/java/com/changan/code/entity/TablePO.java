@@ -6,7 +6,7 @@ package com.changan.code.entity;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -23,8 +23,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=true)
-@Entity(name = "Table")
 @Table(name = "table")
+@MappedSuperclass
 public class TablePO extends BaseEntity {
   /**
    * 

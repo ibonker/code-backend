@@ -4,7 +4,7 @@
 package com.changan.code.entity;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 
 import com.changan.code.common.BaseEntity;
@@ -19,8 +19,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=true)
-@Entity(name = "ApiParam")
 @Table(name = "api_param")
+@MappedSuperclass
 public class ApiParamPO extends BaseEntity {
   /**
    * 
