@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +22,9 @@ import org.springframework.transaction.annotation.TransactionManagementConfigure
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
+import com.changan.anywhere.common.persistence.mybatis.annotation.MyBatisDao;
+import com.changan.anywhere.common.persistence.mybatis.entity.BaseEntity;
 import com.changan.anywhere.dal.datasource.DynamicDataSource;
-import com.changan.code.common.BaseEntity;
 import com.changan.code.datasource.DynamicLoadDatasource;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableTransactionManagement
 @Slf4j
+@MapperScan(basePackages = {"com.changan.code"}, annotationClass = MyBatisDao.class)
 public class DatasourceConfig implements TransactionManagementConfigurer {
 
   /**

@@ -26,7 +26,7 @@ public interface DatabaseDao extends CrudDao<ColumnPO> {
    * @param genTable
    * @return
    */
-  List<TablePO> findTableList(TablePO table);
+  List<TablePO> findTableList(@Param("dbName") String dbName, @Param("name") String name);
 
   /**
    * 根据表名称查找表
@@ -42,7 +42,7 @@ public interface DatabaseDao extends CrudDao<ColumnPO> {
    * @param genTable
    * @return
    */
-  List<ColumnPO> findTableColumnList(TablePO table);
+  List<ColumnPO> findTableColumnList(@Param("dbName") String dbName, @Param("name") String name);
 
   /**
    * 获取数据表主键
@@ -50,7 +50,7 @@ public interface DatabaseDao extends CrudDao<ColumnPO> {
    * @param genTable
    * @return
    */
-  List<String> findTablePK(TablePO table);
+  List<String> findTablePK(@Param("dbName") String dbName, @Param("name") String name);
 
   /**
    * 是否已存在该表
