@@ -1,6 +1,7 @@
 cache
 node_modules
 built
+build
 /.gradle/
 lib
 bin
