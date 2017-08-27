@@ -2,8 +2,8 @@ buildscript {
   repositories {
     mavenLocal()
     maven {
-	    // url anywhere_repo
-        url "http://maven.aliyun.com/nexus/content/groups/public" 
+	    url anywhere_repo
+        // url "http://maven.aliyun.com/nexus/content/groups/public" 
     }
   }
 }
@@ -26,8 +26,8 @@ targetCompatibility = 1.8
 repositories {
 	mavenLocal()
     maven { 
-        // url anywhere_repo
-        url "http://maven.aliyun.com/nexus/content/groups/public" 
+        url anywhere_repo
+        // url "http://maven.aliyun.com/nexus/content/groups/public" 
     }
 }
 
@@ -56,6 +56,7 @@ dependencies {
 	compile "org.springframework.boot:spring-boot-starter-data-jpa"
 	
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jackson_version}"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jackson_version}"
     compile "io.springfox:springfox-swagger2:2.7.0"
   	compile "io.springfox:springfox-swagger-ui:2.7.0"
 	
@@ -63,27 +64,28 @@ dependencies {
     compile "mysql:mysql-connector-java:5.1.43"
     compile "com.oracle:ojdbc14:${orcale_version}"
     compile "com.github.pagehelper:pagehelper:5.0.0"
+    compile "org.hibernate:hibernate-java8:5.0.11.Final"
     compile "org.projectlombok:lombok:1.16.16"
     
-    // compile "com.changan:titan-common:${titan_common_version}"
-    // compile "com.changan:anywhere-dal-core:1.0.9"
-	// compile "com.changan:anywhere-dal-mybatis:1.0.9"
+    compile "com.changan:titan-common:${titan_common_version}"
+    compile "com.changan:anywhere-dal-core:1.0.9"
+	compile "com.changan:anywhere-dal-mybatis:1.0.9"
 
-    compile fileTree(dir:'lib',include:['*.jar'])
+    // compile fileTree(dir:'lib',include:['*.jar'])
     compile "org.mybatis:mybatis:3.4.1"
     compile "org.mybatis:mybatis-spring:1.3.0"
     compile "org.apache.commons:commons-lang3:3.1"
     
     testCompile "org.springframework.boot:spring-boot-starter-test"
-    // testCompile "org.powermock:powermock-module-junit4"
-    // testCompile "org.powermock:powermock-api-mockito"
+    testCompile "org.powermock:powermock-module-junit4"
+    testCompile "org.powermock:powermock-api-mockito"
 }
 
-// dependencyManagement {
-//     imports {
-//         mavenBom "com.changan:titan-dependencies:${titan_version}"
-//     }
-// }
+dependencyManagement {
+    imports {
+        mavenBom "com.changan:titan-dependencies:${titan_version}"
+    }
+}
 
 task wrapper(type: Wrapper) {
   gradleVersion = '3.1'

@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
-import com.changan.code.dto.ResultDTO;
 import com.changan.code.exception.CodeCommonException;
 
 import lombok.extern.slf4j.Slf4j;

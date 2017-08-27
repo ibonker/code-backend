@@ -5,9 +5,12 @@ package com.changan.code.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import com.changan.code.common.BaseEntity;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -19,8 +22,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=true)
-@Entity(name = "ApiBase")
 @Table(name = "api_base")
+@Entity
+@EntityListeners(value = {AuditingEntityListener.class})
 public class ApiBasePO extends BaseEntity {
   /**
    * 
@@ -42,5 +46,22 @@ public class ApiBasePO extends BaseEntity {
   @Column(name = "description")
   @JsonProperty("description")
   private String description; // 描述
+  
+  @Transient
+  private  ApiObjPO apiObjPO; //api方法
 
+  /**
+   * 更新属性
+   * @param apiBasePO
+   * @return
+   */
+  public ApiBasePO updateAttrs(ApiBasePO apiBase){
+	  
+	  this.projectId = apiBase.getProjectId();
+	  this.versionName = apiBase.getVersionName();
+	  this.basePath = apiBase.getBasePath();
+	  this.description = apiBase.getDescription();
+	  
+	  return this;
+  }
 }
