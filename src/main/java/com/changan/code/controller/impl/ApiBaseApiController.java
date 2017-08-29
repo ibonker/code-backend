@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
@@ -25,40 +25,51 @@ import com.changan.code.service.IApiBaseService;
 @Controller
 public class ApiBaseApiController implements ApiBaseApi {
 
-	/**
-	 * 注入api 接口
-	 */
-	@Autowired
-	IApiBaseService apiBaseService;
+  /**
+   * 注入api 接口
+   */
+  @Autowired
+  IApiBaseService apiBaseService;
 
-	/**
-	 * 查询所有api
-	 */
-	@Override
-	public ResponseEntity<ResultDTO> ApiBaseAllShowGet(@RequestParam String projectId) {
-		// 获得所有的api
-		List<ApiBasePO> allApiBases = apiBaseService.findAllApiBase(projectId);
-		// 返回成功信息
-		return new ResponseEntity<ResultDTO>(
-				new ResultOfApiBaseDTO().apiBases(allApiBases).message("成功").statusCode(Constants.SUCCESS_API_CODE),
-				HttpStatus.OK);
-	}
-	/**
-	 * 保存api/修改api,当api版本号相同时操作失败
-	 */
-	@Override
-	public ResponseEntity<ResultDTO> ApiBaseSaveGet(@RequestBody ApiBasePO apiBase) {
-		ApiBasePO newApiBase =  new ApiBasePO();
-		if(apiBase.isNew()){
-			// 保存api
-			newApiBase = apiBaseService.saveApiBase(apiBase);
-		}else{
-			// 更新api
-			newApiBase = apiBaseService.updateApiBase(apiBase);
-		}
-		// 返回成功信息
-		return new ResponseEntity<ResultDTO>(
-				new ResultOfApiBaseDTO().apiBase(newApiBase).message("成功").statusCode(Constants.SUCCESS_API_CODE),
-				HttpStatus.OK);
-	}
+  /**
+   * 查询所有api
+   */
+  @Override
+  public ResponseEntity<ResultDTO> ApiBaseAllShowPost(@PathVariable String projectId) {
+    // 获得所有的api
+    List<ApiBasePO> allApiBases = apiBaseService.findAllApiBase(projectId);
+    // 返回成功信息
+    return new ResponseEntity<ResultDTO>(new ResultOfApiBaseDTO().apiBases(allApiBases)
+        .message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
+
+  /**
+   * 保存api/修改api,当api版本号相同时操作失败
+   */
+  @Override
+  public ResponseEntity<ResultDTO> ApiBaseSavePost(@RequestBody ApiBasePO apiBase) {
+    ApiBasePO newApiBase = new ApiBasePO();
+    if (apiBase.isNew()) {
+      // 保存api
+      newApiBase = apiBaseService.saveApiBase(apiBase);
+    } else {
+      // 更新api
+      newApiBase = apiBaseService.updateApiBase(apiBase);
+    }
+    // 返回成功信息
+    return new ResponseEntity<ResultDTO>(new ResultOfApiBaseDTO().apiBase(newApiBase).message("成功")
+        .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
+
+  /**
+   * 根据id删除api
+   */
+  @Override
+  public ResponseEntity<ResultDTO> ApiBaseDeletePost(@PathVariable String id) {
+    // 根据id删除api
+    apiBaseService.deleteApiBaseById(id);
+    // 返回成功信息
+    return new ResponseEntity<ResultDTO>(
+        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
 }

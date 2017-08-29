@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import com.changan.code.dto.ResultOfComponentsDTO;
 import com.changan.code.dto.ResultOfProjectDTO;
 import com.changan.code.dto.ResultOfTypeDTO;
 import com.changan.code.entity.ProjectPO;
@@ -85,5 +86,14 @@ public interface ProjectApi {
       method = RequestMethod.GET)
   ResponseEntity<ResultDTO> projectDataTypeGet(
       @ApiParam(value = "id", required = true) @PathVariable String id);
+  
+  @ApiOperation(value = "项目组件列表", notes = "项目组件列表", response = ResultOfComponentsDTO.class,
+      tags = {"Project"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfComponentsDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfComponentsDTO.class)})
+  @RequestMapping(value = "/projects/components/default", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> projectsComponentsDefaultGet();
 
 }

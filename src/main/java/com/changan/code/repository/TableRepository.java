@@ -39,5 +39,13 @@ public interface TableRepository
    * @return
    */
   List<TablePO> findByIdIn(List<String> ids);
+  
+  /**
+   * 通过datasourceId,isAutoCrud获取CRUD列表
+   * @param datasourceId
+   * @param isAutoCrud
+   * @return
+   */
+  List<TablePO> findByDatasourceIdAndIsAutoCrudAndDelFlag(String datasourceId, String isAutoCrud, String delFlag);
 
 }

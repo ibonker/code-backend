@@ -14,6 +14,7 @@ import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TransferObjPO;
 
 /**
  * @author wenxing
@@ -94,5 +95,11 @@ public interface ITableService {
    * @param ids
    */
   public void inactiveIsAutoCrud(RequestOfTableIdsDTO tableIds);
+  
+  /**
+   * 转换column到trans
+   * @return
+   */
+  public TransferObjPO transColumnPOToTransPO(String tableId);
 
 }

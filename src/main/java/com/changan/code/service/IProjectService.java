@@ -3,9 +3,12 @@
  */
 package com.changan.code.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
+import com.changan.code.dto.ComponentCategory;
 import com.changan.code.dto.RefObjDTO;
 import com.changan.code.entity.ProjectPO;
 
@@ -13,7 +16,7 @@ import com.changan.code.entity.ProjectPO;
  * @author wenxing
  *
  */
-public interface IProjectService {
+public interface IProjectService extends IComponentService {
   
   /**
    * 分页查询project
@@ -46,5 +49,17 @@ public interface IProjectService {
    * @return
    */
   public RefObjDTO getProjectDTOandPO(String id);
+  
+  /**
+   * 生成代码
+   * @param id
+   */
+  public void generateCodeFiles(String id);
+  
+  /**
+   * 安全组件
+   * @return
+   */
+  public List<ComponentCategory> getComponents();
 
 }

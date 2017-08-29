@@ -5,6 +5,7 @@ package com.changan.code.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,8 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.changan.anywhere.common.mvc.page.rest.request.Filter;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
+import com.changan.code.common.BaseDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.DtoType;
 import com.changan.code.common.PredictUtils;
+import com.changan.code.common.component.Consul;
+import com.changan.code.common.component.Security;
+import com.changan.code.dto.Component;
+import com.changan.code.dto.ComponentCategory;
+import com.changan.code.dto.PackObj;
 import com.changan.code.dto.RefObjDTO;
 import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.entity.DatasourcePO;
@@ -32,6 +40,7 @@ import com.changan.code.entity.ProjectPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ProjectRepository;
 import com.changan.code.service.IDatasourceService;
+import com.changan.code.service.IGenerateService;
 import com.changan.code.service.IProjectService;
 import com.changan.code.service.ITableService;
 import com.changan.code.service.ITransferObjService;
@@ -49,16 +58,19 @@ public class ProjectServiceImpl implements IProjectService {
   // 注入project repository
   @Autowired
   private ProjectRepository projectRepo;
-  
+
   // 注入datasource service
   @Autowired
   private IDatasourceService datasourceService;
-  
+
   @Autowired
   private ITransferObjService transObjService;
-  
+
   @Autowired
   private ITableService tableService;
+
+  @Autowired
+  private IGenerateService generateService;
 
   /**
    * 分页查询project
@@ -137,7 +149,7 @@ public class ProjectServiceImpl implements IProjectService {
       }
       datasourceService.saveDatasources(datasources);
     }
-    
+
     return project;
   }
 
@@ -157,10 +169,64 @@ public class ProjectServiceImpl implements IProjectService {
 
   @Override
   public RefObjDTO getProjectDTOandPO(String id) {
-    List<SimpleDataObj> dtos = transObjService.findClassnameByProjectId(id);
+    // 获取dto
+    Map<String, List<SimpleDataObj>> dtos = transObjService.findClassnameByProjectId(id);
+    // 获取po
     Map<String, List<SimpleDataObj>> pos = tableService.findClassnameByProjectId(id);
-    
-    return new RefObjDTO("refobj", "实体", dtos, pos);
+    // dto根据package分类列表
+    List<PackObj> dtoPacks = Lists.newArrayList();
+    // po根据package分类列表
+    List<PackObj> poPacks = Lists.newArrayList();
+    // 添加默认类型
+    List<SimpleDataObj> defaultdtos = Lists.newArrayList();
+    defaultdtos.add(new SimpleDataObj("", BaseDTO.ResultDTO.toString(), Constants.IS_INACTIVE));
+    defaultdtos.add(new SimpleDataObj("", BaseDTO.PageDTO.toString(), Constants.IS_INACTIVE));
+    defaultdtos.add(new SimpleDataObj("", BaseDTO.ResultPageDTO.toString(), Constants.IS_ACTIVE));
+    defaultdtos.add(new SimpleDataObj("", BaseDTO.JsonSchema.toString(), Constants.IS_INACTIVE));
+    PackObj defaultPackobj = new PackObj("default", defaultdtos);
+    dtoPacks.add(defaultPackobj);
+
+    // dto类型
+    for (Entry<String, List<SimpleDataObj>> entry : dtos.entrySet()) {
+      dtoPacks.add(new PackObj(entry.getKey(), entry.getValue()));
+    }
+    // po类型
+    for (Entry<String, List<SimpleDataObj>> entry : pos.entrySet()) {
+      poPacks.add(new PackObj(entry.getKey(), entry.getValue()));
+    }
+
+    return new RefObjDTO(DtoType.REFOBJ.toString().toLowerCase(), DtoType.REFOBJ.getCname(),
+        dtoPacks, poPacks);
+  }
+
+  @Override
+  public void generateCodeFiles(String id) {
+    // 获得project
+    ProjectPO project = this.getProjectById(id);
+    // 获得数据源
+    List<DatasourcePO> datasources = datasourceService.findByProjectId(id);
+    // 生成配置文件代码
+    generateService.generateConfigFiles(project, datasources);
+  }
+
+  @Override
+  public List<ComponentCategory> getComponents() {
+    List<ComponentCategory> categories = Lists.newArrayList();
+    // security组件
+    categories.add(this.getComponentCategory(() -> Security.isMultiSelect(),
+        () -> Security.getTypeCname(), (List<Component> components) -> {
+          for (Security security : Security.values()) {
+            components.add(new Component(security.name(), security.getCname()));
+          }
+        }));
+    // consul组件
+    categories.add(this.getComponentCategory(() -> Security.isMultiSelect(),
+        () -> Consul.getTypeCname(), (List<Component> components) -> {
+          for (Consul consul : Consul.values()) {
+            components.add(new Component(consul.name(), consul.getCname()));
+          }
+        }));
+    return categories;
   }
 
 }

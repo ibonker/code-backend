@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>mvcConfiguration</name>
+  <filePath>src/main/java/${packageName}/${moduleName}/config</filePath>
+  <fileName>MvcConfiguration.java</fileName>
+  <content><![CDATA[
+package ${packageName}<#if moduleName != "">.${moduleName}</#if>.config;
+
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.validator.HibernateValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.orm.hibernate5.support.OpenSessionInViewInterceptor;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+/** 
+ * MvcConfiguration 
+ *
+ * @author TitanCode2
+ * @version  
+ * @since JDK 1.8 
+ */
+@Configuration
+public class MvcConfiguration extends WebMvcConfigurerAdapter implements EnvironmentAware, MessageSourceAware {
+
+  private static final Logger log = LoggerFactory.getLogger(MvcConfiguration.class);
+  
+  private MessageSource messageSource;
+  
+  private Environment environment;
+  
+  @Autowired
+  private SessionFactory sessionFactory;
+  
+  @Override
+  public void setMessageSource(MessageSource messageSource) {
+    this.messageSource = messageSource;
+  }
+
+  @Override
+  public void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
+  
+  @Override
+  public Validator getValidator() {
+    LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
+    
+    factory.setProviderClass(HibernateValidator.class);
+    factory.setValidationMessageSource(this.messageSource);
+    return factory;
+  }
+}
+]]>
+  </content>
+</template>

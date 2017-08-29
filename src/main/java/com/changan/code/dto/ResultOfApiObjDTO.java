@@ -15,27 +15,27 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ResultOfApiObjDTO extends ResultDTO{
+public class ResultOfApiObjDTO extends ResultDTO {
 
-	// 返回编码
-	@JsonProperty("apiObjs")
-	@JsonPropertyDescription("全部方法")
-	@ApiModelProperty(value = "全部方法")
-	private List<ApiObjPO> apiObjs;
+  // 返回编码
+  @JsonProperty("apiObjs")
+  @JsonPropertyDescription("全部方法")
+  @ApiModelProperty(value = "全部方法")
+  private List<ApiObjPO> apiObjs;
 
-	// 返回编码
-	@JsonProperty("apiObj")
-	@JsonPropertyDescription("方法")
-	@ApiModelProperty(value = "方法")
-	private ApiObjPO apiObj;
+  // 返回编码
+  @JsonProperty("apiObj")
+  @JsonPropertyDescription("方法")
+  @ApiModelProperty(value = "方法")
+  private ApiObjPO apiObj;
 
-	public ResultOfApiObjDTO apiObjs(List<ApiObjPO> apiObjs) {
-		this.apiObjs = apiObjs;
-		return this;
-	}
+  public ResultOfApiObjDTO apiObjs(List<ApiObjPO> apiObjs) {
+    this.apiObjs = apiObjs;
+    return this;
+  }
 
-	public ResultOfApiObjDTO apiObj(ApiObjPO apiObj) {
-		this.apiObj = apiObj;
-		return this;
-	}
+  public ResultOfApiObjDTO apiObj(ApiObjPO apiObj) {
+    this.apiObj = apiObj;
+    return this;
+  }
 }

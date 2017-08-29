@@ -28,3 +28,6 @@ apis:
   arrayType:
     - base
     - refobj
+generate:
+  projectPath: D:/
+  projectZipPath: D:/zip/

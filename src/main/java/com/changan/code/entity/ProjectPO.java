@@ -3,6 +3,7 @@
  */
 package com.changan.code.entity;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.code.annotation.JsonSchemaLink;
@@ -77,6 +79,18 @@ public class ProjectPO extends BaseEntity {
     this.datasources = newProject.getDatasources();
     
     return this;
+  }
+  
+  /**
+   * 组件列表
+   * @return
+   */
+  public List<String> getComponentList() {
+    if (StringUtils.isBlank(components)) {
+      return null;
+    }
+    String[] componentarr = this.components.split(",");
+    return Arrays.asList(componentarr);
   }
 
 }

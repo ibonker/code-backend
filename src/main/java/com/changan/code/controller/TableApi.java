@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.dto.RequestOfTableIdsDTO;
 import com.changan.code.dto.ResultOfColumnsDTO;
+import com.changan.code.dto.ResultOfTransferObjDTO;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
 import io.swagger.annotations.Api;
@@ -47,6 +48,18 @@ public interface TableApi {
   @RequestMapping(value = "/tables/{id}/columns", produces = {"application/json"},
       method = RequestMethod.GET)
   ResponseEntity<ResultDTO> tablesColumnsGet(
+      @ApiParam(value = "表id", required = false) @PathVariable String id);
+  
+  /**
+   * 数据源表分页
+   */
+  @ApiOperation(value = "表字段实体详情", notes = "表字段实体详情", response = ResultOfTransferObjDTO.class, tags = {"Table"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjDTO.class)})
+  @RequestMapping(value = "/tables/{id}/dto", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> tablesDtoGet(
       @ApiParam(value = "表id", required = false) @PathVariable String id);
 
   /**

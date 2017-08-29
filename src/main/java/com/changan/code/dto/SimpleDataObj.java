@@ -18,4 +18,6 @@ public class SimpleDataObj {
   
   private String className; // 名称
   
+  private String isGeneric; // 是否泛型
+  
 }

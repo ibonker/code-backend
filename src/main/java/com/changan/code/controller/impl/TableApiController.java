@@ -17,6 +17,7 @@ import com.changan.code.common.Constants;
 import com.changan.code.controller.TableApi;
 import com.changan.code.dto.RequestOfTableIdsDTO;
 import com.changan.code.dto.ResultOfColumnsDTO;
+import com.changan.code.dto.ResultOfTransferObjDTO;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.service.ITableService;
@@ -59,12 +60,23 @@ public class TableApiController extends BaseController implements TableApi {
   public ResponseEntity<ResultDTO> tablesAutocrudChangeGet(@PathVariable String status,
       @RequestBody RequestOfTableIdsDTO tableIds) {
     if ("active".equals(status)) {
-      
+      tableService.activeIsAutoCrud(tableIds);
     } else {
-      
+      tableService.inactiveIsAutoCrud(tableIds);
     }
     return new ResponseEntity<ResultDTO>(
         new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
+
+  /**
+   * 获取table的实体详情
+   */
+  @Override
+  public ResponseEntity<ResultDTO> tablesDtoGet(@PathVariable String id) {
+    return new ResponseEntity<ResultDTO>(
+        new ResultOfTransferObjDTO().transferObj(tableService.transColumnPOToTransPO(id))
+            .isDto(Constants.IS_INACTIVE).message("成功").statusCode(Constants.SUCCESS_API_CODE),
+        HttpStatus.OK);
   }
 
 }

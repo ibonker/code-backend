@@ -20,7 +20,7 @@ public class ProjectServiceTest {
   @Autowired
   IProjectService projectService;
 
-  @Test
+//  @Test
   public void crudTest() {
     ProjectPO updateProject = new ProjectPO();
 //    updateProject.setId("6e89a8c3-c7e1-4f8b-9947-ac43bf4a28d6");
@@ -30,6 +30,11 @@ public class ProjectServiceTest {
     updateProject.setDescription("测试项目002");
 //    projectService.updateProject(updateProject);
     projectService.saveProject(updateProject);
+  }
+  
+  @Test
+  public void genTest() {
+    projectService.generateCodeFiles("34c2396e-0c38-4c40-ad8d-d769d3849e9c");
   }
   
 }

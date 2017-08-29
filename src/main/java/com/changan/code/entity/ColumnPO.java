@@ -14,7 +14,6 @@ import com.changan.anywhere.common.utils.StringUtils;
 import com.changan.code.common.Constants;
 import com.changan.code.common.ParamerConstant;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.CaseFormat;
 
@@ -37,12 +36,12 @@ public class ColumnPO extends BaseEntity {
   private static final long serialVersionUID = 3980144310483390653L;
   
   @Column(name = "table_id")
-  @JsonProperty(value = "tableId", access = Access.READ_ONLY)
+  @JsonProperty(value = "tableId")
   @JsonPropertyDescription("归属表")
   private String tableId; // 归属表
   
   @Column(name = "name")
-  @JsonProperty(value = "name", access = Access.READ_ONLY)
+  @JsonProperty(value = "name")
   @JsonPropertyDescription("列名")
   private String name; // 列名
   
@@ -52,17 +51,17 @@ public class ColumnPO extends BaseEntity {
   private String comments; // 描述
   
   @Column(name = "jdbc_type")
-  @JsonProperty(value = "jdbcType", access = Access.READ_ONLY)
+  @JsonProperty(value = "jdbcType")
   @JsonPropertyDescription("JDBC类型")
   private String jdbcType; // JDBC类型
   
   @Column(name = "java_type")
-  @JsonProperty(value = "javaType", access = Access.READ_ONLY)
+  @JsonProperty(value = "javaType")
   @JsonPropertyDescription("JAVA类型")
   private String javaType; // JAVA类型
   
   @Column(name = "java_field")
-  @JsonProperty(value = "javaField", access = Access.READ_ONLY)
+  @JsonProperty(value = "javaField")
   @JsonPropertyDescription("JAVA字段名")
   private String javaField; // JAVA字段名
   
@@ -133,10 +132,10 @@ public class ColumnPO extends BaseEntity {
           || StringUtils.toCamelCase(this.getName()) // 当数据库中该字段名为创建字段常量或修改字段常量时
               .equals(ParamerConstant.DATABASE_CONS_CREATED_AT)) {
         // 设置为java8的日期时间类型
-        this.javaType = "java.time.LocalDateTime";
+        this.javaType = "LocalDateTime";
       } else {
         // 设置为java8的日期时间类型
-        this.javaType = "java.time.LocalDateTime";
+        this.javaType = "LocalDateTime";
       }
     } else if (StringUtils.startsWithIgnoreCase(this.getJdbcType(), "DECIMAL")) { // 当数据库中该字段类型为DECIMAL型时
       // 设置该字段的java类型为BigDecimal类型
@@ -184,6 +183,7 @@ public class ColumnPO extends BaseEntity {
    */
   public ColumnPO setConfigedProperties(ColumnPO column) {
     if (null != column) {
+      this.id = column.getId();
       this.readOnly = column.getReadOnly();
       this.pattern = column.getPattern();
       this.lengthMin = column.getLengthMin();

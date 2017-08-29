@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+    <name>gradleProperty</name>
+    <filePath>/</filePath>
+    <fileName>gradle.properties</fileName>
+    <content><![CDATA[
+anywhere_repo = http://172.16.1.188:8082/content/groups/public
+
+titan_common_version = 0.1.51-SNAPSHOT
+
+spring_boot_version = 1.5.4.RELEASE
+
+java_version = 1.8
+
+jar_name = ${projectName}
+
+jar_version = 0.0.1
+
+group_name = com.changan
+
+titan_dependencies_version = 0.1.0-SNAPSHOT
+
+mybatis_typehandlers_jsr310_version = 1.0.2
+
+pagehelper_version = 5.0.0
+
+pagehelper_spring_boot_starter_version = 1.1.0
+
+gradle_version = 3.1
+
+jackson_version = 2.8.8
+
+swagger_version = 2.7.0
+
+<#if hasOracle == "1">
+oracle_version = 10.2.0</#if>
+]]>
+    </content>
+</template>

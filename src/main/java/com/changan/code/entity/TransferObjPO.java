@@ -8,6 +8,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.code.common.Constants;
@@ -54,6 +55,12 @@ public class TransferObjPO extends BaseEntity {
   @JsonProperty("inheritObjName")
   private String inheritObjName; // 父类实体名
 
+  @Column(name = "gen_based_table_id")
+  @JsonProperty("genBasedTableId")
+  private String genBasedTableId; // 自动生成表id
+
+  @Transient
+  private List<TransferObjFieldPO> transferObjField; // 数据源
   /**
    * 数据库名称对应包名
    */
@@ -61,9 +68,6 @@ public class TransferObjPO extends BaseEntity {
   @JsonProperty(value = "packageName", required = false)
   @JsonPropertyDescription("包名")
   private String packageName = Constants.TRANS_OBJ_DEFAULT_PACKAGE;
-
-  @Transient
-  private List<TransferObjFieldPO> transferObjField; // 数据源
 
   /**
    * 可以更新的属性
@@ -79,5 +83,18 @@ public class TransferObjPO extends BaseEntity {
     this.inheritObjName = newTransferObjPO.getInheritObjName();
     this.transferObjField = newTransferObjPO.getTransferObjField();
     return this;
+  }
+
+  /**
+   * 是否自动生成
+   * 
+   * @return
+   */
+  @JsonProperty("isAutoGen")
+  public String getIsAutoGen() {
+    if (StringUtils.isBlank(this.genBasedTableId)) {
+      return Constants.IS_INACTIVE;
+    }
+    return Constants.IS_ACTIVE;
   }
 }

@@ -1,6 +1,7 @@
 package com.changan.code.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,11 @@ import com.changan.code.entity.TransferObjPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.TransferObjFieldRespository;
 import com.changan.code.repository.TransferObjRespository;
+import com.changan.code.service.ITransferObjFieldService;
 import com.changan.code.service.ITransferObjService;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * 
@@ -38,11 +41,16 @@ public class TransferObjServiceImpl implements ITransferObjService {
    */
   @Autowired
   private TransferObjFieldRespository transferObjFieldRePo;
-
+  
+  /**
+   * 注入DTO属性接口
+   */
+  @Autowired
+  private ITransferObjFieldService transferObjFieldService;
+  
   /**
    * 更新DTO
    */
-
   @Override
   public TransferObjPO updateTransferObj(TransferObjPO transferObj) {
     // 当前DTO
@@ -57,9 +65,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     } else {
       throw new CodeCommonException("更新失败！");
     }
-
-  }
-
+}
   /**
    * 保存DTO，相同projectId下 name不能相同
    */
@@ -69,7 +75,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     // 重复条数
     int sameCount = 0;
     // 查询数据库中重复条数
-    sameCount = transferObjRePo.countTransferObjByName(transferObj.getName(),
+    sameCount = transferObjRePo.countByNameAndProjectIdAndDelFlag(transferObj.getName(),
         transferObj.getProjectId(), Constants.DATA_IS_NORMAL);
     // 若重复条数为0
     if (sameCount == 0) {
@@ -79,7 +85,6 @@ public class TransferObjServiceImpl implements ITransferObjService {
     } else {
       throw new CodeCommonException("保存失败，DTO名称重复！");
     }
-
   }
 
   /**
@@ -110,9 +115,8 @@ public class TransferObjServiceImpl implements ITransferObjService {
     } else {
       throw new CodeCommonException("删除失败！执行删除的数据不存在！");
     }
-
   }
-
+  
   /**
    * 通过id查询DTO
    */
@@ -142,25 +146,34 @@ public class TransferObjServiceImpl implements ITransferObjService {
   }
 
   @Override
-  public List<SimpleDataObj> findClassnameByProjectId(String projectId) {
+  public Map<String, List<SimpleDataObj>> findClassnameByProjectId(String projectId) {
     List<Object[]> results = transferObjRePo.findClassNameByProjectId(projectId);
-    List<SimpleDataObj> dataobjs = Lists.newArrayList();
+    Map<String, List<SimpleDataObj>> datamaps = Maps.newHashMap();
     for (Object[] data : results) {
-      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1]);
-      dataobjs.add(dataobj);
+      // 生成新对象
+      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE);
+      // 根据packagename获取list
+      List<SimpleDataObj> objLists = datamaps.get((String) data[2]);
+      if (null != objLists) {
+        objLists.add(dataobj);
+      } else {
+        objLists = Lists.newArrayList();
+        objLists.add(dataobj);
+        datamaps.put((String) data[2], objLists);
+      }
     }
-    return dataobjs;
+    return datamaps;
   }
 
   /**
    * 自动创建实体
    */
   @Override
-  public TransferObjPO createAutoCrudDTO(String tableName, String datasourcePName,
-      String className) {
+  public TransferObjPO createAutoCrudDTO(String projectId, String tableId, String tableName,
+      String datasourcePName, String className) {
     // 详情实体
     TransferObjPO showPO =
-        this.genTransferObjPO(tableName, "", datasourcePName, tableName.concat("详情实体"));
+        this.genTransferObjPO(projectId, tableId, tableName, "", datasourcePName, tableName.concat("详情实体"));
     // 保存详情实体
     showPO = transferObjRePo.save(showPO);
     // 实体属性
@@ -169,7 +182,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     transferObjFieldRePo.save(showPOField);
     // 列表实体
     TransferObjPO listPO =
-        this.genTransferObjPO(tableName, "s", datasourcePName, tableName.concat("列表实体"));
+        this.genTransferObjPO(projectId, tableId, tableName, "s", datasourcePName, tableName.concat("列表实体"));
     // 保存列表实体
     listPO = transferObjRePo.save(listPO);
     // 实体属性
@@ -186,15 +199,17 @@ public class TransferObjServiceImpl implements ITransferObjService {
    * @param packageName
    * @return
    */
-  private TransferObjPO genTransferObjPO(String tableName, String postfix, String packageName,
-      String comments) {
+  private TransferObjPO genTransferObjPO(String projectId, String tableId, String tableName,
+      String postfix, String packageName, String comments) {
     TransferObjPO po = new TransferObjPO();
-    po.setName("ResultOf".concat(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName))
+    po.setProjectId(projectId);
+    po.setName("ResultOf".concat(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName))
         .concat(postfix).concat("DTO"));
     po.setPackageName(packageName);
     po.setComments(comments);
     po.setIsGeneric(Constants.IS_INACTIVE);
     po.setInheritObjName(BaseDTO.ResultDTO.toString());
+    po.setGenBasedTableId(tableId);
 
     return po;
   }
@@ -214,10 +229,24 @@ public class TransferObjServiceImpl implements ITransferObjService {
       String postfix, DtoType type, String format, String description) {
     TransferObjFieldPO po = new TransferObjFieldPO();
     po.setName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName).concat(postfix));
-    po.setType(type.toString());
+    po.setType(type.toString().toLowerCase());
     po.setFormat(format);
     po.setTransferObjId(transferObjId);
     po.setDescription(description);
     return po;
+  }
+
+  @Override
+  public void deleteAutoCrudDTO(String tableId) {
+    // 获取transferObj的id
+    List<String> transobjIds = transferObjRePo.findIdByGenBasedTableId(tableId);
+    if (null != transobjIds) {
+      for (String id : transobjIds) {
+        // 删除field
+        transferObjFieldService.deleteByTransferObjId(id);
+      }
+    }
+    // 删除transferObj
+    transferObjRePo.deleteByGenBasedTableId(tableId);
   }
 }

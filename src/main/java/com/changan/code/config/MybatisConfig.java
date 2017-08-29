@@ -17,10 +17,10 @@ import com.github.pagehelper.PageInterceptor;
  *
  */
 public class MybatisConfig {
-  
+
   public Configuration mybatisConfig() {
     Configuration configuration = new Configuration();
-    
+
     configuration.setCacheEnabled(true);
     configuration.setLazyLoadingEnabled(true);
     configuration.setAggressiveLazyLoading(true);
@@ -32,24 +32,24 @@ public class MybatisConfig {
     configuration.setMapUnderscoreToCamelCase(true);
     configuration.setLocalCacheScope(LocalCacheScope.SESSION);
     configuration.setJdbcTypeForNull(JdbcType.NULL);
-    
+
     configuration.getTypeAliasRegistry().registerAlias("Page", Page.class);
-    
-//  PageHelper pager = new PageHelper();
+
+    // PageHelper pager = new PageHelper();
     PageInterceptor pageInterceptor = new PageInterceptor();
-    
+
     Properties p = new Properties();
     p.put("helperDialect", "mysql");
     p.put("offsetAsPageNum", "true");
     p.put("rowBoundsWithCount", "true");
     p.put("pageSizeZero", "true");
     p.put("reasonable", "true");
-    
+
     pageInterceptor.setProperties(p);
     configuration.addInterceptor(pageInterceptor);
-    
+
     return configuration;
-    
-}
-  
+
+  }
+
 }

@@ -15,9 +15,11 @@ import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.DtoType;
 import com.changan.code.config.property.ApiProperties;
 import com.changan.code.controller.ProjectApi;
 import com.changan.code.dto.JavaTypeDTO;
+import com.changan.code.dto.ResultOfComponentsDTO;
 import com.changan.code.dto.ResultOfProjectDTO;
 import com.changan.code.dto.ResultOfTypeDTO;
 import com.changan.code.entity.ProjectPO;
@@ -97,10 +99,19 @@ public class ProjectApiController extends BaseController implements ProjectApi {
 
   @Override
   public ResponseEntity<ResultDTO> projectDataTypeGet(@PathVariable String id) {
+    return new ResponseEntity<ResultDTO>(new ResultOfTypeDTO()
+        .base(new JavaTypeDTO(DtoType.BASE.toString().toLowerCase(), DtoType.BASE.getCname(),
+            apis.getBaseType()))
+        .array(new JavaTypeDTO(DtoType.ARRAY.toString().toLowerCase(), DtoType.ARRAY.getCname(),
+            apis.getArrayType()))
+        .refobj(projectService.getProjectDTOandPO(id)).message("成功")
+        .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
+
+  @Override
+  public ResponseEntity<ResultDTO> projectsComponentsDefaultGet() {
     return new ResponseEntity<ResultDTO>(
-        new ResultOfTypeDTO().base(new JavaTypeDTO("base", "基本类型", apis.getBaseType()))
-            .array(new JavaTypeDTO("array", "集合类型", apis.getArrayType()))
-            .refobj(projectService.getProjectDTOandPO(id)).message("成功")
+        new ResultOfComponentsDTO().categories(projectService.getComponents()).message("成功")
             .statusCode(Constants.SUCCESS_API_CODE),
         HttpStatus.OK);
   }

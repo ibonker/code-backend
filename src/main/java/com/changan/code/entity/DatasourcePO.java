@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.changan.code.common.Constants;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.google.common.base.CaseFormat;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Data;
@@ -112,5 +113,13 @@ public class DatasourcePO extends BaseEntity {
   @JsonProperty(value = "packageName", required = false)
   @JsonPropertyDescription("数据库名称对应包名")
   private String packageName;
+  
+  /**
+   * 用于class名前缀
+   * @return
+   */
+  public String getUpperCamelPackageName() {
+    return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, this.name);
+  }
 
 }

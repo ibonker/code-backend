@@ -5,28 +5,41 @@ import java.util.List;
 import com.changan.code.entity.ApiParamPO;
 
 public interface IApiParamService {
-	
-	/**
-	 * 更新Api方法参数
-	 * @param apiParam
-	 */
-	public void updateApiParam(ApiParamPO apiParam);
-	
-	/**
-	 * 新增Api方法参数
-	 * @param apiParam
-	 */
-	public void saveApiParam(ApiParamPO apiParam);
-	
-	/**
-	 * 删除Api方法参数
-	 * @param id
-	 */
-	public void deleteApiParam(String id);
-	
-	/**
-	 * 查询所有Api参数
-	 * @return
-	 */
-	public List<ApiParamPO> findAllApiParam(String apiObjId);
+
+
+  /**
+   * 保存Api方法参数
+   * 
+   * @param apiParam
+   */
+  public void saveApiParam(List<ApiParamPO> apiParams, String apiObjId);
+
+  /**
+   * 查询所有Api参数
+   * 
+   * @return
+   */
+  public List<ApiParamPO> findAllApiParam(String apiObjId);
+
+  /**
+   * 根据id执行删除
+   * 
+   * @param apiObjId
+   */
+  public void deleteApiParamById(String id);
+
+  /**
+   * 批量删除ApiParam
+   * 
+   * @param apiObjId
+   */
+  public void deleteAllParam(String apiObjId);
+  
+  /**
+   * 根据apiObjId删除数据
+   * 
+   * @param apiObjId
+   * @return
+   */
+  public void deleteByApiObjId(String apiObjId);
 }

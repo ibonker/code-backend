@@ -2,9 +2,11 @@ package com.changan.code.controller.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
@@ -24,13 +26,14 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 	/**
 	 * 注入apiObjService
 	 */
+    @Autowired
 	IApiObjService apiObjService;
 
 	/**
 	 * 保存apiObj
 	 */
 	@Override
-	public ResponseEntity<ResultDTO> ApiObjSave(@RequestBody ApiObjPO apiObj) {
+	public ResponseEntity<ResultDTO> ApiObjSavePost(@RequestBody ApiObjPO apiObj) {
 		// 判断apiObj是否存在
 		if (apiObj.isNew()) {
 			// 保存apiObj
@@ -39,7 +42,8 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 			// 更新apiObj
 			apiObjService.updateApiObj(apiObj);
 		}
-		return new ResponseEntity<ResultDTO>(new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE),
+		return new ResponseEntity<ResultDTO>(
+				new ResultOfApiObjDTO().apiObj(apiObj).message("成功").statusCode(Constants.SUCCESS_API_CODE),
 				HttpStatus.OK);
 	}
 
@@ -47,10 +51,10 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 	 * 查询指定Api所有的apiObj
 	 */
 	@Override
-	public ResponseEntity<ResultDTO> ApiObjAllShowGet(String id) {
+	public ResponseEntity<ResultDTO> ApiObjAllShowPost(@PathVariable String apiBaseId) {
 		// 查询指定Api所有的apiObj
-		List<ApiObjPO> apiObjs = apiObjService.findAllApiObj(id);
-		//返回成功信息
+		List<ApiObjPO> apiObjs = apiObjService.findAllApiObj(apiBaseId);
+		// 返回成功信息
 		return new ResponseEntity<ResultDTO>(
 				new ResultOfApiObjDTO().apiObjs(apiObjs).message("成功").statusCode(Constants.SUCCESS_API_CODE),
 				HttpStatus.OK);
@@ -60,12 +64,23 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 	 * 根据id查询apiObj
 	 */
 	@Override
-	public ResponseEntity<ResultDTO> ApiObjFindOneGet(String id) {
+	public ResponseEntity<ResultDTO> ApiObjFindOnePost(@PathVariable String id) {
 		// 根据id查询apiObj
 		ApiObjPO apiObj = apiObjService.findOneApiObj(id);
-		//返回成功信息
+		// 返回成功信息
 		return new ResponseEntity<ResultDTO>(
 				new ResultOfApiObjDTO().apiObj(apiObj).message("成功").statusCode(Constants.SUCCESS_API_CODE),
+				HttpStatus.OK);
+	}
+
+	/**
+	 * 根据id删除apiObj
+	 */
+	@Override
+	public ResponseEntity<ResultDTO> ApiObjdeletePost(@PathVariable String id) {
+		// 执行删除
+		apiObjService.deleteApiObj(id);
+		return new ResponseEntity<ResultDTO>(new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE),
 				HttpStatus.OK);
 	}
 

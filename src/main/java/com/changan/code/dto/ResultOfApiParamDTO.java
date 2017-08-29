@@ -15,16 +15,16 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ResultOfApiParamDTO extends ResultDTO{
+public class ResultOfApiParamDTO extends ResultDTO {
 
-	//返回编码
-	 @JsonProperty("apiParams")
-	 @JsonPropertyDescription("全部参数")
-	 @ApiModelProperty(value = "全部参数")
-	 private List<ApiParamPO> apiParams;
-	 
-	 public ResultOfApiParamDTO apiParams(List<ApiParamPO> apiParams) {
-	   this.apiParams = apiParams;
-	   return this;
-	 }
+  // 返回编码
+  @JsonProperty("apiParams")
+  @JsonPropertyDescription("全部参数")
+  @ApiModelProperty(value = "全部参数")
+  private List<ApiParamPO> apiParams;
+
+  public ResultOfApiParamDTO apiParams(List<ApiParamPO> apiParams) {
+    this.apiParams = apiParams;
+    return this;
+  }
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>application</name>
+  <filePath>src/main/java/${packageName}/${moduleName}</filePath>
+  <fileName>Application.java</fileName>
+  <content><![CDATA[
+package ${packageName}<#if moduleName != "">.${moduleName}</#if>;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/** 
+ * Application 
+ *
+ * @author TitanCode2
+ * @version  
+ * @since JDK 1.8 
+ */
+@SpringBootApplication
+@ServletComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>.config"})
+public class Application {
+  
+   /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    SpringApplication app = new SpringApplication(Application.class);
+
+    app.run(args);
+  }
+
+  @Bean
+  public ObjectMapper objectMapper() {
+    return new ObjectMapper();
+  }
+
+}
+]]>
+  </content>
+</template>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+    <name>applicationYaml</name>
+    <filePath>src/main/resources/config</filePath>
+    <fileName>application.yml</fileName>
+    <content><![CDATA[
+info:
+  app_name: TITAN::${projectName}
+  app_version: 0.1-SNAPSHOT
+  
+server:
+  tomcat:
+    remote_ip_header: x-forwarded-for
+    protocol_header: x-forwarded-proto
+    baseDir: ''
+    backgroundProcessorDelay: 1
+    accessLogEnabled: true
+    accessLogPattern: '%h %l %u %t "%r" %s %b %{Host}i %{Location}o'
+  port: 8080
+  session:
+    timeout: 1000000
+    
+spring:
+  profiles:
+    active: local
+  datasource:
+    <#list datasourcelist as datasource>
+    druid:
+      ${datasource.name}:
+        driverClassName: ${datasource.dbdriver}
+        url: ${datasource.dburl}
+        username: ${datasource.dbuser}
+        password: ${datasource.dbpassword}
+        filters: stat
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    </#list>
+
+logging:
+  file: logs/application_log
+  level:
+    ROOT: INFO
+    org.springframework.boot: INFO
+    org.springframework.web: INFO
+    com.changan.anywhere: DEBUG]]>
+    </content>
+</template>

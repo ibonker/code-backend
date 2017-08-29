@@ -3,6 +3,8 @@
  */
 package com.changan.code.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -21,47 +23,49 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "api_base")
 @Entity
 @EntityListeners(value = {AuditingEntityListener.class})
 public class ApiBasePO extends BaseEntity {
+
   /**
    * 
    */
   private static final long serialVersionUID = 5086146945294192788L;
-	
+
   @Column(name = "project_id")
   @JsonProperty("projectId")
   private String projectId; // 項目id
-  
+
   @Column(name = "version_name")
   @JsonProperty("versionName")
   private String versionName; // 版本
-  
+
   @Column(name = "base_path")
   @JsonProperty("base_path")
   private String basePath; // 根路徑
-  
+
   @Column(name = "description")
   @JsonProperty("description")
   private String description; // 描述
-  
+
   @Transient
-  private  ApiObjPO apiObjPO; //api方法
+  private List<ApiObjPO> apiObjs; // api方法
 
   /**
    * 更新属性
+   * 
    * @param apiBasePO
    * @return
    */
-  public ApiBasePO updateAttrs(ApiBasePO apiBase){
-	  
-	  this.projectId = apiBase.getProjectId();
-	  this.versionName = apiBase.getVersionName();
-	  this.basePath = apiBase.getBasePath();
-	  this.description = apiBase.getDescription();
-	  
-	  return this;
+  public ApiBasePO updateAttrs(ApiBasePO apiBase) {
+
+    this.projectId = apiBase.getProjectId();
+    this.versionName = apiBase.getVersionName();
+    this.basePath = apiBase.getBasePath();
+    this.description = apiBase.getDescription();
+
+    return this;
   }
 }

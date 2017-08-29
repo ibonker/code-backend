@@ -26,6 +26,7 @@ import com.changan.anywhere.common.datasource.annotation.ChangeDatasource;
 import com.changan.anywhere.common.mvc.page.rest.request.Filter;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.DtoType;
 import com.changan.code.common.PredictUtils;
 import com.changan.code.dao.DatabaseDao;
 import com.changan.code.dto.RequestOfTableIdsDTO;
@@ -35,7 +36,9 @@ import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
+import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.TableRepository;
 import com.changan.code.service.IApiBaseService;
 import com.changan.code.service.IApiObjService;
@@ -201,7 +204,7 @@ public class TableServiceImpl implements ITableService {
     List<Object[]> results = tableRepository.findClassNameByDatasourceId(datasourceId);
     List<SimpleDataObj> dataobjs = Lists.newArrayList();
     for (Object[] data : results) {
-      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1]);
+      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE);
       dataobjs.add(dataobj);
     }
     return dataobjs;
@@ -239,30 +242,70 @@ public class TableServiceImpl implements ITableService {
     }
     // 更新状态字段-active
     for (TablePO table : tables) {
+      // 判断是否已激活
+      if (Constants.IS_ACTIVE.equals(table.getIsAutoCrud())) {
+        throw new CodeCommonException(table.getName().concat("自动生成crud设置已被激活"));
+      }
       table.setIsAutoCrud(Constants.IS_ACTIVE);
-      String className = datasource.getPackageName().concat(table.getClassName());
+      String className = datasource.getPackageName().concat(".").concat(table.getClassName());
       // 保存transfer obj
-      TransferObjPO showdto = transobjService.createAutoCrudDTO(table.getName(),
+      TransferObjPO showdto = transobjService.createAutoCrudDTO(project.getId(), table.getId(), table.getName(),
           datasource.getPackageName(), className);
       // 保存api obj
-      apiobjService.createAutoCrudApi(firstApibase.getId(), table.getName(),
+      apiobjService.createAutoCrudApi(firstApibase.getId(), table.getId(), table.getName().toLowerCase(),
           showdto.getPackageName().concat(".").concat(showdto.getName()), className,
-          datasource.getPackageName(), datasource.getName(), dbcount);
+          datasource.getPackageName().toLowerCase(), datasource.getName().toLowerCase(), dbcount);
     }
     // 保存tables
     tableRepository.save(tables);
   }
 
   @Override
+  @Transactional("jpaTransactionManager")
   public void inactiveIsAutoCrud(RequestOfTableIdsDTO tableIds) {
     // 获取table
     List<TablePO> tables = tableRepository.findByIdIn(tableIds.getIds());
-    // 更新状态字段-active
+    // 更新状态字段-inactive
     for (TablePO table : tables) {
-      table.setIsAutoCrud(Constants.IS_ACTIVE);
+      // 判断是否未激活
+      if (Constants.IS_INACTIVE.equals(table.getIsAutoCrud())) {
+        throw new CodeCommonException(table.getName().concat("自动生成crud设置为未激活"));
+      }
+      table.setIsAutoCrud(Constants.IS_INACTIVE);
+      // 删除api
+      apiobjService.deleteAutoCrudApi(table.getId());
+      // 删除transobj
+      transobjService.deleteAutoCrudDTO(table.getId());
     }
-    // 删除api
     // 保存tables
+    tableRepository.save(tables);
+  }
+
+  @Override
+  public TransferObjPO transColumnPOToTransPO(String tableId) {
+    // 获取表信息
+    TablePO table = tableRepository.findOne(tableId);
+    // 获取字段信息
+    List<ColumnPO> columns = this.findMergedColumns(tableId);
+    // 创建临时实体
+    TransferObjPO transobj = new TransferObjPO();
+    transobj.setName(table.getClassName());
+    transobj.setComments(table.getComments());
+    // 创建临时实体属性列表
+    List<TransferObjFieldPO> transfields = Lists.newArrayList();
+    for (ColumnPO column : columns) {
+      // 创建临时实体属性
+      TransferObjFieldPO transfield = new TransferObjFieldPO();
+      // 设置属性
+      transfield.setName(column.getJavaField());
+      transfield.setDescription(column.getComments());
+      transfield.setType(DtoType.BASE.toString().toLowerCase());
+      transfield.setFormat(column.getJavaType());
+      transfields.add(transfield);
+    }
+    // 设置属性列表
+    transobj.setTransferObjField(transfields);
+    return transobj;
   }
 
 }

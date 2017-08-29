@@ -44,6 +44,8 @@ public class Constants {
   public final static String API_BASE_DEFAULT_DESCRIPTION = "由代码生成器自动生成";
   // DTO实体类默认包名
   public final static String TRANS_OBJ_DEFAULT_PACKAGE = "other";
+  // Api默认包名
+  public final static String API_DEFAULT_PREFIX = "";
   // api默认生成类型
   public final static String API_PRODUCES = "application/json";
   // api默认消费类型
