@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>generatorConfig</name>
+  <filePath>${projectName}</filePath>
+  <fileName>${dataSource.name}_generatorConfig.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+<!-- 数据库驱动-->
+	<classPathEntry location = "<#if dataSource.dbtype == "oracle">ojdbc14-10.2.0.jar</#if><#if dataSource.dbtype == "mysql">mysql-connector-java-5.1.43.jar</#if>" />
+	<context id = "DB2Tables" targetRuntime = "MyBatis3">
+		<commentGenerator>
+			<property name="suppressDate" value="true"/>
+			<!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+			<property name="suppressAllComments" value="true"/>
+		</commentGenerator>
+		<!--数据库链接URL，用户名、密码 -->
+		<jdbcConnection driverClass = "${dataSource.dbdriver}"
+		connectionURL = "${dataSource.dburl}"
+		userId = "${dataSource.dbuser}"
+		password = "${dataSource.dbpassword}"/>
+		<javaTypeResolver>
+			<property name = "forceBigDecimals" value = "false" />
+		</javaTypeResolver>
+		<!-- 生成模型的包名和位置-->
+		<javaModelGenerator targetPackage="${packageName}.entity.${dataSource.packageName}" targetProject="${projectPath}${projectName}/src/main/java">
+			<property name="enableSubPackages" value="false"/>
+			<property name="trimStrings" value="true"/>
+		</javaModelGenerator>
+		<!-- 生成映射文件的包名和位置-->
+		<sqlMapGenerator targetPackage="mappings.${dataSource.packageName}" targetProject="${projectPath}${projectName}/src/main/resources">
+			<property name="enableSubPackages" value="false"/>
+		</sqlMapGenerator>
+		<!-- 生成DAO的包名和位置，其中type有两种形式：XMLMAPPER表示生成xml映射文件；ANNOTATEDMAPPER，表示不生成xml，生成的dao采用注解来写sql-->
+		<javaClientGenerator type="XMLMAPPER" targetPackage="${packageName}.dao.${dataSource.packageName}" 
+		targetProject="${projectPath}${projectName}/src/main/java">
+			<property name="enableSubPackages" value="false"/>
+		</javaClientGenerator>
+		<!-- 要生成哪些表-->
+		<#list tables as t>
+		<table schema="${dataSource.dbuser ?upper_case}" tableName="${t.name}" domainObjectName="${t.className}" 
+		enableDeleteByExample="false" enableCountByExample="false" 
+		enableUpdateByExample="false"></table>
+		</#list>
+	</context>
+</generatorConfiguration>
+   ]]>
+  </content>
+</template>

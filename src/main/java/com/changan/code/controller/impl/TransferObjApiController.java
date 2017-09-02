@@ -34,7 +34,7 @@ public class TransferObjApiController implements TransferObjApi {
    * 查询DTO
    */
   @Override
-  public ResponseEntity<ResultDTO> transferObjShowPost(@PathVariable String id) {
+  public ResponseEntity<ResultDTO> transferObjShowGet(@PathVariable String id) {
     // 通过id查询，获取TransferObj对象
     TransferObjPO transferObj = transferObjService.findTransferObjById(id);
     return new ResponseEntity<ResultDTO>(new ResultOfTransferObjDTO().transferObj(transferObj)
@@ -63,7 +63,7 @@ public class TransferObjApiController implements TransferObjApi {
    * 删除DTO
    */
   @Override
-  public ResponseEntity<ResultDTO> transferObjDeletePost(@PathVariable String id) {
+  public ResponseEntity<ResultDTO> transferObjDelete(@PathVariable String id) {
     // 执行逻辑删除
     transferObjService.deleteTransferObj(id);
     return new ResponseEntity<ResultDTO>(

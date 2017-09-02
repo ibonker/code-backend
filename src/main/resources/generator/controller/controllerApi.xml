@@ -2,7 +2,7 @@
 <template>
   <name>controllerApi</name>
   <filePath>src/main/java/${packageName}/${moduleName}/controller/${versionName}</filePath>
-  <fileName>MvcConfiguration.java</fileName>
+  <fileName>${controllerName}Api.java</fileName>
   <content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.${versionName};
 
@@ -12,14 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
-import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
-import com.changan.code.dto.ResultOfComponentsDTO;
-import com.changan.code.dto.ResultOfProjectDTO;
-import com.changan.code.dto.ResultOfTypeDTO;
-import com.changan.code.entity.ProjectPO;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+<#list importIFPackageList as package>
+import ${package};
+</#list>
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,36 +28,24 @@ import io.swagger.annotations.ApiResponses;
  * @version  
  * @since JDK 1.8 
  */
-@Configuration
-public class ${prefixName}${uriFirstName}Api {
-
-  private static final Logger log = LoggerFactory.getLogger(MvcConfiguration.class);
+@Api(value = "${controllerName}", description = "the ${controllerName} API")
+@RequestMapping(value = "${basePath}")
+public interface ${controllerName}Api {
   
-  private MessageSource messageSource;
+  <#list apiObjList as apiObj>
+  /**
+   * ${apiObj.summary}
+   */
+  @ApiOperation(value = "${apiObj.summary}", notes = "${apiObj.description}", response = ${apiObj.responseObjNameNoPack}.class,
+      tags = {"${apiObj.tag}"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ${apiObj.responseObjNameNoPack}.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ${apiObj.responseObjNameNoPack}.class)})
+  @RequestMapping(value = "/${apiObj.uri}", produces = {"${apiObj.produces}"},
+      method = RequestMethod.${apiObj.requestMethod})
+  ResponseEntity<ResultDTO> ${apiObj.name}(<#list apiObj.apiParam as apiParam>@ApiParam(value = "${apiParam.name}", required = <#if apiParam.isRequired == "1">true<#else>false</#if>) ${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
+  </#list>
   
-  private Environment environment;
-  
-  @Autowired
-  private SessionFactory sessionFactory;
-  
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
-    this.messageSource = messageSource;
-  }
-
-  @Override
-  public void setEnvironment(Environment environment) {
-    this.environment = environment;
-  }
-  
-  @Override
-  public Validator getValidator() {
-    LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
-    
-    factory.setProviderClass(HibernateValidator.class);
-    factory.setValidationMessageSource(this.messageSource);
-    return factory;
-  }
 }
 ]]>
   </content>

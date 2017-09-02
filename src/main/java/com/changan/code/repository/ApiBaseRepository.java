@@ -47,4 +47,15 @@ public interface ApiBaseRepository
    */
   public ApiBasePO findFirstByProjectIdAndDelFlagOrderByCreatedAtDesc(String projectId,
       String delFlag);
+
+  /**
+   * 根据versionName、projectId查询Api
+   * 
+   * @param versionName
+   * @param projectId
+   * @param delFlag
+   * @return
+   */
+  public List<ApiBasePO> findByVersionNameAndProjectIdAndDelFlag(String versionName,
+      String projectId, String delFlag);
 }

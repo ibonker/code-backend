@@ -32,7 +32,7 @@ public interface TransferObjRespository
    * @param datasourceId
    * @return
    */
-  @Query("SELECT t.id as id, t.name as name, t.packageName as packageName FROM TransferObjPO t WHERE t.projectId = ?1")
+  @Query("SELECT t.id as id, t.name as name, t.packageName as packageName FROM TransferObjPO t WHERE t.projectId = ?1 and t.delFlag = '0'")
   List<Object[]> findClassNameByProjectId(String projectId);
 
   /**
@@ -67,4 +67,15 @@ public interface TransferObjRespository
    * @return
    */
   Long deleteByGenBasedTableId(String genBasedTableId);
+
+  /**
+   * 根据name、projectId查询实体
+   * 
+   * @param name
+   * @param ProjectId
+   * @param DelFlag
+   * @return
+   */
+  public List<TransferObjPO> findByNameAndProjectIdAndDelFlag(String name, String ProjectId,
+      String DelFlag);
 }

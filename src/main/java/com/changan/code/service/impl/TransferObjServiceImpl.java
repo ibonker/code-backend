@@ -41,13 +41,13 @@ public class TransferObjServiceImpl implements ITransferObjService {
    */
   @Autowired
   private TransferObjFieldRespository transferObjFieldRePo;
-  
+
   /**
    * 注入DTO属性接口
    */
   @Autowired
   private ITransferObjFieldService transferObjFieldService;
-  
+
   /**
    * 更新DTO
    */
@@ -59,13 +59,28 @@ public class TransferObjServiceImpl implements ITransferObjService {
     if (updateTransferObj != null) {
       // 更新属性
       updateTransferObj.updateAttrs(transferObj);
-      // 更新数据库
-      updateTransferObj = this.saveTransferObj(updateTransferObj);
-      return updateTransferObj;
+      // 根据name、projectId查询DTO
+      List<TransferObjPO> transferObjs = transferObjRePo.findByNameAndProjectIdAndDelFlag(
+          updateTransferObj.getName(), updateTransferObj.getProjectId(), Constants.DATA_IS_NORMAL);
+      // 若长度为0则直接更新、若长度为1则判断id是否相同，若不相同则保存失败
+      if (transferObjs.size() == 0) {
+        // 保存更新
+        transferObjRePo.save(updateTransferObj);
+        return updateTransferObj;
+      } else {
+        if (transferObjs.get(0).getId().equals(updateTransferObj.getId())) {
+          // 保存更新
+          transferObjRePo.save(updateTransferObj);
+          return updateTransferObj;
+        } else {
+          throw new CodeCommonException("更新失败！参数名重复！");
+        }
+      }
     } else {
-      throw new CodeCommonException("更新失败！");
+      throw new CodeCommonException("更新失败！数据不存在！");
     }
-}
+  }
+
   /**
    * 保存DTO，相同projectId下 name不能相同
    */
@@ -116,7 +131,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
       throw new CodeCommonException("删除失败！执行删除的数据不存在！");
     }
   }
-  
+
   /**
    * 通过id查询DTO
    */
@@ -127,8 +142,10 @@ public class TransferObjServiceImpl implements ITransferObjService {
     // 获取TransferObjField
     List<TransferObjFieldPO> transferObjField =
         transferObjFieldRePo.findByTransferObjIdAndDelFlag(id, Constants.DATA_IS_NORMAL);
-    // 设置返回对象值
-    transferObj.setTransferObjField(transferObjField);
+    if (transferObj != null) {
+      // 设置返回对象值
+      transferObj.setTransferObjField(transferObjField);
+    }
     // 返回查询到的TransferObj对象
     return transferObj;
   }
@@ -151,7 +168,8 @@ public class TransferObjServiceImpl implements ITransferObjService {
     Map<String, List<SimpleDataObj>> datamaps = Maps.newHashMap();
     for (Object[] data : results) {
       // 生成新对象
-      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE);
+      SimpleDataObj dataobj =
+          new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE, null);
       // 根据packagename获取list
       List<SimpleDataObj> objLists = datamaps.get((String) data[2]);
       if (null != objLists) {
@@ -172,23 +190,23 @@ public class TransferObjServiceImpl implements ITransferObjService {
   public TransferObjPO createAutoCrudDTO(String projectId, String tableId, String tableName,
       String datasourcePName, String className) {
     // 详情实体
-    TransferObjPO showPO =
-        this.genTransferObjPO(projectId, tableId, tableName, "", datasourcePName, tableName.concat("详情实体"));
+    TransferObjPO showPO = this.genTransferObjPO(projectId, tableId, tableName, "", datasourcePName,
+        tableName.concat("详情实体"));
     // 保存详情实体
     showPO = transferObjRePo.save(showPO);
     // 实体属性
     TransferObjFieldPO showPOField = this.genTransferObjFieldPO(showPO.getId(), tableName, "",
-        DtoType.ARRAY, className, tableName.concat("对象"));
+        DtoType.PO, className, tableName.concat("对象"));
     transferObjFieldRePo.save(showPOField);
-    // 列表实体
-    TransferObjPO listPO =
-        this.genTransferObjPO(projectId, tableId, tableName, "s", datasourcePName, tableName.concat("列表实体"));
-    // 保存列表实体
-    listPO = transferObjRePo.save(listPO);
-    // 实体属性
-    TransferObjFieldPO listPOField = this.genTransferObjFieldPO(listPO.getId(), tableName, "s",
-        DtoType.REFOBJ, className, tableName.concat("对象列表"));
-    transferObjFieldRePo.save(listPOField);
+    // 列表实体暂时不需要
+//    TransferObjPO listPO = this.genTransferObjPO(projectId, tableId, tableName, "s",
+//        datasourcePName, tableName.concat("列表实体"));
+//    // 保存列表实体
+//    listPO = transferObjRePo.save(listPO);
+//    // 实体属性
+//    TransferObjFieldPO listPOField = this.genTransferObjFieldPO(listPO.getId(), tableName, "s",
+//        DtoType.ARRAY, className, tableName.concat("对象列表"));
+//    transferObjFieldRePo.save(listPOField);
     return showPO;
   }
 

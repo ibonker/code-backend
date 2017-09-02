@@ -33,17 +33,19 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 	 * 保存apiObj
 	 */
 	@Override
-	public ResponseEntity<ResultDTO> ApiObjSavePost(@RequestBody ApiObjPO apiObj) {
+	public ResponseEntity<ResultDTO> apiObjSavePost(@RequestBody ApiObjPO apiObj) {
+	  //定义返回值对象
+	  ApiObjPO newApiObj = new ApiObjPO();
 		// 判断apiObj是否存在
 		if (apiObj.isNew()) {
 			// 保存apiObj
-			apiObjService.saveApiObj(apiObj);
+		  newApiObj = apiObjService.saveApiObj(apiObj);
 		} else {
 			// 更新apiObj
-			apiObjService.updateApiObj(apiObj);
+		  newApiObj = apiObjService.updateApiObj(apiObj);
 		}
 		return new ResponseEntity<ResultDTO>(
-				new ResultOfApiObjDTO().apiObj(apiObj).message("成功").statusCode(Constants.SUCCESS_API_CODE),
+				new ResultOfApiObjDTO().apiObj(newApiObj).message("成功").statusCode(Constants.SUCCESS_API_CODE),
 				HttpStatus.OK);
 	}
 
@@ -51,7 +53,7 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 	 * 查询指定Api所有的apiObj
 	 */
 	@Override
-	public ResponseEntity<ResultDTO> ApiObjAllShowPost(@PathVariable String apiBaseId) {
+	public ResponseEntity<ResultDTO> apiObjAllShowGet(@PathVariable String apiBaseId) {
 		// 查询指定Api所有的apiObj
 		List<ApiObjPO> apiObjs = apiObjService.findAllApiObj(apiBaseId);
 		// 返回成功信息
@@ -64,7 +66,7 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 	 * 根据id查询apiObj
 	 */
 	@Override
-	public ResponseEntity<ResultDTO> ApiObjFindOnePost(@PathVariable String id) {
+	public ResponseEntity<ResultDTO> apiObjFindOneGet(@PathVariable String id) {
 		// 根据id查询apiObj
 		ApiObjPO apiObj = apiObjService.findOneApiObj(id);
 		// 返回成功信息
@@ -77,7 +79,7 @@ public class ApiObjApiController implements com.changan.code.controller.ApiObjAp
 	 * 根据id删除apiObj
 	 */
 	@Override
-	public ResponseEntity<ResultDTO> ApiObjdeletePost(@PathVariable String id) {
+	public ResponseEntity<ResultDTO> apiObjDelete(@PathVariable String id) {
 		// 执行删除
 		apiObjService.deleteApiObj(id);
 		return new ResponseEntity<ResultDTO>(new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE),

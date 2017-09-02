@@ -13,6 +13,7 @@ import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.dto.ResultOfApiParamDTO;
 import com.changan.code.entity.ApiParamPO;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -23,6 +24,8 @@ import io.swagger.annotations.ApiResponses;
  * @author xuyufeng
  *
  */
+@Api(value = "apiParam", description = "the apiParam API")
+@RequestMapping(value = "/codegen/api/v1")
 public interface ApiParamApi {
 
 
@@ -31,19 +34,19 @@ public interface ApiParamApi {
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfApiParamDTO.class),
           @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfApiParamDTO.class)})
-  @RequestMapping(value = "/ApiParam/Save", produces = {"application/json"},
+  @RequestMapping(value = "/apiparam/save", produces = {"application/json"},
       method = RequestMethod.POST)
-  ResponseEntity<ResultDTO> ApiObjSavePost(
+  ResponseEntity<ResultDTO> apiObjSavePost(
       @ApiParam(value = "参数列表") @RequestBody List<ApiParamPO> apiParams,
-      @ApiParam(value = "方法id") @RequestParam String apiObjId);
+      @ApiParam(value = "apiObjId") @RequestParam String ApiObjId);
 
   @ApiOperation(value = "查询指定apiObj所有的apiParam", notes = "查询指定apiObj所有的apiParam",
       response = ResultOfApiParamDTO.class, tags = {"ApiParam"})
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfApiParamDTO.class),
           @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfApiParamDTO.class)})
-  @RequestMapping(value = "/ApiParams/{apiObjId}/Show", produces = {"application/json"},
-      method = RequestMethod.POST)
-  ResponseEntity<ResultDTO> ApiObjAllShowPost(
+  @RequestMapping(value = "/apiparams/{apiObjId}/show", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> apiObjAllShowGet(
       @ApiParam(value = "apiObjId") @PathVariable(value = "apiObjId", required = true) String apiObjId);
 }

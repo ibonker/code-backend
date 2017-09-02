@@ -30,7 +30,7 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
    * 通过id查询DTO属性
    */
   @Override
-  public ResponseEntity<ResultDTO> transferObjFieldShowPost(@RequestParam String id) {
+  public ResponseEntity<ResultDTO> transferObjFieldShowGet(@RequestParam String id) {
     // 获得查询到的DTO属性对象
     TransferObjFieldPO transferObjField = transferObjFieldService.findTransferObjFieldById(id);
     // 返回成功信息
@@ -43,7 +43,7 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
    * 删除DTO属性
    */
   @Override
-  public ResponseEntity<ResultDTO> transferObjFieldDeletePost(@PathVariable String id) {
+  public ResponseEntity<ResultDTO> transferObjFieldDelete(@PathVariable String id) {
     // 执行逻辑删除
     transferObjFieldService.deleteTransferObjField(id);
     // 返回成功信息
@@ -76,7 +76,7 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
    * 查询所有DTO属性
    */
   @Override
-  public ResponseEntity<ResultDTO> transferObjFieldAllShowPost(@PathVariable String transferObjId) {
+  public ResponseEntity<ResultDTO> transferObjFieldAllShowGet(@PathVariable String transferObjId) {
     // 获取查询结果
     List<TransferObjFieldPO> transferObjFields = transferObjFieldService.findAllTransferObjField(transferObjId);
     // 返回成功信息

@@ -30,8 +30,7 @@ public class ApiParamApiController implements ApiParamApi {
    * 保存ApiParam
    */
   @Override
-  public ResponseEntity<ResultDTO> ApiObjSavePost(@RequestBody List<ApiParamPO> apiParams,
-      @RequestParam String apiObjId) {
+  public ResponseEntity<ResultDTO> apiObjSavePost(@RequestBody List<ApiParamPO> apiParams, @RequestParam String apiObjId) {
     // 执行保存
     apiParamService.saveApiParam(apiParams, apiObjId);
     // 返回成功信息
@@ -43,12 +42,11 @@ public class ApiParamApiController implements ApiParamApi {
    * 查询指定ApiObj的ApiParam
    */
   @Override
-  public ResponseEntity<ResultDTO> ApiObjAllShowPost(@PathVariable String apiObjId) {
+  public ResponseEntity<ResultDTO> apiObjAllShowGet(@PathVariable String apiObjId) {
     // 查询指定ApiObj的ApiParam
     List<ApiParamPO> apiParams = apiParamService.findAllApiParam(apiObjId);
     // 返回成功信息
     return new ResponseEntity<ResultDTO>(new ResultOfApiParamDTO().apiParams(apiParams)
         .message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
-
 }

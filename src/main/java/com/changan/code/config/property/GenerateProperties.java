@@ -21,4 +21,6 @@ public class GenerateProperties {
   
   private String projectZipPath;
   
+  private String mybatisGenlibsPath;
+  
 }

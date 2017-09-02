@@ -3,6 +3,9 @@
  */
 package com.changan.code.controller;
 
+import java.io.FileNotFoundException;
+
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +16,7 @@ import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.dto.ResultOfComponentsDTO;
+import com.changan.code.dto.ResultOfMsgDataDTO;
 import com.changan.code.dto.ResultOfProjectDTO;
 import com.changan.code.dto.ResultOfTypeDTO;
 import com.changan.code.entity.ProjectPO;
@@ -39,7 +43,7 @@ public interface ProjectApi {
           @ApiResponse(code = 200, message = "返回错误信息", response = JsonSchema.class)})
   @RequestMapping(value = "/projects", produces = {"application/schema+json"},
       method = RequestMethod.GET)
-  ResponseEntity<JsonSchema> projectsSchemaGet();
+  ResponseEntity<ResultDTO> projectsSchemaGet();
 
   @ApiOperation(value = "分页获取项目列表", notes = "分页获取项目列表", response = ResultPageDTO.class,
       tags = {"Project"})
@@ -86,14 +90,35 @@ public interface ProjectApi {
       method = RequestMethod.GET)
   ResponseEntity<ResultDTO> projectDataTypeGet(
       @ApiParam(value = "id", required = true) @PathVariable String id);
-  
+
   @ApiOperation(value = "项目组件列表", notes = "项目组件列表", response = ResultOfComponentsDTO.class,
       tags = {"Project"})
-  @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfComponentsDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfComponentsDTO.class)})
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfComponentsDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfComponentsDTO.class)})
   @RequestMapping(value = "/projects/components/default", produces = {"application/json"},
       method = RequestMethod.GET)
   ResponseEntity<ResultDTO> projectsComponentsDefaultGet();
+
+  @ApiOperation(value = "生成项目代码", notes = "生成项目代码", response = ResultOfMsgDataDTO.class,
+      tags = {"Project"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfMsgDataDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfMsgDataDTO.class)})
+  @RequestMapping(value = "/projects/{id}/generate/code", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> projectsGenerateCodeGet(
+      @ApiParam(value = "id", required = true) @PathVariable String id);
+
+  @ApiOperation(value = "下载项目代码", notes = "下载项目代码", response = InputStreamResource.class,
+      tags = {"Project"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = InputStreamResource.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = InputStreamResource.class)})
+  @RequestMapping(value = "/projects/{projectName}/download",
+      produces = {"application/octet-stream"}, method = RequestMethod.GET)
+  ResponseEntity<InputStreamResource> projectsDownloadGet(
+      @ApiParam(value = "projectName", required = true) @PathVariable String projectName)
+      throws FileNotFoundException;
 
 }

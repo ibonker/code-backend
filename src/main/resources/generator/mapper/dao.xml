@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dao</name>
+	<filePath>src/main/java/${packageName}/dao</filePath>
+	<fileName>${className}Dao.java</fileName>
+	<content><![CDATA[
+	package ${packageName}.dao;
+	
+	import java.util.List;
+	import java.util.Map;
+
+	import org.apache.ibatis.annotations.Mapper;
+	import packageName.entity.${className}PO;
+	import packageName.dto.${className}DTO;
+	
+	
+	/**
+	 * ${className}DAO接口
+	 */
+	@Mapper
+	public interface ${className}Dao {
+   
+   /**
+	 * 获取单条数据
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public ${className}PO get(String id);
+
+  /**
+   * 插入数据
+   * 
+   * @param entity
+   * @return
+   */
+  public int insert(${className}PO entity);
+
+  /**
+   * 更新数据
+   * 
+   * @param entity
+   * @return
+   */
+  public int update(${className}PO entity);
+  
+  /**
+   * 删除数据（物理删除，将该数据记录从数据库中删除）
+   * 
+   * @param id
+   * @return
+   */
+  public int delete(String id);
+	
+  /**
+   * @Description datatable 分页查询
+   * 
+   * @param params
+   * @return
+   */
+  public List<${className}PO> queryPage(${className}DTO ${lowerName});
+  
+}
+	]]>
+	</content>
+</template>

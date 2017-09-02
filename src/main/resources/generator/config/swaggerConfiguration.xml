@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>swaggerConfiguration</name>
+  <filePath>src/main/java/${packageName}/${moduleName}/config</filePath>
+  <fileName>SwaggerConfiguration.java</fileName>
+  <content><![CDATA[
+package ${packageName}<#if moduleName != "">.${moduleName}</#if>.config;
+
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+/** 
+ * SwaggerConfiguration 
+ *
+ * @author TitanCode2
+ * @version  
+ * @since JDK 1.8 
+ */
+@Configuration
+@EnableSwagger2
+public class SwaggerConfiguration {
+
+  ApiInfo apiInfo() {
+    return new ApiInfoBuilder().title("${projectName} API")
+        .description(
+            "${projectDesc}")
+        .license("").licenseUrl("http://unlicense.org").termsOfServiceUrl("").version("1.0.0")
+        .contact(new Contact("", "", "")).build();
+  }
+
+  @Bean
+  public Docket customImplementation() {
+    return new Docket(DocumentationType.SWAGGER_2).select()
+        .apis(RequestHandlerSelectors.basePackage("${packageName}.controller")).build()
+        .apiInfo(apiInfo());
+  }
+
+}
+]]>
+  </content>
+</template>

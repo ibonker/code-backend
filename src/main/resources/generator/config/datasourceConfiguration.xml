@@ -2,21 +2,30 @@
 <template>
   <name>datasourceConfiguration</name>
   <filePath>src/main/java/${packageName}/${moduleName}/config</filePath>
-  <fileName>DatasourceConfiguration.java</fileName>
+  <fileName>${datasource.upperCamelPackageName}DatasourceConfiguration.java</fileName>
   <content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.config;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.session.AutoMappingBehavior;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.LocalCacheScope;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -25,17 +34,7 @@ import org.springframework.transaction.annotation.TransactionManagementConfigure
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
-import com.changan.anywhere.common.persistence.mybatis.annotation.MyBatisDao;
 import com.changan.anywhere.common.persistence.mybatis.entity.BaseEntity;
-import com.changan.anywhere.dal.datasource.DynamicDataSource;
-import com.changan.code.datasource.DynamicLoadDatasource;
-
-import org.apache.ibatis.session.AutoMappingBehavior;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.LocalCacheScope;
-import org.apache.ibatis.type.JdbcType;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInterceptor;
 
@@ -48,68 +47,69 @@ import com.github.pagehelper.PageInterceptor;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = "${packageName}"}, annotationClass = MyBatisDao.class)
-public class ${datasource.upperCamelPackageName}DatasourceConfiguration {
-  
-  private static final Logger log = LoggerFactory.getLogger(${datasource.upperCamelPackageName}DatasourceConfiguration.class);
-  
+@MapperScan(basePackages = {"com.changan.testproj.dao.${datasource.packageName}"},
+    sqlSessionFactoryRef = "<#if dbcount == 1>sqlSessionFactory<#else>${datasource.lowerCamelPackageName}SqlSessionFactory</#if>")
+public class ${datasource.upperCamelPackageName}DatasourceConfiguration implements TransactionManagementConfigurer {
+
   /**
    * 配置数据源
    * 
    * @return
    * @throws Exception
    */
-  @Bean(name = "${datasource.name}DataSource")
-  @ConfigurationProperties("spring.datasource.druid.${datasource.name}")
-  public DataSource dataSource(Environment env) {
+  @Bean(name = "${datasource.lowerCamelPackageName}DataSource")
+  @ConfigurationProperties("spring.datasource.druid.${datasource.packageName}")
+  public DataSource dataSource() {
     DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
-    
-    // set filters default value on StatViewServlet enabled.
-    if (! "false".equals(env.getProperty("spring.datasource.secondary.druid.StatViewServlet.enabled"))) {
-        try {
-            dataSource.setFilters("stat");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+    try {
+      dataSource.setFilters("stat");
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
     return dataSource;
   }
-  
+
+  <#if dbcount gt 1>
   /**
    * 配置数据源连接会话
    * 
    * @return
    * @throws Exception
    */
-  @Bean(name = "${datasource.name}SqlSessionFactory")
+  @Bean(name = "${datasource.lowerCamelPackageName}SqlSessionFactory")
   public SqlSessionFactory sqlSessionFactoryBean() throws Exception {
-    // 打印数据源会话开始的初始化信息
-    log.info("sqlSessionFactory");
     // 新建mybatis
     SqlSessionFactoryBean sessionBean = new SqlSessionFactoryBean();
     // 给mybatis设置数据源
-    sessionBean.setDataSource(dynamicDataSource());
+    sessionBean.setDataSource(dataSource());
     // 配置typeAliasesPackage
-    sessionBean.setTypeAliasesPackage("${packageName}<#if moduleName != "">.${moduleName}</#if>.entity");
+    sessionBean.setTypeAliasesPackage("com.changan.testproj.entity.${datasource.packageName}");
     sessionBean.setTypeAliasesSuperType(BaseEntity.class);
     sessionBean.setConfiguration(mybatisConfig());
     // 配置扫描xml文件所在的路径
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     // 以通配符的方式配置mybatis xml的扫描路径
-    sessionBean.setMapperLocations(resolver.getResources("classpath:/mappings/*.xml"));
+    List<Resource> resources = new ArrayList<Resource>();
+    Resource[] mappersfirst = resolver.getResources("classpath:/mappings/*.xml");
+    Resource[] mapperssec = resolver.getResources("classpath:/mappings/**/*.xml");
+    resources.addAll(Arrays.asList(mappersfirst));
+    resources.addAll(Arrays.asList(mapperssec));
+    sessionBean.setMapperLocations(resources.toArray(new Resource[resources.size()]));
     // 返回数据库连接会话
     return sessionBean.getObject();
 
   }
-  
+
   /**
    * 配置mybatis
    * 
    * @return
    * @throws Exception
    */
-  public Configuration mybatisConfig() {
-    Configuration configuration = new Configuration();
+  public org.apache.ibatis.session.Configuration mybatisConfig() {
+    org.apache.ibatis.session.Configuration configuration =
+        new org.apache.ibatis.session.Configuration();
 
     configuration.setCacheEnabled(true);
     configuration.setLazyLoadingEnabled(true);
@@ -129,7 +129,7 @@ public class ${datasource.upperCamelPackageName}DatasourceConfiguration {
     PageInterceptor pageInterceptor = new PageInterceptor();
 
     Properties p = new Properties();
-    p.put("helperDialect", "${datasource.dbtype}");
+    p.put("helperDialect", "mysql");
     p.put("offsetAsPageNum", "true");
     p.put("rowBoundsWithCount", "true");
     p.put("pageSizeZero", "true");
@@ -141,11 +141,12 @@ public class ${datasource.upperCamelPackageName}DatasourceConfiguration {
     return configuration;
 
   }
-
+  </#if>
+  
   /**
    * 事务管理器接口实现
    */
-  @Bean(name = "${datasource.name}TransactionManager")
+  @Bean(name = "${datasource.lowerCamelPackageName}TransactionManager")
   @Override
   @Order(value = 1)
   public PlatformTransactionManager annotationDrivenTransactionManager() {
@@ -157,6 +158,7 @@ public class ${datasource.upperCamelPackageName}DatasourceConfiguration {
     return transactionManager;
   }
 }
+
 ]]>
   </content>
 </template>

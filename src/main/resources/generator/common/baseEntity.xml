@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>baseEntity</name>
+  <filePath>src/main/java/${packageName}/${moduleName}/common</filePath>
+  <fileName>BaseEntity.java</fileName>
+  <content><![CDATA[
+package ${packageName}.common;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+
+import com.changan.anywhere.common.utils.IdGen;
+import com.changan.anywhere.common.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
+import lombok.Data;  
+
+/**
+ * 持久化实体基类
+ * 
+ * @author TitanCode2
+ *
+ */
+@Data
+@JsonInclude(Include.NON_NULL)
+public class BaseEntity implements Serializable {
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+  @Column(name = "id")
+  @JsonProperty(value = "id")
+  @JsonPropertyDescription("id")
+  private String id;
+
+  @Column(name = "created_at", nullable = false)
+  @JsonPropertyDescription("创建时间")
+  @JsonProperty(value = "createdAt", access = Access.READ_ONLY)
+  @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+  protected LocalDateTime createdAt;
+
+  @Column(name = "updated_at", nullable = false)
+  @JsonPropertyDescription("更新时间")
+  @JsonProperty(value = "updatedAt", access = Access.READ_ONLY)
+  @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+  protected LocalDateTime updatedAt;
+
+  /**
+   * 创建之前执行方法，手动调用 添加id和更新时间/创建时间
+   */
+  public void preInsert() {
+    // 不限制ID为UUID,可以使用其他规则
+    if (this.isNew()) {
+      setId(IdGen.uuid());
+    }
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = this.createdAt;
+  }
+
+  /**
+   * 更新之前执行方法，需要手动调用
+   */
+  public void preUpdate() {
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  /**
+   * 判断是否新增
+   * 
+   * @return
+   */
+  public boolean isNew() {
+    return StringUtils.isEmpty(getId());
+  }
+
+}
+]]>
+  </content>
+</template>

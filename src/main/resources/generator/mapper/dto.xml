@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dto</name>
+	<filePath>src/main/java/${packageName}/dto/${transferObj.packageName}</filePath>
+	<fileName>${transferObj.name}.java</fileName>
+	<content><![CDATA[
+package ${packageName}.dto.${transferObj.packageName};
+
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+<#if (transferObj.inheritObjName)??>
+	<#list BaseDTO as b>
+		<#if b == transferObj.inheritObjName>
+import ${b.getPackageName()};
+		</#if>
+	</#list>
+</#if>
+<#list transferObjFileds as t>
+	<#if t.type == "po" || t.type == "dto" || t.type == "array">
+import ${packageName}.entity.${t.format};
+	</#if>
+</#list>
+<#list imports as i>
+<#if i == "length">
+import org.hibernate.validator.constraints.Length;
+</#if>
+<#if i == "isNullable">
+import javax.validation.constraints.NotNull;
+</#if>
+<#if i == "readOnly">
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+</#if>
+<#if i == "constraintsMax">
+import javax.validation.constraints.Max;
+</#if>
+<#if i == "constraintsMin">
+import javax.validation.constraints.Min;
+</#if>
+<#if i == "pattern">
+import javax.validation.constraints.Pattern;
+</#if>
+</#list>
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+ /**
+  *
+  * <#if (transferObj.comments)??> ${transferObj.comments}</#if>
+  */
+@Data
+@EqualsAndHashCode(callSuper = <#if (transferObj.inheritObjName)??>true<#else>false</#if>)
+@ToString(callSuper = true)
+public class ${transferObj.name} <#if (transferObj.inheritObjName)??>extends ${transferObj.inheritObjName}</#if>{
+
+	<#list transferObjFileds as t>
+	<#if (t.isNullable)?? && t.isNullable == "1">
+  	@NotNull
+  	</#if>
+  	<#if (t.pattern)??>
+  	@Pattern(regexp = "${t.pattern}")
+  	</#if>
+  	<#if t.type == "String" && ((t.min)?? || (t.max)??)>
+  	@Length(<#if (t.max)??>max = ${t.max?replace(",","")}</#if><#if (t.min)??>,min = ${t.min?replace(",","")}</#if>)
+  	<#else>
+  	<#if t.type != "String" && ((t.min)?? || (t.max)??)>
+  	<#if (t.max)??>@max = (${t.max?replace(",","")})</#if><#if (t.min)??>@min = (${t.min?replace(",","")})</#if>
+  	</#if>
+  	</#if>
+	@JsonProperty("${t.name}"<#if (t.readOnly)?? && t.readOnly == "1">, access = Access.READ_ONLY</#if>)
+	@JsonPropertyDescription("${t.description}")				
+	@ApiModelProperty(value = "${t.description}")
+	
+		<#if t.type == "array">
+			<#assign format= t.format?split(".")>
+			<#list format as f>
+				<#if !f_has_next>
+	private List<${f}> ${t.name};
+	
+				</#if>
+			</#list> 
+		</#if>
+		
+		<#if t.type == "base">
+	private ${t.format} ${t.name};
+	
+		</#if>
+		
+		<#if t.type == "po" || t.type == "dto">
+		<#assign format= t.format?split(".")>
+			<#list format as f>
+				<#if !f_has_next>
+	private ${f} ${t.name};
+	
+				</#if>
+			</#list> 
+		</#if>
+	</#list>
+
+	<#list transferObjFileds as t>
+		<#if t.type == "array">
+		<#assign format= t.format?split(".")>
+		<#list format as f>
+			<#if !f_has_next>
+	public ${transferObj.name} ${t.name} (List<${f}> ${t.name}){
+	  this.${t.name} = ${t.name};
+	  return this;
+	}
+			</#if>
+		</#list> 
+		</#if>
+		<#if t.type == "po" || t.type == "dto">
+		<#assign format= t.format?split(".")>
+		<#list format as f>
+			<#if !f_has_next>
+	public ${transferObj.name} ${t.name} (${f} ${t.name}){
+	  this.${t.name} = ${t.name};
+	  return this;
+	}
+			</#if>
+		</#list> 
+		</#if>
+		<#if t.type == "base">
+	public ${transferObj.name} ${t.name} (${t.format} ${t.name}){
+	  this.${t.name} = ${t.name};
+	  return this;
+	}
+		</#if>
+	</#list>
+}
+	  ]]>
+	</content>
+</template>

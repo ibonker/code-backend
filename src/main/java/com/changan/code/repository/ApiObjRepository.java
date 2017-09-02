@@ -34,7 +34,7 @@ public interface ApiObjRepository
    * @return
    */
   public ApiObjPO findByIdAndDelFlag(String id, String delFlag);
-  
+
   /**
    * 根据genBasedTableId获取数据id
    * 
@@ -43,7 +43,7 @@ public interface ApiObjRepository
    */
   @Query("SELECT t.id as id FROM ApiObjPO t WHERE t.genBasedTableId = ?1")
   List<String> findIdByGenBasedTableId(String genBasedTableId);
-  
+
   /**
    * 根据genBasedTableId删除数据
    * 
@@ -51,4 +51,35 @@ public interface ApiObjRepository
    * @return
    */
   Long deleteByGenBasedTableId(String genBasedTableId);
+
+  /**
+   * 通过apiId和uri查询ApiObj
+   * 
+   * @param apiBaseId
+   * @param uri
+   * @return
+   */
+  public ApiObjPO findByApiBaseIdAndUri(String apiBaseId, String uri);
+
+  /**
+   * 根据apiBaseId、genBasedTableId获取表对应的Api
+   * 
+   * @param apiBaseId
+   * @param genBasedTableId
+   * @param delFlag
+   * @return
+   */
+  public List<ApiObjPO> findByApiBaseIdAndGenBasedTableIdAndDelFlag(String apiBaseId,
+      String genBasedTableId, String delFlag);
+
+  /**
+   * 根据uri和apiBaseId查询ApiObj
+   * 
+   * @param uri
+   * @param apiBaseId
+   * @param delFlag
+   * @return
+   */
+  public List<ApiObjPO> findByUriAndApiBaseIdAndDelFlag(String uri, String apiBaseId,
+      String delFlag);
 }

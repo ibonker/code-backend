@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>entity</name>
+	<filePath>src/main/java/${packageName}/entity/${moduleName}</filePath>
+	<fileName>${className}.java</fileName>
+	<content><![CDATA[
+package ${packageName}.entity.${moduleName};
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import ${packageName}.common.BaseEntity;
+
+<#list imports as i>
+<#if i == "length">
+import org.hibernate.validator.constraints.Length;
+</#if>
+<#if i == "isNullable">
+import javax.validation.constraints.NotNull;
+</#if>
+<#if i == "readOnly">
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+</#if>
+<#if i == "constraintsMax">
+import javax.validation.constraints.Max;
+</#if>
+<#if i == "constraintsMin">
+import javax.validation.constraints.Min;
+</#if>
+<#if i == "pattern">
+import javax.validation.constraints.Pattern;
+</#if>
+</#list>
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ *
+ * 
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class ${className} extends BaseEntity {
+  private static final long serialVersionUID = 1L;
+
+  <#list columns as c>
+  <#if c.javaField != "createdAt" && c.javaField != "updatedAt" && c.javaField != "id">
+  <#if (c.isNullable)?? && c.isNullable == "1">
+  @NotNull
+  </#if>
+  <#if (c.pattern)??>
+  @Pattern(regexp = "${c.pattern}")
+  </#if>
+  <#if c.javaType == "String" && ((c.min)?? || (c.max)??)>
+  @Length(<#if (c.max)??>max = ${c.max}</#if><#if (c.min)??>,min = ${c.min}</#if>)
+  <#elseif c.javaType != "String" && ((c.min)?? || (c.max)??)>
+  <#if (c.max)??>@max = (${c.max})</#if>
+  <#if (c.min)??>@min = (${c.min})</#if>
+  </#if>
+  </#if>
+  @Column(name = "${c.name}")
+  @JsonProperty(value = "${c.javaField}"<#if (c.readOnly)?? && c.readOnly == "1">, access = Access.READ_ONLY</#if>)
+  @JsonPropertyDescription("${c.comments}")
+  <#if c.javaType == "LocalDateTime">
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  </#if>
+  private ${c.javaType} ${c.javaField};
+  
+  </#list>
+}
+	]]>
+	</content>
+</template>

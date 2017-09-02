@@ -3,6 +3,7 @@
  */
 package com.changan.code.service.impl;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,27 +25,45 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.changan.anywhere.common.mvc.page.rest.request.Filter;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
+import com.changan.anywhere.common.utils.FileUtil;
+import com.changan.anywhere.common.utils.FileUtils;
 import com.changan.code.common.BaseDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.common.DtoType;
 import com.changan.code.common.PredictUtils;
 import com.changan.code.common.component.Consul;
 import com.changan.code.common.component.Security;
+import com.changan.code.config.property.GenerateProperties;
 import com.changan.code.dto.Component;
 import com.changan.code.dto.ComponentCategory;
 import com.changan.code.dto.PackObj;
 import com.changan.code.dto.RefObjDTO;
 import com.changan.code.dto.SimpleDataObj;
+import com.changan.code.entity.ApiBasePO;
+import com.changan.code.entity.ApiObjPO;
+import com.changan.code.entity.ApiParamPO;
+import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
+import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TransferObjFieldPO;
+import com.changan.code.entity.TransferObjPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ProjectRepository;
+import com.changan.code.repository.TableRepository;
+import com.changan.code.service.IApiBaseService;
+import com.changan.code.service.IApiObjService;
+import com.changan.code.service.IApiParamService;
 import com.changan.code.service.IDatasourceService;
 import com.changan.code.service.IGenerateService;
 import com.changan.code.service.IProjectService;
 import com.changan.code.service.ITableService;
+import com.changan.code.service.ITransferObjFieldService;
 import com.changan.code.service.ITransferObjService;
+import com.changan.code.utils.GeneratorUtils;
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * 项目Project Service
@@ -54,6 +73,9 @@ import com.google.common.collect.Lists;
  */
 @Service
 public class ProjectServiceImpl implements IProjectService {
+
+  @Autowired
+  private GenerateProperties genProperties;
 
   // 注入project repository
   @Autowired
@@ -71,6 +93,21 @@ public class ProjectServiceImpl implements IProjectService {
 
   @Autowired
   private IGenerateService generateService;
+
+  @Autowired
+  private ITransferObjFieldService transferObjFieldService;
+
+  @Autowired
+  private IApiBaseService apiBaseService;
+
+  @Autowired
+  private IApiObjService apiObjService;
+
+  @Autowired
+  private IApiParamService apiParamService;
+
+  @Autowired
+  private TableRepository tableRepo;
 
   /**
    * 分页查询project
@@ -168,45 +205,168 @@ public class ProjectServiceImpl implements IProjectService {
   }
 
   @Override
-  public RefObjDTO getProjectDTOandPO(String id) {
+  public RefObjDTO getProjectDTO(String id) {
     // 获取dto
     Map<String, List<SimpleDataObj>> dtos = transObjService.findClassnameByProjectId(id);
-    // 获取po
-    Map<String, List<SimpleDataObj>> pos = tableService.findClassnameByProjectId(id);
     // dto根据package分类列表
     List<PackObj> dtoPacks = Lists.newArrayList();
-    // po根据package分类列表
-    List<PackObj> poPacks = Lists.newArrayList();
     // 添加默认类型
     List<SimpleDataObj> defaultdtos = Lists.newArrayList();
-    defaultdtos.add(new SimpleDataObj("", BaseDTO.ResultDTO.toString(), Constants.IS_INACTIVE));
-    defaultdtos.add(new SimpleDataObj("", BaseDTO.PageDTO.toString(), Constants.IS_INACTIVE));
-    defaultdtos.add(new SimpleDataObj("", BaseDTO.ResultPageDTO.toString(), Constants.IS_ACTIVE));
-    defaultdtos.add(new SimpleDataObj("", BaseDTO.JsonSchema.toString(), Constants.IS_INACTIVE));
+    for (BaseDTO basedto : BaseDTO.values()) {
+      defaultdtos.add(new SimpleDataObj("", basedto.toString(), Constants.IS_INACTIVE, null));
+    }
     PackObj defaultPackobj = new PackObj("default", defaultdtos);
     dtoPacks.add(defaultPackobj);
 
-    // dto类型
+    // 自定义dto类型
     for (Entry<String, List<SimpleDataObj>> entry : dtos.entrySet()) {
       dtoPacks.add(new PackObj(entry.getKey(), entry.getValue()));
     }
+
+    return new RefObjDTO(DtoType.DTO.toString().toLowerCase(), DtoType.DTO.getCname(), dtoPacks);
+  }
+
+  @Override
+  public RefObjDTO getProjectPO(String id) {
+    // 获取po
+    Map<String, List<SimpleDataObj>> pos = tableService.findClassnameByProjectId(id);
+    // po根据package分类列表
+    List<PackObj> poPacks = Lists.newArrayList();
     // po类型
     for (Entry<String, List<SimpleDataObj>> entry : pos.entrySet()) {
       poPacks.add(new PackObj(entry.getKey(), entry.getValue()));
     }
 
-    return new RefObjDTO(DtoType.REFOBJ.toString().toLowerCase(), DtoType.REFOBJ.getCname(),
-        dtoPacks, poPacks);
+    return new RefObjDTO(DtoType.PO.toString().toLowerCase(), DtoType.PO.getCname(), poPacks);
   }
 
+  /**
+   * 生成项目代码
+   */
   @Override
-  public void generateCodeFiles(String id) {
+  public String generateCodeFiles(String id) {
     // 获得project
     ProjectPO project = this.getProjectById(id);
     // 获得数据源
     List<DatasourcePO> datasources = datasourceService.findByProjectId(id);
+    // 获取表map
+    Map<String, TablePO> tablemap = Maps.newHashMap();
     // 生成配置文件代码
     generateService.generateConfigFiles(project, datasources);
+
+    // 查询对应项目下的DTO信息
+    List<TransferObjPO> transferObjs = transObjService.findAllTransferObj(id);
+    for (TransferObjPO transferObj : transferObjs) {
+      // 查询DTO下对应DTO属性
+      List<TransferObjFieldPO> transferObjFileds =
+          transferObjFieldService.findAllTransferObjField(transferObj.getId());
+      // 生成DTO文件代码
+      generateService.generateDTOFiles(project.getName(), project.getPackages().toLowerCase(),
+          transferObj, transferObjFileds);
+    }
+
+    // 获取需要自动生成crud的table
+    for (DatasourcePO datasource : datasources) {
+      // 查询对应数据源下的所有表
+      List<TablePO> tables = tableRepo.findByDatasourceIdAndIsAutoCrudAndDelFlag(datasource.getId(),
+          Constants.IS_ACTIVE, Constants.DATA_IS_NORMAL);
+      for (TablePO table : tables) {
+        table.setPackageName(datasource.getPackageName());
+        tablemap.put(table.getId(), table);
+        // 生成dao代码
+        // generateService.generateDAOFiles(project.getName(), project.getPackages().toLowerCase(),
+        // table);
+        // 生成servcie和serviceImpl
+        generateService.generateIServiceAndServiceImpl(datasource.getPackageName(),
+            project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
+      }
+      // 数据库代码生成xml
+      generateService.generateGeneratorConfigFiles(project.getName(),
+          project.getPackages().toLowerCase(), datasource, tables);
+    }
+    
+    // 生成mybatis代码
+    generateService.generateMybatisFiles(project.getName());
+
+    // 获取实体表名
+    for (DatasourcePO datasource : datasources) {
+      // 查询对应数据源下的所有表
+      List<SimpleDataObj> tables = tableService.findClassnameByDatasourceId(datasource.getId());
+      for (SimpleDataObj table : tables) {
+        List<ColumnPO> columns = tableService.findMergedColumns(table.getId());
+        // 生成实体文件代码
+        generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
+            project.getPackages().toLowerCase(), table, columns);
+      }
+    }
+
+    // 获取apibase
+    List<ApiBasePO> apibases = apiBaseService.findAllApiBase(project.getId());
+    for (ApiBasePO apibase : apibases) {
+      // 获取api obj
+      List<ApiObjPO> apiobjs = apiObjService.findAllApiObj(apibase.getId());
+      Map<String, List<ApiObjPO>> controllerMap = Maps.newHashMap();
+      for (ApiObjPO apiobj : apiobjs) {
+        // 获取api param
+        List<ApiParamPO> apiparams = apiParamService.findAllApiParam(apiobj.getId());
+        apiobj.setApiParam(apiparams);
+        // 添加包名
+        if (Constants.IS_ACTIVE.equals(apiobj.getIsAutoGen())) {
+          String tableName = tablemap.get(apiobj.getGenBasedTableId()).getName();
+          apiobj.setServiceName(tablemap.get(apiobj.getGenBasedTableId()).getPackageName()
+              .concat(".I")
+              .concat(
+                  CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName.toLowerCase()))
+              .concat("Service"));
+          apiobj.setRelateTableName(tableName);
+        }
+        // controller分类
+        List<ApiObjPO> apilist = controllerMap.get(apiobj.getControllerName());
+        if (null == apilist) {
+          apilist = Lists.newArrayList();
+          apilist.add(apiobj);
+          controllerMap.put(apiobj.getControllerName(), apilist);
+        } else {
+          apilist.add(apiobj);
+        }
+      }
+
+      // 循环controller map生成controller文件
+      for (Entry<String, List<ApiObjPO>> entry : controllerMap.entrySet()) {
+        generateService.generateControllerFiles(project, apibase, entry.getKey(), entry.getValue());
+      }
+    }
+
+    // 打包代码
+    // this.zipcode(project.getName());
+
+    return "/codegen/api/v1/projects/" + project.getName() + "/download";
+  }
+
+  /**
+   * 打包项目代码
+   * 
+   * @param projectName
+   */
+  private void zipcode(String projectName) {
+    // 压缩生成的项目
+    String projectPath = GeneratorUtils.getProjectPath(genProperties.getProjectPath(), projectName);
+    String projectZipPath =
+        GeneratorUtils.getProjectZipPath(genProperties.getProjectZipPath(), projectName);
+    FileUtils.zipFiles(projectPath, "*", projectZipPath);
+    // 删除生成的未压缩文件及文件夹
+    FileUtil.delete(new File(projectPath));
+  }
+
+  /**
+   * 下载文件
+   */
+  @Override
+  public File downloadZipFiles(String projectName) {
+    String projectZipPath =
+        GeneratorUtils.getProjectZipPath(genProperties.getProjectZipPath(), projectName);
+
+    return new File(projectZipPath);
   }
 
   @Override

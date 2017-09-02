@@ -65,10 +65,23 @@ public class ApiBaseServiceImpl implements IApiBaseService {
     if (updateApiBasePO != null) {
       // 更新API
       updateApiBasePO.updateAttrs(apiBase);
-      // 保存api
-      updateApiBasePO = this.saveApiBase(updateApiBasePO);
-      // 返回结果
-      return updateApiBasePO;
+      // 根据versionName、projectId查询Api
+      List<ApiBasePO> apiBases =
+          apiBaseRepo.findByVersionNameAndProjectIdAndDelFlag(updateApiBasePO.getVersionName(),
+              updateApiBasePO.getProjectId(), Constants.DATA_IS_NORMAL);
+      if (apiBases.size() == 0) {
+        // 保存更新
+        apiBaseRepo.save(updateApiBasePO);
+        return updateApiBasePO;
+      } else {
+        if (apiBases.get(0).getId().equals(updateApiBasePO.getId())) {
+          // 保存更新
+          apiBaseRepo.save(updateApiBasePO);
+          return updateApiBasePO;
+        } else {
+          throw new CodeCommonException("更新失败，versionName重复！");
+        }
+      }
     } else {
       throw new CodeCommonException("更新失败，需要更新的数据不存在!");
     }

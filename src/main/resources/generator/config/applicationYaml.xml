@@ -35,6 +35,12 @@ spring:
         connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     </#list>
 
+<#if dbcount == 1>
+mybatis:
+  type-aliases-package: ${packageName}.entity
+  mapper-locations: classpath:/mappings/*.xml,classpath:/mappings/**/*.xml
+</#if>
+
 logging:
   file: logs/application_log
   level:

@@ -204,7 +204,7 @@ public class TableServiceImpl implements ITableService {
     List<Object[]> results = tableRepository.findClassNameByDatasourceId(datasourceId);
     List<SimpleDataObj> dataobjs = Lists.newArrayList();
     for (Object[] data : results) {
-      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE);
+      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE, null);
       dataobjs.add(dataobj);
     }
     return dataobjs;

@@ -35,7 +35,7 @@ public class ApiBaseApiController implements ApiBaseApi {
    * 查询所有api
    */
   @Override
-  public ResponseEntity<ResultDTO> ApiBaseAllShowPost(@PathVariable String projectId) {
+  public ResponseEntity<ResultDTO> apiBaseAllShowGet(@PathVariable String projectId) {
     // 获得所有的api
     List<ApiBasePO> allApiBases = apiBaseService.findAllApiBase(projectId);
     // 返回成功信息
@@ -47,7 +47,7 @@ public class ApiBaseApiController implements ApiBaseApi {
    * 保存api/修改api,当api版本号相同时操作失败
    */
   @Override
-  public ResponseEntity<ResultDTO> ApiBaseSavePost(@RequestBody ApiBasePO apiBase) {
+  public ResponseEntity<ResultDTO> apiBaseSavePost(@RequestBody ApiBasePO apiBase) {
     ApiBasePO newApiBase = new ApiBasePO();
     if (apiBase.isNew()) {
       // 保存api
@@ -65,7 +65,7 @@ public class ApiBaseApiController implements ApiBaseApi {
    * 根据id删除api
    */
   @Override
-  public ResponseEntity<ResultDTO> ApiBaseDeletePost(@PathVariable String id) {
+  public ResponseEntity<ResultDTO> apiBaseDelete(@PathVariable String id) {
     // 根据id删除api
     apiBaseService.deleteApiBaseById(id);
     // 返回成功信息

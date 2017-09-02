@@ -20,8 +20,6 @@ public class RefObjDTO {
   
   private String cname; // 中文名
   
-  private List<PackObj> dto; // dto数据，key为包名
-  
-  private List<PackObj> po; // po数据，key为数据库的包名
+  private List<PackObj> data; // dto/po数据，key为包名
   
 }

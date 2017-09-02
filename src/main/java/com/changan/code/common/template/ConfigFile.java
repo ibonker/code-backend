@@ -14,7 +14,12 @@ public enum ConfigFile {
   datasourceConfig("config/datasourceConfiguration.xml"), 
   buildGradle("gradle/build.xml"), 
   propertiesGradle("gradle/property.xml"), 
-  mvcConfig("config/mvcConfiguration.xml");
+  mvcConfig("config/mvcConfiguration.xml"),
+  swaggerConfig("config/swaggerConfiguration.xml"),
+  basecontroller("controller/controllerBase.xml"),
+  commonException("exception/commonException.xml"),
+  baseEntity("common/baseEntity.xml"),
+  commonConstants("common/constants.xml");
   
   private String path;
   

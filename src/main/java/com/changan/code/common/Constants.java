@@ -50,4 +50,6 @@ public class Constants {
   public final static String API_PRODUCES = "application/json";
   // api默认消费类型
   public final static String API_CONSUMES = "application/json";
+  // mybatis配置文件根路径
+  public final static String MYBATIS_GEN_CONFIG_ROOT = "configfiles";
 }

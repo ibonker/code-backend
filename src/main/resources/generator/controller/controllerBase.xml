@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>controllerBase</name>
+  <filePath>src/main/java/${packageName}/${moduleName}/controller/base</filePath>
+  <fileName>BaseController.java</fileName>
+  <content><![CDATA[
+package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base;
+
+import ${packageName}<#if moduleName != "">.${moduleName}</#if>.exception.ResponseCommonException;
+import com.changan.anywhere.common.mvc.page.rest.response.ValidationSchemaFactoryWrapperExtend;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+
+/**
+ * @author TitanCode2
+ *
+ */
+public class BaseController {
+
+  /**
+   * 获取json-schema
+   * 
+   * @param typeRef
+   * @return
+   */
+  protected JsonSchema getJsonSchemaByJavaType(TypeReference<?> typeRef) {
+    ValidationSchemaFactoryWrapperExtend visitor = new ValidationSchemaFactoryWrapperExtend();
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      JavaType jt = mapper.getTypeFactory().constructType(typeRef);
+      mapper.acceptJsonFormatVisitor(jt, visitor);
+    } catch (JsonMappingException e) {
+      throw new ResponseCommonException("实体映射异常");
+    }
+    return visitor.finalSchema();
+  }
+
+}
+]]>
+  </content>
+</template>

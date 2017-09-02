@@ -10,6 +10,10 @@ import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.changan.code.common.Constants;
+import com.changan.code.common.DtoType;
+import com.changan.code.common.ParamIn;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -48,7 +52,7 @@ public class ApiParamPO extends BaseEntity {
 
   @Column(name = "is_required")
   @JsonProperty("isRequired")
-  private String isRequired; // 归属表
+  private String isRequired = Constants.IS_ACTIVE; // 是否必需
 
   @Column(name = "type")
   @JsonProperty("type")
@@ -65,7 +69,6 @@ public class ApiParamPO extends BaseEntity {
    * @return
    */
   public ApiParamPO updateAttrs(ApiParamPO newApiParamPO) {
-    this.apiObjId = newApiParamPO.getApiObjId();
     this.name = newApiParamPO.getName();
     this.description = newApiParamPO.getDescription();
     this.form = newApiParamPO.getForm();
@@ -73,5 +76,30 @@ public class ApiParamPO extends BaseEntity {
     this.type = newApiParamPO.getType();
     this.format = newApiParamPO.getFormat();
     return this;
+  }
+  
+  /**
+   * 获取实体名
+   * 
+   * @return
+   */
+  @JsonIgnore
+  public String getParamObj() {
+    String[] responseObjNames = this.format.split("\\.");
+    String prefix = "", postfix = "";
+    if (DtoType.ARRAY.toString().equals(this.type.toUpperCase())) {
+      prefix = "List<";
+      postfix = ">";
+    }
+    return prefix.concat(responseObjNames[responseObjNames.length - 1]).concat(postfix);
+  }
+  
+  /**
+   * 根据参数位置类型获取相应注解
+   * @return
+   */
+  @JsonIgnore
+  public String getFormAnnotation() {
+    return ParamIn.valueOf(this.form.toUpperCase()).getAnnotation();
   }
 }

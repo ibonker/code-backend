@@ -85,25 +85,15 @@ public class ColumnPO extends BaseEntity {
   @JsonPropertyDescription("正则表达式")
   private String pattern; // 正则表达式
   
-  @Column(name = "length_min")
-  @JsonProperty(value = "lengthMin")
-  @JsonPropertyDescription("字符串最小长度")
-  private Integer lengthMin; // 字符串最小长度
-  
-  @Column(name = "length_max")
-  @JsonProperty(value = "lengthMax")
-  @JsonPropertyDescription("字符串最大长度")
-  private Integer lengthMax; // 字符串最大长度
-  
   @Column(name = "min")
   @JsonProperty(value = "min")
   @JsonPropertyDescription("最小值")
-  private Integer min; // 最小值
+  private Integer min; // 最小值、字符串最小长度
   
   @Column(name = "max")
   @JsonProperty(value = "max")
   @JsonPropertyDescription("最大值")
-  private Integer max; // 最大值
+  private Integer max; // 最大值、 字符串最大长度
   
   /**
    * 设置java类型
@@ -184,10 +174,12 @@ public class ColumnPO extends BaseEntity {
   public ColumnPO setConfigedProperties(ColumnPO column) {
     if (null != column) {
       this.id = column.getId();
+      // 如果数据库可以为空则由用户自定义
+      if (Constants.IS_ACTIVE.equals(this.isNullable)) {
+        this.isNullable = column.getIsNullable();
+      }
       this.readOnly = column.getReadOnly();
       this.pattern = column.getPattern();
-      this.lengthMin = column.getLengthMin();
-      this.lengthMax = column.getLengthMax();
       this.min = column.getMin();
       this.max = column.getMax();
     }

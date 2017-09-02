@@ -3,8 +3,14 @@
  */
 package com.changan.code.controller.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultJsonSchemaDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.common.DtoType;
@@ -20,6 +27,7 @@ import com.changan.code.config.property.ApiProperties;
 import com.changan.code.controller.ProjectApi;
 import com.changan.code.dto.JavaTypeDTO;
 import com.changan.code.dto.ResultOfComponentsDTO;
+import com.changan.code.dto.ResultOfMsgDataDTO;
 import com.changan.code.dto.ResultOfProjectDTO;
 import com.changan.code.dto.ResultOfTypeDTO;
 import com.changan.code.entity.ProjectPO;
@@ -44,9 +52,10 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    * 项目schema
    */
   @Override
-  public ResponseEntity<JsonSchema> projectsSchemaGet() {
+  public ResponseEntity<ResultDTO> projectsSchemaGet() {
     JsonSchema jsonSchema = this.getJsonSchemaByJavaType(new TypeReference<ProjectPO>() {});
-    return new ResponseEntity<JsonSchema>(jsonSchema, HttpStatus.OK);
+    return new ResponseEntity<ResultDTO>(new ResultJsonSchemaDTO().jsonSchema(jsonSchema)
+        .message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
   /**
@@ -91,12 +100,14 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectDtoPoGet(@PathVariable String id) {
-    return new ResponseEntity<ResultDTO>(
-        new ResultOfTypeDTO().refobj(projectService.getProjectDTOandPO(id)).message("成功")
-            .statusCode(Constants.SUCCESS_API_CODE),
+    return new ResponseEntity<ResultDTO>(new ResultOfTypeDTO().dto(projectService.getProjectDTO(id))
+        .po(projectService.getProjectPO(id)).message("成功").statusCode(Constants.SUCCESS_API_CODE),
         HttpStatus.OK);
   }
 
+  /**
+   * 项目支持数据类型
+   */
   @Override
   public ResponseEntity<ResultDTO> projectDataTypeGet(@PathVariable String id) {
     return new ResponseEntity<ResultDTO>(new ResultOfTypeDTO()
@@ -104,16 +115,47 @@ public class ProjectApiController extends BaseController implements ProjectApi {
             apis.getBaseType()))
         .array(new JavaTypeDTO(DtoType.ARRAY.toString().toLowerCase(), DtoType.ARRAY.getCname(),
             apis.getArrayType()))
-        .refobj(projectService.getProjectDTOandPO(id)).message("成功")
+        .dto(projectService.getProjectDTO(id)).po(projectService.getProjectPO(id)).message("成功")
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
+  /**
+   * 项目支持组件
+   */
   @Override
   public ResponseEntity<ResultDTO> projectsComponentsDefaultGet() {
     return new ResponseEntity<ResultDTO>(
         new ResultOfComponentsDTO().categories(projectService.getComponents()).message("成功")
             .statusCode(Constants.SUCCESS_API_CODE),
         HttpStatus.OK);
+  }
+
+  /**
+   * 生成项目代码
+   */
+  @Override
+  public ResponseEntity<ResultDTO> projectsGenerateCodeGet(@PathVariable String id) {
+    return new ResponseEntity<ResultDTO>(
+        new ResultOfMsgDataDTO().msgData(projectService.generateCodeFiles(id)).message("成功")
+            .statusCode(Constants.SUCCESS_API_CODE),
+        HttpStatus.OK);
+  }
+
+  /**
+   * 下载项目代码
+   */
+  @Override
+  public ResponseEntity<InputStreamResource> projectsDownloadGet(@PathVariable String projectName)
+      throws FileNotFoundException {
+    File file = projectService.downloadZipFiles(projectName);
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+    headers.add("Content-Disposition",
+        String.format("attachment; filename=\"%s\"", file.getName()));
+    headers.add("Pragma", "no-cache");
+    headers.add("Expires", "0");
+    return ResponseEntity.ok().headers(headers).contentLength(file.length())
+        .body(new InputStreamResource(new FileInputStream(file)));
   }
 
 }

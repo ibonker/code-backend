@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
-  <name>application</name>
-  <filePath>src/main/java/${packageName}/${moduleName}</filePath>
-  <fileName>Application.java</fileName>
-  <content><![CDATA[
+	<name>application</name>
+	<filePath>src/main/java/${packageName}/${moduleName}</filePath>
+	<fileName>Application.java</fileName>
+	<content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>;
 
+import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.context.annotation.Bean;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 
 /** 
  * Application 
@@ -22,11 +24,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @version  
  * @since JDK 1.8 
  */
-@SpringBootApplication
-@ServletComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>.config"})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
+    HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class,
+    DataSourceTransactionManagerAutoConfiguration.class<#if dbcount gt 1>,
+    MybatisAutoConfiguration.class, PageHelperAutoConfiguration.class</#if>})
+@ComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>"})
 public class Application {
   
-   /**
+  /**
    * @param args
    */
   public static void main(String[] args) {
@@ -35,12 +40,7 @@ public class Application {
     app.run(args);
   }
 
-  @Bean
-  public ObjectMapper objectMapper() {
-    return new ObjectMapper();
-  }
-
 }
 ]]>
-  </content>
+	</content>
 </template>

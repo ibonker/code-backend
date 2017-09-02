@@ -43,7 +43,7 @@ public class ApiBasePO extends BaseEntity {
   private String versionName; // 版本
 
   @Column(name = "base_path")
-  @JsonProperty("base_path")
+  @JsonProperty("basePath")
   private String basePath; // 根路徑
 
   @Column(name = "description")
@@ -60,8 +60,6 @@ public class ApiBasePO extends BaseEntity {
    * @return
    */
   public ApiBasePO updateAttrs(ApiBasePO apiBase) {
-
-    this.projectId = apiBase.getProjectId();
     this.versionName = apiBase.getVersionName();
     this.basePath = apiBase.getBasePath();
     this.description = apiBase.getDescription();

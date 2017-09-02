@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.changan.anywhere.common.datasource.annotation.ChangeDatasource;
+import com.changan.code.common.Constants;
 import com.changan.code.dao.DatabaseDao;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
@@ -42,7 +43,16 @@ public class ColumnServiceImpl implements IColumnService {
   @ChangeDatasource
   public List<ColumnPO> findColumnListFromOriginalDatasource(DatasourcePO datasource,
       String tableName) {
-    return databaseDao.findTableColumnList(datasource.getDbtype(), tableName);
+    // 获取表
+    List<ColumnPO> columns = databaseDao.findTableColumnList(datasource.getDbtype(), tableName);
+    // 获取主键
+    List<String> pks = databaseDao.findTablePK(datasource.getDbtype(), tableName);
+    for (ColumnPO column : columns) {
+      if (pks.contains(column.getName())) {
+        column.setIsPk(Constants.IS_ACTIVE);
+      }
+    }
+    return columns;
   }
 
   @Override

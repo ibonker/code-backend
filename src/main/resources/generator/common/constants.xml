@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>commonConstants</name>
+  <filePath>src/main/java/${packageName}/${moduleName}/common</filePath>
+  <fileName>Constants.java</fileName>
+  <content><![CDATA[
+package ${packageName}.common;  
+
+/**
+ * 
+ * @author TitanCode2
+ *
+ */
+public class Constants {
+
+  private Constants() {
+
+  }
+
+  // api成功编码
+  public final static String SUCCESS_API_CODE = "200";
+  // api异常编码
+  public final static String EXCEPTION_API_CODE = "300";
+  // 数据无效标识
+  public final static String DATA_IS_INVALID = "1";
+  // 数据有效标识
+  public final static String DATA_IS_NORMAL = "0";
+  // 数据激活标识
+  public final static String IS_ACTIVE = "1";
+  // 数据未激活标识
+  public final static String IS_INACTIVE = "0";
+  // 默认时间格式
+  public final static String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+}
+]]>
+  </content>
+</template>

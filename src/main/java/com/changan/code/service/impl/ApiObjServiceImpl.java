@@ -13,9 +13,7 @@ import com.changan.code.common.Constants;
 import com.changan.code.common.DtoType;
 import com.changan.code.common.ParamIn;
 import com.changan.code.entity.ApiObjPO;
-
 import com.changan.code.entity.ApiParamPO;
-
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ApiObjRepository;
 import com.changan.code.repository.ApiParamRepository;
@@ -63,12 +61,19 @@ public class ApiObjServiceImpl implements IApiObjService {
     sameCount = apiObjRepo.countByApiBaseIdAndUriAndDelFlag(apiObj.getApiBaseId(), apiObj.getUri(),
         Constants.DATA_IS_NORMAL);
     if (sameCount == 0) {
+      // 通过uri设置名称
+      apiObj.setName(CaseFormat.LOWER_UNDERSCORE
+          .to(CaseFormat.LOWER_CAMEL, (apiObj.getUri().replace("/", "_").toLowerCase()))
+          .concat(StringUtils.capitalize(apiObj.getRequestMethod().toLowerCase())));
       // 保存apiObj
       apiObjRepo.save(apiObj);
       // 若参数不为空
       if (apiObj.getApiParam() != null && !apiObj.getApiParam().isEmpty()) {
+        // 通过Uri和ApiBaseId查询刚保存的ApiObj
+        ApiObjPO findApiObj =
+            apiObjRepo.findByApiBaseIdAndUri(apiObj.getApiBaseId(), apiObj.getUri());
         // 批量保存参数
-        apiParamService.saveApiParam(apiObj.getApiParam(), apiObj.getId());
+        apiParamService.saveApiParam(apiObj.getApiParam(),findApiObj.getId());
       }
       return apiObj;
     } else {
@@ -87,10 +92,29 @@ public class ApiObjServiceImpl implements IApiObjService {
     if (updateApiObj != null) {
       // 更新属性
       updateApiObj.updateAttrs(apiObj);
-      // 保存apiObj
-      this.saveApiObj(updateApiObj);
-      // 返回更新对象
-      return updateApiObj;
+      // 通过uri设置名称
+      updateApiObj.setName(CaseFormat.LOWER_UNDERSCORE
+          .to(CaseFormat.LOWER_CAMEL, (updateApiObj.getUri().replace("/", "_").toLowerCase()))
+          .concat(StringUtils.capitalize(updateApiObj.getRequestMethod().toLowerCase())));
+      // 根据Uri和ApiBaseId查询apiObj
+      List<ApiObjPO> apiObjs = apiObjRepo.findByUriAndApiBaseIdAndDelFlag(updateApiObj.getUri(),
+          updateApiObj.getId(), Constants.DATA_IS_NORMAL);
+      // 若数组长度为0则直接更新，若为1则判断id是否相同，若不同则更新失败
+      if (apiObjs.size() == 0) {
+        // 保存apiObj
+        updateApiObj = apiObjRepo.save(updateApiObj);
+        // 返回更新对象
+        return updateApiObj;
+      } else {
+        if (updateApiObj.getId().equals(apiObjs.get(0).getId())) {
+          // 保存apiObj
+          updateApiObj = apiObjRepo.save(updateApiObj);
+          // 返回更新对象
+          return updateApiObj;
+        } else {
+          throw new CodeCommonException("更新失败！Uri重复！");
+        }
+      }
     } else {
       throw new CodeCommonException("更新失败！数据不存在！");
     }
@@ -150,47 +174,67 @@ public class ApiObjServiceImpl implements IApiObjService {
   @Transactional("jpaTransactionManager")
   public void createAutoCrudApi(String apiBaseId, String tableId, String tableName, String dtoName,
       String className, String datasourcePName, String dbname, Long dbcount) {
+    // table名称转换
+    String tableParamName =
+        CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName.toLowerCase());
     // 列表接口
     ApiObjPO pageApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
-        BaseDTO.ResultPageDTO.toString(), dtoName, className, datasourcePName, dbname, dbcount, "s",
-        "s", Constants.API_PRODUCES, "分页列表", RequestMethod.POST.toString());
+        BaseDTO.ResultPageDTO.toString(), className, className, datasourcePName, dbname, dbcount,
+        "s", "s", Constants.API_PRODUCES, "分页列表", RequestMethod.POST.toString());
     pageApiObj = apiObjRepo.save(pageApiObj);
     // 列表接口参数
     ApiParamPO pageApiparam = this.genApiParamPO(pageApiObj.getId(), "searchParams", "分页参数",
-        ParamIn.BODY, DtoType.REFOBJ, BaseDTO.PageDTO.toString());
+        ParamIn.BODY, DtoType.DTO, BaseDTO.PageDTO.toString());
     apiParamRepo.save(pageApiparam);
     // 详情接口
     ApiObjPO showApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, dtoName, null, className,
-        datasourcePName, dbname, dbcount, "s/{id}/show", "sShow", Constants.API_PRODUCES, "详情",
-        RequestMethod.GET.toString());
+        datasourcePName, dbname, dbcount, "s/{".concat(tableParamName.concat("Id}/show")), "sShow",
+        Constants.API_PRODUCES, "详情", RequestMethod.GET.toString());
     showApiObj = apiObjRepo.save(showApiObj);
     // 详情接口参数
-    ApiParamPO showApiparam =
-        this.genApiParamPO(pageApiObj.getId(), "id", "对象id", ParamIn.PATH, DtoType.BASE, "String");
+    ApiParamPO showApiparam = this.genApiParamPO(showApiObj.getId(), tableParamName.concat("Id"),
+        tableParamName.concat("对象id"), ParamIn.PATH, DtoType.BASE, "String");
     apiParamRepo.save(showApiparam);
     // 删除接口
-    ApiObjPO delApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, dtoName, null, className,
-        datasourcePName, dbname, dbcount, "s/{id}/delete", "s", Constants.API_PRODUCES, "删除",
+    ApiObjPO delApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+        BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount,
+        "s/{".concat(tableParamName.concat("Id}/delete")), "s", Constants.API_PRODUCES, "删除",
         RequestMethod.DELETE.toString());
     showApiObj = apiObjRepo.save(delApiObj);
-    // 详情接口参数
-    ApiParamPO delApiparam =
-        this.genApiParamPO(pageApiObj.getId(), "id", "对象id", ParamIn.PATH, DtoType.BASE, "String");
+    // 删除接口参数
+    ApiParamPO delApiparam = this.genApiParamPO(delApiObj.getId(), tableParamName.concat("Id"),
+        tableParamName.concat("对象id"), ParamIn.PATH, DtoType.BASE, "String");
     apiParamRepo.save(delApiparam);
-    // 保存接口
-    ApiObjPO saveApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, dtoName, null, className,
-        datasourcePName, dbname, dbcount, "/save", "Save", Constants.API_PRODUCES, "保存（新增、修改）",
-        RequestMethod.POST.toString());
+    // 新增接口
+    ApiObjPO saveApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+        BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount, "s/save",
+        "sSave", Constants.API_PRODUCES, "新增", RequestMethod.POST.toString());
     saveApiObj = apiObjRepo.save(saveApiObj);
-    // 保存接口参数
-    ApiParamPO saveApiparam = this.genApiParamPO(pageApiObj.getId(),
+    // 新增接口参数
+    ApiParamPO saveApiparam = this.genApiParamPO(saveApiObj.getId(),
         CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName), "实体对象参数", ParamIn.BODY,
-        DtoType.REFOBJ, className);
+        DtoType.PO, className);
     apiParamRepo.save(saveApiparam);
+    // 更新接口
+    ApiObjPO updateApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+        BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount,
+        "s/{".concat(tableParamName.concat("Id}/save")), "Save", Constants.API_PRODUCES, "修改",
+        RequestMethod.PUT.toString());
+    updateApiObj = apiObjRepo.save(updateApiObj);
+    // 更新接口参数 - id参数
+    ApiParamPO updateIdApiparam =
+        this.genApiParamPO(updateApiObj.getId(), tableParamName.concat("Id"),
+            tableParamName.concat("对象id"), ParamIn.PATH, DtoType.BASE, "String");
+    apiParamRepo.save(updateIdApiparam);
+    // 更新接口参数 - 实体参数
+    ApiParamPO updateEntityApiparam = this.genApiParamPO(updateApiObj.getId(),
+        CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName), "实体对象参数", ParamIn.BODY,
+        DtoType.PO, className);
+    apiParamRepo.save(updateEntityApiparam);
     // jsonschema接口
     ApiObjPO schemaApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
-        BaseDTO.JsonSchema.toString(), null, className, datasourcePName, dbname, dbcount, "s", "s",
-        "application/schema+json", "的json-schema", RequestMethod.GET.toString());
+        BaseDTO.ResultJsonSchemaDTO.toString(), className, className, datasourcePName, dbname,
+        dbcount, "s", "s", "application/schema+json", "的json-schema", RequestMethod.GET.toString());
     schemaApiObj = apiObjRepo.save(schemaApiObj);
   }
 
@@ -220,16 +264,18 @@ public class ApiObjServiceImpl implements IApiObjService {
     if (dbcount > 1) {
       urlPrefix = dbname.concat("/");
       namePrefix = dbname.concat("_");
-      apiObj.setPrefixName(
-          CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, dbname));
+      apiObj.setPrefixName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, dbname));
     }
-    apiObj.setUri(urlPrefix.concat(tableName).concat(urlPostfix));
+    apiObj.setUri("/".concat(urlPrefix).concat(tableName).concat(urlPostfix));
     apiObj.setName(CaseFormat.LOWER_UNDERSCORE
         .to(CaseFormat.LOWER_CAMEL, namePrefix.concat(tableName).toLowerCase()).concat(namePostfix)
         .concat(StringUtils.capitalize(requestMethod.toLowerCase())));
     apiObj.setRequestMethod(requestMethod);
     apiObj.setResponseObjName(dtoName);
-    apiObj.setResponseObjGeneric(genericName);
+    if (null != genericName) {
+      apiObj.setResponseObjGenericType(DtoType.PO.toString().toLowerCase());
+      apiObj.setResponseObjGenericFormat(genericName);
+    }
     apiObj.setSummary("实体".concat(className).concat(description));
     apiObj.setDescription("实体".concat(className).concat(description));
     apiObj.setProduces(produces);

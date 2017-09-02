@@ -3,6 +3,7 @@
  */
 package com.changan.code.service;
 
+import java.io.File;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -44,22 +45,36 @@ public interface IProjectService extends IComponentService {
   public ProjectPO getProjectById(String id);
   
   /**
-   * 获取dto和po
+   * 获取dto
    * @param id
    * @return
    */
-  public RefObjDTO getProjectDTOandPO(String id);
+  public RefObjDTO getProjectDTO(String id);
+  
+  /**
+   * 获取po
+   * @param id
+   * @return
+   */
+  public RefObjDTO getProjectPO(String id);
   
   /**
    * 生成代码
    * @param id
    */
-  public void generateCodeFiles(String id);
+  public String generateCodeFiles(String id);
   
   /**
    * 安全组件
    * @return
    */
   public List<ComponentCategory> getComponents();
+  
+  /**
+   * 下载文件
+   * @param projectName
+   * @return
+   */
+  public File downloadZipFiles(String projectName);
 
 }

@@ -15,9 +15,10 @@ import javax.validation.constraints.NotNull;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.code.common.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 
@@ -68,6 +69,14 @@ public class TablePO extends BaseEntity {
   @Transient
   @JsonPropertyDescription("表字段列表")
   private List<ColumnPO> columnList = Lists.newArrayList(); // 表列
+  
+  @Transient
+  @JsonPropertyDescription("api列表")
+  private List<ApiObjPO> pathList = Lists.newArrayList(); // api列表
+  
+  @Transient
+  @JsonIgnore
+  private String packageName; // 包名
   
   /**
    * 初始化值

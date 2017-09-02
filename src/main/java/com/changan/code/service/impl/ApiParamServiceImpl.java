@@ -28,12 +28,14 @@ public class ApiParamServiceImpl implements IApiParamService {
    */
   @Override
   @Transactional("jpaTransactionManager")
-  public void saveApiParam(List<ApiParamPO> apiParams, String apiObjId) {
+  public void saveApiParam(List<ApiParamPO> apiParams,String apiObjId) {
     Map<String, String> map = new HashMap<String, String>();
     // 定义长度
     int length = 1;
     for (ApiParamPO apiParam : apiParams) {
       map.put(apiParam.getName(), null);
+      //给ApiParam设置ApiObjId
+      apiParam.setApiObjId(apiObjId);
       if (map.size() != length) {
         throw new CodeCommonException("参数重复：" + apiParam.getName());
       }

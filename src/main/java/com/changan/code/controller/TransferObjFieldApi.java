@@ -33,9 +33,9 @@ public interface TransferObjFieldApi {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjFieldDTO.class),
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjFieldDTO.class)})
-  @RequestMapping(value = "/transferObjField/{id}/Show", produces = {"application/json"},
-      method = RequestMethod.POST)
-  ResponseEntity<ResultDTO> transferObjFieldShowPost(
+  @RequestMapping(value = "/transferobjfield/{id}/show", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> transferObjFieldShowGet(
       @ApiParam(value = "id") @PathVariable(value = "id", required = true) String id);
 
   @ApiOperation(value = "删除DTO属性", notes = "删除DTO属性", response = ResultOfTransferObjFieldDTO.class,
@@ -44,8 +44,8 @@ public interface TransferObjFieldApi {
       @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjFieldDTO.class),
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjFieldDTO.class)})
   @RequestMapping(value = "/transferObjField/{id}/Delete", produces = {"application/json"},
-      method = RequestMethod.POST)
-  ResponseEntity<ResultDTO> transferObjFieldDeletePost(
+      method = RequestMethod.DELETE)
+  ResponseEntity<ResultDTO> transferObjFieldDelete(
       @ApiParam(value = "id", required = true) @PathVariable(value = "id", required = true) String id);
 
   @ApiOperation(value = "保存DTO属性", notes = "保存DTO属性", response = ResultOfTransferObjFieldDTO.class,
@@ -53,7 +53,7 @@ public interface TransferObjFieldApi {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjFieldDTO.class),
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjFieldDTO.class)})
-  @RequestMapping(value = "/transferObjField/Save", produces = {"application/json"},
+  @RequestMapping(value = "/transferobjfield/save", produces = {"application/json"},
       method = RequestMethod.POST)
   ResponseEntity<ResultDTO> transferObjFieldSavePost(
       @ApiParam(value = "transferObjField", required = true) @RequestBody TransferObjFieldPO transferObjField);
@@ -64,8 +64,8 @@ public interface TransferObjFieldApi {
       @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjFieldDTO.class),
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjFieldDTO.class)})
   @RequestMapping(value = "/transferObjFields/{transferObjId}/Show",
-      produces = {"application/json"}, method = RequestMethod.POST)
-  ResponseEntity<ResultDTO> transferObjFieldAllShowPost(
+      produces = {"application/json"}, method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> transferObjFieldAllShowGet(
       @ApiParam(value = "transferObjId") @PathVariable(value = "transferObjId", required = true) String transferObjId);
 
   @ApiOperation(value = "批量添加DTO属性", notes = "批量添加DTO属性",
@@ -73,7 +73,7 @@ public interface TransferObjFieldApi {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjFieldDTO.class),
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjFieldDTO.class)})
-  @RequestMapping(value = "/transferObjFields/Save", produces = {"application/json"},
+  @RequestMapping(value = "/transferobjfields/Save", produces = {"application/json"},
       method = RequestMethod.POST)
   ResponseEntity<ResultDTO> transferObjFielSaveAllPost(
       @ApiParam(value = "transferObjFields", required = true) @RequestBody List<TransferObjFieldPO> transferObjFields);

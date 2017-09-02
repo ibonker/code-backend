@@ -121,5 +121,13 @@ public class DatasourcePO extends BaseEntity {
   public String getUpperCamelPackageName() {
     return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, this.name);
   }
+  
+  /**
+   * 用于bean名前缀
+   * @return
+   */
+  public String getLowerCamelPackageName() {
+    return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.name);
+  }
 
 }

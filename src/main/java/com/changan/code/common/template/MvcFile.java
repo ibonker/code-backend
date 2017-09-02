@@ -10,7 +10,9 @@ package com.changan.code.common.template;
 public enum MvcFile {
   
   controllerApi("controller/controllerApi.xml"), 
-  controllerImpl("controller/controllerImpl.xml"), 
+  controllerImpl("controller/controllerImpl.xml"),
+  controllerBase("controller/controllerBase.xml"),
+  controllerAdvice("controller/controllerAdvice.xml"),
   serviceIF("service/serviceIF.xml"), 
   serviceImpl("service/serviceImpl.xml");
   

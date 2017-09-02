@@ -76,7 +76,6 @@ public class TransferObjPO extends BaseEntity {
    * @return
    */
   public TransferObjPO updateAttrs(TransferObjPO newTransferObjPO) {
-    this.projectId = newTransferObjPO.getProjectId();
     this.name = newTransferObjPO.getName();
     this.comments = newTransferObjPO.getComments();
     this.isGeneric = newTransferObjPO.getIsGeneric();

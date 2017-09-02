@@ -90,19 +90,36 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
   @Override
   public TransferObjFieldPO updateTransferObjField(TransferObjFieldPO transferObjField) {
     // 查询数据库中需要更新的DTO属性对象
-    TransferObjFieldPO updateTransfer =
+    TransferObjFieldPO updateTransferField =
         transferObjRePo.findByIdAndDelFlag(transferObjField.getId(), Constants.DATA_IS_NORMAL);
     // 当重复为0且数据库中存在此条数据时
-    if (updateTransfer != null) {
+    if (updateTransferField != null) {
       // 更新DTO属性对象信息
-      updateTransfer.updateAttrs(transferObjField);
-      // 保存已更新的信息
-      updateTransfer = transferObjRePo.save(updateTransfer);
-      return updateTransfer;
+      updateTransferField.updateAttrs(transferObjField);
+      // 根据name和transferObjId查询
+      List<TransferObjFieldPO> transferObjFields =
+          transferObjRePo.findByNameAndDelFlagAndTransferObjId(updateTransferField.getName(),
+              Constants.DATA_IS_NORMAL, updateTransferField.getTransferObjId());
+      // 如果长度为0则直接更新
+      if (transferObjFields.size() == 0) {
+        // 保存属性
+        updateTransferField = transferObjRePo.save(updateTransferField);
+        // 返回对象
+        return updateTransferField;
+      } else {
+        // 若长度为1则判断id是否相同
+        if (transferObjFields.get(0).getId().equals(transferObjField.getId())) {
+          // 保存属性
+          updateTransferField = transferObjRePo.save(updateTransferField);
+          // 返回对象
+          return updateTransferField;
+        } else {
+          throw new CodeCommonException("更新失败！参数名重复！");
+        }
+      }
     } else {
-      throw new CodeCommonException("更新失败！");
+      throw new CodeCommonException("更新失败！数据不存在！");
     }
-
   }
 
   /**
@@ -136,6 +153,7 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
     // 批量保存DTO属性对象
     transferObjRePo.save(transferObjFields);
   }
+
   @Override
   public void deleteByTransferObjId(String transferObjId) {
     transferObjRePo.deleteByTransferObjId(transferObjId);

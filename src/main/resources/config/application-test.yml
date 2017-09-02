@@ -14,3 +14,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
+generate:
+  projectPath: ./codedir/
+  projectZipPath: ./codedir/zip/
+  mybatisGenlibsPath: ./mybatis-genlibs/

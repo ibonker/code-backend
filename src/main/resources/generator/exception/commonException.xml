@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>commonException</name>
+  <filePath>src/main/java/${packageName}/${moduleName}/exception</filePath>
+  <fileName>ResponseCommonException.java</fileName>
+  <content><![CDATA[
+package ${packageName}.exception;
+
+/**
+ * @author TitanCode2
+ *
+ */
+public class ResponseCommonException extends RuntimeException {
+  
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -7090277986807518L;
+
+  /**
+   * 异常消息构造方法
+   * 
+   * @param string
+   */
+  public ResponseCommonException(String string) {
+    super(string);
+  }
+
+  /**
+   * 异常消息构造方法
+   * 
+   * @param string
+   * @param e
+   */
+  public ResponseCommonException(String string, Exception e) {
+    super(string, e);
+  }
+
+}
+]]>
+  </content>
+</template>

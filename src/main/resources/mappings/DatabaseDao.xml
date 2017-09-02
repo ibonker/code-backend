@@ -40,24 +40,6 @@
 			<if test="name != null and name != ''">
 				AND t.TABLE_NAME = lower(#{name})
 			</if>
-			AND
-			t.TABLE_NAME !=
-			'dict_type'
-			AND t.TABLE_NAME != 'dict_value'
-			AND
-			t.TABLE_NAME !=
-			'sys_menu'
-			AND t.TABLE_NAME != 'sys_office'
-			AND
-			t.TABLE_NAME !=
-			'sys_role'
-			AND t.TABLE_NAME != 'sys_role_menu'
-			AND
-			t.TABLE_NAME !=
-			'sys_user'
-			AND t.TABLE_NAME != 'sys_user_role'
-			ORDER BY
-			t.TABLE_NAME
 		</if>
 	</select>
 
