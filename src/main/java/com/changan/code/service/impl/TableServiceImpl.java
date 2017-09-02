@@ -204,7 +204,8 @@ public class TableServiceImpl implements ITableService {
     List<Object[]> results = tableRepository.findClassNameByDatasourceId(datasourceId);
     List<SimpleDataObj> dataobjs = Lists.newArrayList();
     for (Object[] data : results) {
-      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE, null);
+      SimpleDataObj dataobj =
+          new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE, null);
       dataobjs.add(dataobj);
     }
     return dataobjs;
@@ -249,10 +250,11 @@ public class TableServiceImpl implements ITableService {
       table.setIsAutoCrud(Constants.IS_ACTIVE);
       String className = datasource.getPackageName().concat(".").concat(table.getClassName());
       // 保存transfer obj
-      TransferObjPO showdto = transobjService.createAutoCrudDTO(project.getId(), table.getId(), table.getName(),
-          datasource.getPackageName(), className);
+      TransferObjPO showdto = transobjService.createAutoCrudDTO(project.getId(), table.getId(),
+          table.getName(), datasource.getPackageName(), className);
       // 保存api obj
-      apiobjService.createAutoCrudApi(firstApibase.getId(), table.getId(), table.getName().toLowerCase(),
+      apiobjService.createAutoCrudApi(firstApibase.getId(), table.getId(),
+          table.getName().toLowerCase(), table.getComments(),
           showdto.getPackageName().concat(".").concat(showdto.getName()), className,
           datasource.getPackageName().toLowerCase(), datasource.getName().toLowerCase(), dbcount);
     }
@@ -306,6 +308,16 @@ public class TableServiceImpl implements ITableService {
     // 设置属性列表
     transobj.setTransferObjField(transfields);
     return transobj;
+  }
+
+  @Override
+  public void updateTable(String id, TablePO table) {
+    TablePO currentTable = tableRepository.findOne(id);
+    if (null != currentTable) {
+      tableRepository.save(currentTable.updateAttrs(table));
+    } else {
+      throw new CodeCommonException("数据库查无此数据");
+    }
   }
 
 }

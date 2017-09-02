@@ -79,4 +79,15 @@ public class TableApiController extends BaseController implements TableApi {
         HttpStatus.OK);
   }
 
+  /**
+   * 更新表
+   */
+  @Override
+  public ResponseEntity<ResultDTO> tablesSavePut(@PathVariable String id,
+      @RequestBody TablePO table) {
+    tableService.updateTable(id, table);
+    return new ResponseEntity<ResultDTO>(
+        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
+
 }

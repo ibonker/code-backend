@@ -42,6 +42,12 @@ public interface ITableService {
   public void saveNewTables(List<TablePO> tables);
   
   /**
+   * 更新表
+   * @param tables
+   */
+  public void updateTable(String id, TablePO table);
+  
+  /**
    * 删除不存在的表
    * @param tables
    */

@@ -13,6 +13,7 @@ import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.dto.RequestOfTableIdsDTO;
 import com.changan.code.dto.ResultOfColumnsDTO;
 import com.changan.code.dto.ResultOfTransferObjDTO;
+import com.changan.code.entity.TablePO;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
 import io.swagger.annotations.Api;
@@ -49,14 +50,27 @@ public interface TableApi {
       method = RequestMethod.GET)
   ResponseEntity<ResultDTO> tablesColumnsGet(
       @ApiParam(value = "表id", required = false) @PathVariable String id);
-  
+
   /**
    * 数据源表分页
    */
-  @ApiOperation(value = "表字段实体详情", notes = "表字段实体详情", response = ResultOfTransferObjDTO.class, tags = {"Table"})
-  @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjDTO.class)})
+  @ApiOperation(value = "更新表字段", notes = "更新表字段", response = ResultDTO.class, tags = {"Table"})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/{id}/save", produces = {"application/json"},
+      method = RequestMethod.PUT)
+  ResponseEntity<ResultDTO> tablesSavePut(
+      @ApiParam(value = "表id", required = false) @PathVariable String id,
+      @ApiParam(value = "表对象", required = false) @RequestBody TablePO table);
+
+  /**
+   * 数据源表分页
+   */
+  @ApiOperation(value = "表字段实体详情", notes = "表字段实体详情", response = ResultOfTransferObjDTO.class,
+      tags = {"Table"})
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjDTO.class)})
   @RequestMapping(value = "/tables/{id}/dto", produces = {"application/json"},
       method = RequestMethod.GET)
   ResponseEntity<ResultDTO> tablesDtoGet(

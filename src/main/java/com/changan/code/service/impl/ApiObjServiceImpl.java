@@ -73,7 +73,7 @@ public class ApiObjServiceImpl implements IApiObjService {
         ApiObjPO findApiObj =
             apiObjRepo.findByApiBaseIdAndUri(apiObj.getApiBaseId(), apiObj.getUri());
         // 批量保存参数
-        apiParamService.saveApiParam(apiObj.getApiParam(),findApiObj.getId());
+        apiParamService.saveApiParam(apiObj.getApiParam(), findApiObj.getId());
       }
       return apiObj;
     } else {
@@ -172,13 +172,14 @@ public class ApiObjServiceImpl implements IApiObjService {
    */
   @Override
   @Transactional("jpaTransactionManager")
-  public void createAutoCrudApi(String apiBaseId, String tableId, String tableName, String dtoName,
-      String className, String datasourcePName, String dbname, Long dbcount) {
+  public void createAutoCrudApi(String apiBaseId, String tableId, String tableName,
+      String tableComment, String dtoName, String className, String datasourcePName, String dbname,
+      Long dbcount) {
     // table名称转换
     String tableParamName =
         CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName.toLowerCase());
     // 列表接口
-    ApiObjPO pageApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+    ApiObjPO pageApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
         BaseDTO.ResultPageDTO.toString(), className, className, datasourcePName, dbname, dbcount,
         "s", "s", Constants.API_PRODUCES, "分页列表", RequestMethod.POST.toString());
     pageApiObj = apiObjRepo.save(pageApiObj);
@@ -187,16 +188,17 @@ public class ApiObjServiceImpl implements IApiObjService {
         ParamIn.BODY, DtoType.DTO, BaseDTO.PageDTO.toString());
     apiParamRepo.save(pageApiparam);
     // 详情接口
-    ApiObjPO showApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, dtoName, null, className,
-        datasourcePName, dbname, dbcount, "s/{".concat(tableParamName.concat("Id}/show")), "sShow",
-        Constants.API_PRODUCES, "详情", RequestMethod.GET.toString());
+    ApiObjPO showApiObj =
+        this.genApiObjPO(apiBaseId, tableId, tableName, tableComment, dtoName, null, className,
+            datasourcePName, dbname, dbcount, "s/{".concat(tableParamName.concat("Id}/show")),
+            "sShow", Constants.API_PRODUCES, "详情", RequestMethod.GET.toString());
     showApiObj = apiObjRepo.save(showApiObj);
     // 详情接口参数
     ApiParamPO showApiparam = this.genApiParamPO(showApiObj.getId(), tableParamName.concat("Id"),
         tableParamName.concat("对象id"), ParamIn.PATH, DtoType.BASE, "String");
     apiParamRepo.save(showApiparam);
     // 删除接口
-    ApiObjPO delApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+    ApiObjPO delApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
         BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount,
         "s/{".concat(tableParamName.concat("Id}/delete")), "s", Constants.API_PRODUCES, "删除",
         RequestMethod.DELETE.toString());
@@ -206,7 +208,7 @@ public class ApiObjServiceImpl implements IApiObjService {
         tableParamName.concat("对象id"), ParamIn.PATH, DtoType.BASE, "String");
     apiParamRepo.save(delApiparam);
     // 新增接口
-    ApiObjPO saveApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+    ApiObjPO saveApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
         BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount, "s/save",
         "sSave", Constants.API_PRODUCES, "新增", RequestMethod.POST.toString());
     saveApiObj = apiObjRepo.save(saveApiObj);
@@ -216,7 +218,7 @@ public class ApiObjServiceImpl implements IApiObjService {
         DtoType.PO, className);
     apiParamRepo.save(saveApiparam);
     // 更新接口
-    ApiObjPO updateApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+    ApiObjPO updateApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
         BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount,
         "s/{".concat(tableParamName.concat("Id}/save")), "Save", Constants.API_PRODUCES, "修改",
         RequestMethod.PUT.toString());
@@ -232,7 +234,7 @@ public class ApiObjServiceImpl implements IApiObjService {
         DtoType.PO, className);
     apiParamRepo.save(updateEntityApiparam);
     // jsonschema接口
-    ApiObjPO schemaApiObj = this.genApiObjPO(apiBaseId, tableId, tableName,
+    ApiObjPO schemaApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
         BaseDTO.ResultJsonSchemaDTO.toString(), className, className, datasourcePName, dbname,
         dbcount, "s", "s", "application/schema+json", "的json-schema", RequestMethod.GET.toString());
     schemaApiObj = apiObjRepo.save(schemaApiObj);
@@ -254,10 +256,10 @@ public class ApiObjServiceImpl implements IApiObjService {
    * @param requestMethod
    * @return
    */
-  private ApiObjPO genApiObjPO(String apiBaseId, String tableId, String tableName, String dtoName,
-      String genericName, String className, String datasourcePName, String dbname, Long dbcount,
-      String urlPostfix, String namePostfix, String produces, String description,
-      String requestMethod) {
+  private ApiObjPO genApiObjPO(String apiBaseId, String tableId, String tableName,
+      String tableComment, String dtoName, String genericName, String className,
+      String datasourcePName, String dbname, Long dbcount, String urlPostfix, String namePostfix,
+      String produces, String description, String requestMethod) {
     ApiObjPO apiObj = new ApiObjPO();
     apiObj.setApiBaseId(apiBaseId);
     String urlPrefix = "", namePrefix = "";
@@ -276,7 +278,11 @@ public class ApiObjServiceImpl implements IApiObjService {
       apiObj.setResponseObjGenericType(DtoType.PO.toString().toLowerCase());
       apiObj.setResponseObjGenericFormat(genericName);
     }
-    apiObj.setSummary("实体".concat(className).concat(description));
+    if (StringUtils.isNotBlank(tableComment)) {
+      apiObj.setSummary(tableComment.concat(description));
+    } else {
+      apiObj.setSummary("实体".concat(className).concat(description));
+    }
     apiObj.setDescription("实体".concat(className).concat(description));
     apiObj.setProduces(produces);
     apiObj.setTag(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName));

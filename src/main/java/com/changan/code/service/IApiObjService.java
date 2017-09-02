@@ -53,11 +53,13 @@ public interface IApiObjService {
    * @param dbname ddemo_test
    * @param dbcount 1
    */
-  public void createAutoCrudApi(String apiBaseId, String tableId, String tableName, String dtoName,
-      String className, String datasourcePName, String dbname, Long dbcount);
-  
+  public void createAutoCrudApi(String apiBaseId, String tableId, String tableName,
+      String tableComment, String dtoName, String className, String datasourcePName, String dbname,
+      Long dbcount);
+
   /**
    * 根据tableId删除api
+   * 
    * @param tableId
    */
   public void deleteAutoCrudApi(String tableId);

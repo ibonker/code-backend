@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.changan.anywhere.common.utils.StringUtils;
 import com.changan.code.common.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -92,6 +93,18 @@ public class TablePO extends BaseEntity {
     // 是否自动生成crud，默认否
     this.setIsAutoCrud(Constants.IS_INACTIVE);
     
+    return this;
+  }
+  
+  /**
+   * 更新表
+   * @param newTable
+   * @return
+   */
+  public TablePO updateAttrs(TablePO newTable) {
+    if (StringUtils.isNotBlank(newTable.getComments())) {
+      this.comments = newTable.getComments();
+    }
     return this;
   }
 

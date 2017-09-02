@@ -182,6 +182,9 @@ public class ColumnPO extends BaseEntity {
       this.pattern = column.getPattern();
       this.min = column.getMin();
       this.max = column.getMax();
+      if (StringUtils.isNotBlank(column.getComments())) {
+        this.comments = column.getComments();
+      }
     }
     
     return this;
