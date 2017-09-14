@@ -3,6 +3,7 @@
  */
 package com.changan.code.service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -108,4 +109,24 @@ public interface ITableService {
    */
   public TransferObjPO transColumnPOToTransPO(String tableId);
 
+  /**
+   * 实体文件生成
+   * @param projectId
+   * @return
+   */
+  public String generateEntityCodeFiles(String tableId);
+  
+  /**
+   * 下载实体文件
+   * @param projectName
+   * @return
+   */
+  public File downLoadFile(String tableName);
+  
+  /**
+   * 获取表
+   * @param datasourceId
+   * @return
+   */
+  public List<TablePO> findByDatasourceId(String datasourceId);
 }

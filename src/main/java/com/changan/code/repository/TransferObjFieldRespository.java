@@ -7,6 +7,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.changan.code.entity.TransferObjFieldPO;
 
+/**
+ * TransferObjField JPA数据库操作
+ * @author xuyufeng
+ *
+ */
 public interface TransferObjFieldRespository extends JpaRepository<TransferObjFieldPO, String>,
     JpaSpecificationExecutor<TransferObjFieldPO> {
 
@@ -26,7 +31,7 @@ public interface TransferObjFieldRespository extends JpaRepository<TransferObjFi
    * @param delFlag
    * @return
    */
-  public List<TransferObjFieldPO> findByTransferObjIdAndDelFlag(String TransferObjId,
+  public List<TransferObjFieldPO> findByTransferObjIdAndDelFlag(String transferObjId,
       String delFlag);
 
   /**

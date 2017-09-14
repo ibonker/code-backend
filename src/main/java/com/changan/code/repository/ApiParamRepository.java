@@ -6,7 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.changan.code.entity.ApiParamPO;
-
+/**
+ * ApiParam JPA数据库操作
+ * @author xuyufeng
+ *
+ */
 public interface ApiParamRepository
     extends JpaRepository<ApiParamPO, String>, JpaSpecificationExecutor<ApiParamPO> {
 

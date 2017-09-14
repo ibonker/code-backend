@@ -6,7 +6,6 @@ package com.changan.code.service;
 import java.util.List;
 import java.util.Map;
 
-import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.dto.Template;
 import com.changan.code.entity.ApiBasePO;
 import com.changan.code.entity.ApiObjPO;
@@ -40,7 +39,7 @@ public interface IGenerateService {
    * @param datasources
    * @return
    */
-  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources);
+  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources, String basepath);
 
   /**
    * 生成实体类
@@ -49,7 +48,7 @@ public interface IGenerateService {
    * @param columns
    */
   public void generateEntityFiles(String moduleName, String projectName, String packageName,
-      SimpleDataObj table, List<ColumnPO> columns);
+      TablePO table, List<ColumnPO> columns);
 
 
   /**
@@ -77,7 +76,7 @@ public interface IGenerateService {
    * @param ClassName
    */
   public void generateIServiceAndServiceImpl(String moduleName, String projectName,
-      String packageName, TablePO table, String DTOPackageName);
+      String packageName, TablePO table, String dtoPackageName);
 
   /**
    * 生成controller文件
@@ -104,4 +103,27 @@ public interface IGenerateService {
    * @param projectName
    */
   public void generateMybatisFiles(String projectName);
+  
+  /**
+   * 生成JPA Repository
+   */
+  public void generateRepository(String moduleName, String projectName, String packageName, String name);
+  
+  /**
+   * 生成JPAService 和 JPAServiceImpl
+   * @param moduleName
+   * @param projectName
+   * @param packageName
+   * @param table
+   * @param DTOPackageName
+   */
+  public void generateJPAServiceAndJPAServiceImpl(String module, String projectName,
+      String packageName, TablePO table, String dtoPackageName);
+  
+  /**
+   * 生成advice文件
+   * @param packageName
+   * @param module
+   */
+  public void generateAdvice(String packageName, String projectName);
 }

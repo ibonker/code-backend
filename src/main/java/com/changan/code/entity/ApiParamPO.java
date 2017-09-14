@@ -3,18 +3,24 @@
  */
 package com.changan.code.entity;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.code.common.Constants;
-import com.changan.code.common.DtoType;
-import com.changan.code.common.ParamIn;
+import com.changan.code.common.BaseType;
+import com.changan.code.common.BaseParamIn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -57,6 +63,10 @@ public class ApiParamPO extends BaseEntity {
   @Column(name = "type")
   @JsonProperty("type")
   private String type; // 参数类型
+  
+  @Column(name = "array_type")
+  @JsonProperty("arrayType")
+  private String arrayType; // 参数array类型
 
   @Column(name = "format")
   @JsonProperty("format")
@@ -79,6 +89,22 @@ public class ApiParamPO extends BaseEntity {
   }
   
   /**
+   * 设置array type
+   * @return
+   */
+  public ApiParamPO setArrayType() {
+    if (StringUtils.isNotBlank(this.type) && BaseType.ARRAY.equals(BaseType.valueOf(this.type.toUpperCase()))) {
+      String[] array = this.format.split("\\.");
+      this.arrayType = array[0];
+      List<String> formats = Lists.newArrayList(Arrays.asList(array));
+      formats.remove(0);
+      this.format = Joiner.on(".").join(formats);
+    }
+    
+    return this;
+  }
+  
+  /**
    * 获取实体名
    * 
    * @return
@@ -87,7 +113,7 @@ public class ApiParamPO extends BaseEntity {
   public String getParamObj() {
     String[] responseObjNames = this.format.split("\\.");
     String prefix = "", postfix = "";
-    if (DtoType.ARRAY.toString().equals(this.type.toUpperCase())) {
+    if (BaseType.ARRAY.toString().equals(this.type.toUpperCase())) {
       prefix = "List<";
       postfix = ">";
     }
@@ -100,6 +126,6 @@ public class ApiParamPO extends BaseEntity {
    */
   @JsonIgnore
   public String getFormAnnotation() {
-    return ParamIn.valueOf(this.form.toUpperCase()).getAnnotation();
+    return BaseParamIn.valueOf(this.form.toUpperCase()).getAnnotation();
   }
 }

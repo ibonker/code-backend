@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>restStatus</name>
+  <filePath>src/main/java/${packageName}/${moduleName}/common</filePath>
+  <fileName>RestStatus.java</fileName>
+  <content><![CDATA[
+package ${packageName}.common;
+
+import com.changan.anywhere.common.mvc.page.rest.response.BaseRestStatus;
+
+/**
+ * @author wenxing
+ *
+ */
+public class RestStatus extends BaseRestStatus {
+
+  public RestStatus(String code, String description, String message) {
+    super(code, description, message);
+  }
+
+}
+]]>
+  </content>
+</template>

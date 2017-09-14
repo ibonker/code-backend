@@ -35,15 +35,12 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
   @Override
   @Transactional("jpaTransactionManager")
   public TransferObjFieldPO saveTransferObjField(TransferObjFieldPO transferObjField) {
-    // 重复条数
-    int sameCount = 0;
     // 查询重复条数
-    sameCount = transferObjRePo.countByNameAndTransferObjIdAndDelFlag(transferObjField.getName(),
+    int sameCount = transferObjRePo.countByNameAndTransferObjIdAndDelFlag(transferObjField.getName(),
         transferObjField.getTransferObjId(), Constants.DATA_IS_NORMAL);
     if (sameCount == 0) {
       // 保存DTO属性对象
-      transferObjField = transferObjRePo.save(transferObjField);
-      return transferObjField;
+      return transferObjRePo.save(transferObjField.setArrayType());
     } else {
       throw new CodeCommonException("保存失败！");
     }
@@ -55,7 +52,6 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
   @Override
   @Transactional("jpaTransactionManager")
   public void deleteTransferObjField(String id) {
-
     // 查询数据库中DTO属性对象是否存在
     TransferObjFieldPO transferObjField =
         transferObjRePo.findByIdAndDelFlag(id, Constants.DATA_IS_NORMAL);
@@ -75,13 +71,8 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
    */
   @Override
   public TransferObjFieldPO findTransferObjFieldById(String id) {
-
     // 查询数据库中DTO属性对象
-    TransferObjFieldPO transferObjField =
-        transferObjRePo.findByIdAndDelFlag(id, Constants.DATA_IS_NORMAL);
-    // 返回查询结果
-    return transferObjField;
-
+    return transferObjRePo.findByIdAndDelFlag(id, Constants.DATA_IS_NORMAL);
   }
 
   /**
@@ -101,18 +92,14 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
           transferObjRePo.findByNameAndDelFlagAndTransferObjId(updateTransferField.getName(),
               Constants.DATA_IS_NORMAL, updateTransferField.getTransferObjId());
       // 如果长度为0则直接更新
-      if (transferObjFields.size() == 0) {
+      if (transferObjFields.isEmpty()) {
         // 保存属性
-        updateTransferField = transferObjRePo.save(updateTransferField);
-        // 返回对象
-        return updateTransferField;
+        return transferObjRePo.save(updateTransferField.setArrayType());
       } else {
         // 若长度为1则判断id是否相同
         if (transferObjFields.get(0).getId().equals(transferObjField.getId())) {
           // 保存属性
-          updateTransferField = transferObjRePo.save(updateTransferField);
-          // 返回对象
-          return updateTransferField;
+          return transferObjRePo.save(updateTransferField.setArrayType());
         } else {
           throw new CodeCommonException("更新失败！参数名重复！");
         }
@@ -128,10 +115,7 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
   @Override
   public List<TransferObjFieldPO> findAllTransferObjField(String transferObjId) {
     // 获取查询结果
-    List<TransferObjFieldPO> transferObjFields =
-        transferObjRePo.findByTransferObjIdAndDelFlag(transferObjId, Constants.DATA_IS_NORMAL);
-    // 返回结果
-    return transferObjFields;
+    return transferObjRePo.findByTransferObjIdAndDelFlag(transferObjId, Constants.DATA_IS_NORMAL);
   }
 
   /**
@@ -139,11 +123,12 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
    */
   @Override
   public void saveAllTransferObjField(List<TransferObjFieldPO> transferObjFields) {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     // 初始化长度
     int length = 1;
     for (TransferObjFieldPO transferObjField : transferObjFields) {
       // 将属性name放入map，若map长度未增加则，name重复
+      transferObjField.setArrayType();
       map.put(transferObjField.getName(), transferObjField.getName());
       if (map.size() != length) {
         throw new CodeCommonException("DTO属性重复：" + transferObjField.getName());
@@ -154,6 +139,10 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
     transferObjRePo.save(transferObjFields);
   }
 
+
+  /**
+   * 根据transferObjId删除参数
+   */
   @Override
   public void deleteByTransferObjId(String transferObjId) {
     transferObjRePo.deleteByTransferObjId(transferObjId);

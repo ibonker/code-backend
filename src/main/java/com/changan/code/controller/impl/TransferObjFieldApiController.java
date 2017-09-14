@@ -12,11 +12,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.RestStatus;
 import com.changan.code.controller.TransferObjFieldApi;
 import com.changan.code.dto.ResultOfTransferObjFieldDTO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.service.ITransferObjFieldService;
 
+/**
+ * TransferObjField API Contoller
+ * @author xuyufeng
+ *
+ */
 @Controller
 public class TransferObjFieldApiController implements TransferObjFieldApi {
 
@@ -34,8 +40,8 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
     // 获得查询到的DTO属性对象
     TransferObjFieldPO transferObjField = transferObjFieldService.findTransferObjFieldById(id);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(new ResultOfTransferObjFieldDTO()
-        .transferObjField(transferObjField).message("成功").statusCode(Constants.SUCCESS_API_CODE),
+    return new ResponseEntity<>(new ResultOfTransferObjFieldDTO()
+        .transferObjField(transferObjField).message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE),
         HttpStatus.OK);
   }
 
@@ -47,8 +53,8 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
     // 执行逻辑删除
     transferObjFieldService.deleteTransferObjField(id);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(
-        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(
+        new ResultDTO().message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
   /**
@@ -57,7 +63,7 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
   @Override
   public ResponseEntity<ResultDTO> transferObjFieldSavePost(
       @RequestBody TransferObjFieldPO transferObjField) {
-    TransferObjFieldPO newTransferObjField = new TransferObjFieldPO();
+    TransferObjFieldPO newTransferObjField;
     // 数据库中无此数据，则执行sava，否则执行update
     if (transferObjField.isNew()) {
       // 保存DTO属性
@@ -67,8 +73,8 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
       newTransferObjField = transferObjFieldService.updateTransferObjField(transferObjField);
     }
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(new ResultOfTransferObjFieldDTO()
-        .transferObjField(newTransferObjField).message("成功").statusCode(Constants.SUCCESS_API_CODE),
+    return new ResponseEntity<>(new ResultOfTransferObjFieldDTO()
+        .transferObjField(newTransferObjField).message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE),
         HttpStatus.OK);
   }
 
@@ -80,8 +86,8 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
     // 获取查询结果
     List<TransferObjFieldPO> transferObjFields = transferObjFieldService.findAllTransferObjField(transferObjId);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(new ResultOfTransferObjFieldDTO()
-        .transferObjFields(transferObjFields).message("成功").statusCode(Constants.SUCCESS_API_CODE),
+    return new ResponseEntity<>(new ResultOfTransferObjFieldDTO()
+        .transferObjFields(transferObjFields).message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE),
         HttpStatus.OK);
   }
 
@@ -94,7 +100,7 @@ public class TransferObjFieldApiController implements TransferObjFieldApi {
     // 批量保存DTO属性
     transferObjFieldService.saveAllTransferObjField(transferObjFields);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(
-        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(
+        new ResultDTO().message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 }

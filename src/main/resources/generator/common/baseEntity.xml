@@ -7,7 +7,7 @@
 package ${packageName}.common;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 
@@ -46,13 +46,13 @@ public class BaseEntity implements Serializable {
   @JsonPropertyDescription("创建时间")
   @JsonProperty(value = "createdAt", access = Access.READ_ONLY)
   @JsonFormat(pattern = Constants.DATETIME_FORMAT)
-  protected LocalDateTime createdAt;
+  protected Date createdAt;
 
   @Column(name = "updated_at", nullable = false)
   @JsonPropertyDescription("更新时间")
   @JsonProperty(value = "updatedAt", access = Access.READ_ONLY)
   @JsonFormat(pattern = Constants.DATETIME_FORMAT)
-  protected LocalDateTime updatedAt;
+  protected Date updatedAt;
 
   /**
    * 创建之前执行方法，手动调用 添加id和更新时间/创建时间
@@ -62,7 +62,7 @@ public class BaseEntity implements Serializable {
     if (this.isNew()) {
       setId(IdGen.uuid());
     }
-    this.createdAt = LocalDateTime.now();
+    this.createdAt = new Date();
     this.updatedAt = this.createdAt;
   }
 
@@ -70,7 +70,7 @@ public class BaseEntity implements Serializable {
    * 更新之前执行方法，需要手动调用
    */
   public void preUpdate() {
-    this.updatedAt = LocalDateTime.now();
+    this.updatedAt = new Date();
   }
 
   /**

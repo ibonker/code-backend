@@ -83,7 +83,7 @@
 			'(' || t.DATA_PRECISION || ',' || t.DATA_SCALE || ')',
 			'(' ||
 			t.DATA_PRECISION || ')'),'(18)')),t.DATA_TYPE) AS jdbcType,
-			t.data_length as lengthMax
+			t.data_length as max
 			FROM
 			user_tab_columns t, user_col_comments c
 			WHERE t.TABLE_NAME =
@@ -98,7 +98,7 @@
 			SELECT t.COLUMN_NAME AS name, (CASE WHEN t.IS_NULLABLE = 'YES' THEN
 			'1' ELSE '0' END) AS isNullable,
 			t.COLUMN_COMMENT AS comments,t.COLUMN_TYPE AS jdbcType,
-			t.CHARACTER_MAXIMUM_LENGTH as lengthMax
+			t.CHARACTER_MAXIMUM_LENGTH as max
 			FROM
 			information_schema.`COLUMNS` t
 			WHERE t.TABLE_SCHEMA = (select

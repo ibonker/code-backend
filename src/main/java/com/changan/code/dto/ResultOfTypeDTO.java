@@ -4,8 +4,10 @@
 package com.changan.code.dto;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +21,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@JsonInclude(value = Include.NON_NULL)
 public class ResultOfTypeDTO extends ResultDTO {
   
   @JsonProperty("base")

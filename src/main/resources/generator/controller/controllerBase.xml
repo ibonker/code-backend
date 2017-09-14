@@ -6,7 +6,8 @@
   <content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base;
 
-import ${packageName}<#if moduleName != "">.${moduleName}</#if>.exception.ResponseCommonException;
+import ${packageName}<#if moduleName != "">.${moduleName}</#if>.exception.CodeCommonException;
+import ${packageName}<#if moduleName != "">.${moduleName}</#if>.common.RestStatus;
 import com.changan.anywhere.common.mvc.page.rest.response.ValidationSchemaFactoryWrapperExtend;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
@@ -33,7 +34,8 @@ public class BaseController {
       JavaType jt = mapper.getTypeFactory().constructType(typeRef);
       mapper.acceptJsonFormatVisitor(jt, visitor);
     } catch (JsonMappingException e) {
-      throw new ResponseCommonException("实体映射异常");
+      throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
+          RestStatus.RESULT_SYSTEM_ERROR.message());
     }
     return visitor.finalSchema();
   }

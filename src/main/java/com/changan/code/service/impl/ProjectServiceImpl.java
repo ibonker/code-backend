@@ -7,12 +7,14 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +31,7 @@ import com.changan.anywhere.common.utils.FileUtil;
 import com.changan.anywhere.common.utils.FileUtils;
 import com.changan.code.common.BaseDTO;
 import com.changan.code.common.Constants;
-import com.changan.code.common.DtoType;
+import com.changan.code.common.BaseType;
 import com.changan.code.common.PredictUtils;
 import com.changan.code.common.component.Consul;
 import com.changan.code.common.component.Security;
@@ -160,11 +162,33 @@ public class ProjectServiceImpl implements IProjectService {
     if (null == updateProject) {
       throw new CodeCommonException("未找到项目");
     }
-    // 删除之前的数据源
+    // 旧数据源
     List<DatasourcePO> datasources = datasourceService.findByProjectId(project.getId());
+    // 需要删除的数据源
+    List<DatasourcePO> delDbs = Lists.newArrayList();
+    // 需要新增的数据源
+    List<DatasourcePO> newDbs = Lists.newArrayList();
     if (datasources != null) {
-      datasourceService.deleteDatasources(datasources);
+      // 旧数据源map
+      Map<String, DatasourcePO> oldDbMap = Maps.newHashMap();
+      for (DatasourcePO oldDb : datasources) {
+        oldDbMap.put(oldDb.getId(), oldDb);
+      }
+      for (DatasourcePO newDb : project.getDatasources()) {
+        if (StringUtils.isNotBlank(newDb.getId())) {
+          oldDbMap.remove(newDb.getId());
+        } else {
+          newDbs.add(newDb);
+        }
+      }
+      for (Entry<String, DatasourcePO> entry : oldDbMap.entrySet()) {
+        delDbs.add(entry.getValue());
+      }
+      // 删除数据源
+      datasourceService.deleteDatasources(delDbs);
     }
+    // 添加新增的数据源
+    project.setDatasources(newDbs);
     // 更新属性
     updateProject.updateAttrs(project);
     // 更新数据库
@@ -177,8 +201,8 @@ public class ProjectServiceImpl implements IProjectService {
   @Override
   @Transactional("jpaTransactionManager")
   public ProjectPO saveProject(ProjectPO project) {
-    project = projectRepo.save(project);
     List<DatasourcePO> datasources = project.getDatasources();
+    project = projectRepo.save(project);
     // 存入数据源
     if (datasources != null) {
       for (DatasourcePO datasource : datasources) {
@@ -197,10 +221,28 @@ public class ProjectServiceImpl implements IProjectService {
   public ProjectPO getProjectById(String id) {
     // 项目
     ProjectPO project = projectRepo.findOne(id);
+    if (null == project) {
+      throw new CodeCommonException("数据库查无此数据");
+    }
     // 项目数据源
     List<DatasourcePO> datasources = datasourceService.findByProjectId(id);
     // 注入datasources
     project.setDatasources(datasources);
+    // 组合项目组件
+    Map<String, Object> componentMap = Maps.newHashMap();
+    List<ComponentCategory> list = getComponents();
+    for (ComponentCategory co : list) {
+      List<String> codes = co.getComponents().stream()
+          .filter(cop -> project.getComponents() != null
+              && project.getComponents().indexOf(cop.getCode()) > -1)
+          .map(Component::getCode).collect(Collectors.toList());
+      if (co.getIsMultiSelect().equals(Constants.DATA_IS_INVALID)) {
+        componentMap.put(co.getCategory(), codes);
+      } else {
+        componentMap.put(co.getCategory(), codes.size() == 1 ? codes.get(0) : null);
+      }
+    }
+    project.setComponentsMap(componentMap);
     return project;
   }
 
@@ -213,7 +255,9 @@ public class ProjectServiceImpl implements IProjectService {
     // 添加默认类型
     List<SimpleDataObj> defaultdtos = Lists.newArrayList();
     for (BaseDTO basedto : BaseDTO.values()) {
-      defaultdtos.add(new SimpleDataObj("", basedto.toString(), Constants.IS_INACTIVE, null));
+      defaultdtos.add(new SimpleDataObj("", basedto.toString(),
+          basedto.equals(BaseDTO.ResultPageDTO) ? Constants.IS_ACTIVE : Constants.IS_INACTIVE,
+          null));
     }
     PackObj defaultPackobj = new PackObj("default", defaultdtos);
     dtoPacks.add(defaultPackobj);
@@ -223,7 +267,7 @@ public class ProjectServiceImpl implements IProjectService {
       dtoPacks.add(new PackObj(entry.getKey(), entry.getValue()));
     }
 
-    return new RefObjDTO(DtoType.DTO.toString().toLowerCase(), DtoType.DTO.getCname(), dtoPacks);
+    return new RefObjDTO(BaseType.DTO.toString().toLowerCase(), BaseType.DTO.getCname(), dtoPacks);
   }
 
   @Override
@@ -237,7 +281,7 @@ public class ProjectServiceImpl implements IProjectService {
       poPacks.add(new PackObj(entry.getKey(), entry.getValue()));
     }
 
-    return new RefObjDTO(DtoType.PO.toString().toLowerCase(), DtoType.PO.getCname(), poPacks);
+    return new RefObjDTO(BaseType.PO.toString().toLowerCase(), BaseType.PO.getCname(), poPacks);
   }
 
   /**
@@ -251,9 +295,10 @@ public class ProjectServiceImpl implements IProjectService {
     List<DatasourcePO> datasources = datasourceService.findByProjectId(id);
     // 获取表map
     Map<String, TablePO> tablemap = Maps.newHashMap();
+    // 获取最新的apibase
+    ApiBasePO firstApibase = apiBaseService.findEarlestApiBaseByProjectId(id);
     // 生成配置文件代码
-    generateService.generateConfigFiles(project, datasources);
-
+    generateService.generateConfigFiles(project, datasources, firstApibase.getBasePath());
     // 查询对应项目下的DTO信息
     List<TransferObjPO> transferObjs = transObjService.findAllTransferObj(id);
     for (TransferObjPO transferObj : transferObjs) {
@@ -265,7 +310,11 @@ public class ProjectServiceImpl implements IProjectService {
           transferObj, transferObjFileds);
     }
 
+    //生成advice代码
+    generateService.generateAdvice(project.getPackages(), project.getName());
+    
     // 获取需要自动生成crud的table
+    boolean isAutoGen = false;
     for (DatasourcePO datasource : datasources) {
       // 查询对应数据源下的所有表
       List<TablePO> tables = tableRepo.findByDatasourceIdAndIsAutoCrudAndDelFlag(datasource.getId(),
@@ -273,33 +322,40 @@ public class ProjectServiceImpl implements IProjectService {
       for (TablePO table : tables) {
         table.setPackageName(datasource.getPackageName());
         tablemap.put(table.getId(), table);
-        // 生成dao代码
-        // generateService.generateDAOFiles(project.getName(), project.getPackages().toLowerCase(),
-        // table);
         // 生成servcie和serviceImpl
         generateService.generateIServiceAndServiceImpl(datasource.getPackageName(),
             project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
+        // TODO 判断mybatis和jpa 生成JPAService和JPAServiceImpl
+        // generateService.generateJPAServiceAndJPAServiceImpl(datasource.getPackageName(),
+        // project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
       }
       // 数据库代码生成xml
-      generateService.generateGeneratorConfigFiles(project.getName(),
-          project.getPackages().toLowerCase(), datasource, tables);
+      if (!tables.isEmpty()) {
+        generateService.generateGeneratorConfigFiles(project.getName(),
+            project.getPackages().toLowerCase(), datasource, tables);
+        isAutoGen = true;
+      }
+
     }
-    
     // 生成mybatis代码
-    generateService.generateMybatisFiles(project.getName());
+    if (isAutoGen) {
+      generateService.generateMybatisFiles(project.getName());
+    }
 
     // 获取实体表名
     for (DatasourcePO datasource : datasources) {
       // 查询对应数据源下的所有表
-      List<SimpleDataObj> tables = tableService.findClassnameByDatasourceId(datasource.getId());
-      for (SimpleDataObj table : tables) {
+      List<TablePO> tables = tableService.findByDatasourceId(datasource.getId());
+      for (TablePO table : tables) {
         List<ColumnPO> columns = tableService.findMergedColumns(table.getId());
         // 生成实体文件代码
         generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
             project.getPackages().toLowerCase(), table, columns);
+        // TODO 判断mybatis和jpa 生成Jpa Repository
+//        generateService.generateRepository(datasource.getPackageName(), project.getName(),
+//            project.getPackages().toLowerCase(), table.getName());
       }
     }
-
     // 获取apibase
     List<ApiBasePO> apibases = apiBaseService.findAllApiBase(project.getId());
     for (ApiBasePO apibase : apibases) {
@@ -309,7 +365,7 @@ public class ProjectServiceImpl implements IProjectService {
       for (ApiObjPO apiobj : apiobjs) {
         // 获取api param
         List<ApiParamPO> apiparams = apiParamService.findAllApiParam(apiobj.getId());
-        apiobj.setApiParam(apiparams);
+        apiobj.setApiParams(apiparams);
         // 添加包名
         if (Constants.IS_ACTIVE.equals(apiobj.getIsAutoGen())) {
           String tableName = tablemap.get(apiobj.getGenBasedTableId()).getName();
@@ -338,7 +394,7 @@ public class ProjectServiceImpl implements IProjectService {
     }
 
     // 打包代码
-    // this.zipcode(project.getName());
+    this.zipcode(project.getName());
 
     return "/codegen/api/v1/projects/" + project.getName() + "/download";
   }
@@ -380,7 +436,7 @@ public class ProjectServiceImpl implements IProjectService {
           }
         }));
     // consul组件
-    categories.add(this.getComponentCategory(() -> Security.isMultiSelect(),
+    categories.add(this.getComponentCategory(() -> Consul.isMultiSelect(),
         () -> Consul.getTypeCname(), (List<Component> components) -> {
           for (Consul consul : Consul.values()) {
             components.add(new Component(consul.name(), consul.getCname()));

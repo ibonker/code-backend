@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.changan.anywhere.common.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.google.common.collect.Lists;
 
 import lombok.Data;
@@ -20,6 +22,7 @@ import lombok.Data;
  */
 @Data
 @XmlRootElement(name = "template")
+@JsonInclude(value = Include.NON_NULL)
 public class Template implements Serializable {
   
   /**

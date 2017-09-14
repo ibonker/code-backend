@@ -3,7 +3,11 @@ package com.changan.code.service;
 import java.util.List;
 
 import com.changan.code.entity.ApiObjPO;
-
+/**
+ * ApiObj Service接口
+ * @author xuyufeng
+ *
+ */
 public interface IApiObjService {
 
   /**

@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 /**
- * TransferObjField Api
+ * TransferObjField RESTful接口
  * 
  * @author xuyufeng
  *
@@ -28,6 +28,11 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping(value = "/codegen/api/v1")
 public interface TransferObjFieldApi {
 
+  /**
+   * 根据id获取dto属性
+   * @param id
+   * @return
+   */
   @ApiOperation(value = "根据id获取DTO属性", notes = "根据id获取DTO属性",
       response = ResultOfTransferObjFieldDTO.class, tags = {"TransferObjField"})
   @ApiResponses(value = {
@@ -38,16 +43,26 @@ public interface TransferObjFieldApi {
   ResponseEntity<ResultDTO> transferObjFieldShowGet(
       @ApiParam(value = "id") @PathVariable(value = "id", required = true) String id);
 
-  @ApiOperation(value = "删除DTO属性", notes = "删除DTO属性", response = ResultOfTransferObjFieldDTO.class,
+  /**
+   * 根据id删除dto属性
+   * @param id
+   * @return
+   */
+  @ApiOperation(value = "删除DTO属性", notes = "删除DTO属性", response = ResultDTO.class,
       tags = {"TransferObjField"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjFieldDTO.class),
-      @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjFieldDTO.class)})
+      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/transferObjField/{id}/Delete", produces = {"application/json"},
       method = RequestMethod.DELETE)
   ResponseEntity<ResultDTO> transferObjFieldDelete(
       @ApiParam(value = "id", required = true) @PathVariable(value = "id", required = true) String id);
 
+  /**
+   * 保存dto属性
+   * @param transferObjField
+   * @return
+   */
   @ApiOperation(value = "保存DTO属性", notes = "保存DTO属性", response = ResultOfTransferObjFieldDTO.class,
       tags = {"TransferObjField"})
   @ApiResponses(value = {
@@ -58,6 +73,11 @@ public interface TransferObjFieldApi {
   ResponseEntity<ResultDTO> transferObjFieldSavePost(
       @ApiParam(value = "transferObjField", required = true) @RequestBody TransferObjFieldPO transferObjField);
 
+  /**
+   * 查询指定dto下的所有属性
+   * @param transferObjId
+   * @return
+   */
   @ApiOperation(value = "查询所有DTO属性", notes = "查询所有DTO属性",
       response = ResultOfTransferObjFieldDTO.class, tags = {"TransferObjField"})
   @ApiResponses(value = {
@@ -68,11 +88,16 @@ public interface TransferObjFieldApi {
   ResponseEntity<ResultDTO> transferObjFieldAllShowGet(
       @ApiParam(value = "transferObjId") @PathVariable(value = "transferObjId", required = true) String transferObjId);
 
+  /**
+   * 批量添加dto属性
+   * @param transferObjFields
+   * @return
+   */
   @ApiOperation(value = "批量添加DTO属性", notes = "批量添加DTO属性",
-      response = ResultOfTransferObjFieldDTO.class, tags = {"TransferObjField"})
+      response = ResultDTO.class, tags = {"TransferObjField"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjFieldDTO.class),
-      @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjFieldDTO.class)})
+      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/transferobjfields/Save", produces = {"application/json"},
       method = RequestMethod.POST)
   ResponseEntity<ResultDTO> transferObjFielSaveAllPost(

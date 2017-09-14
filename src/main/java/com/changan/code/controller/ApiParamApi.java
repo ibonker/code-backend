@@ -20,7 +20,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 /**
- * 
+ * ApiParam RESTful接口
  * @author xuyufeng
  *
  */
@@ -28,18 +28,28 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping(value = "/codegen/api/v1")
 public interface ApiParamApi {
 
-
-  @ApiOperation(value = "保存apiParam", notes = "保存apiParam", response = ResultOfApiParamDTO.class,
+  /**
+   * 批量ApiParams
+   * @param apiParams
+   * @param ApiObjId
+   * @return
+   */
+  @ApiOperation(value = "保存apiParam", notes = "保存apiParam", response = ResultDTO.class,
       tags = {"ApiParam"})
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfApiParamDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfApiParamDTO.class)})
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/apiparam/save", produces = {"application/json"},
       method = RequestMethod.POST)
   ResponseEntity<ResultDTO> apiObjSavePost(
       @ApiParam(value = "参数列表") @RequestBody List<ApiParamPO> apiParams,
-      @ApiParam(value = "apiObjId") @RequestParam String ApiObjId);
+      @ApiParam(value = "apiObjId") @RequestParam String apiObjId);
 
+  /**
+   * 查询指定apiObj下所有的apiParam
+   * @param apiObjId
+   * @return
+   */
   @ApiOperation(value = "查询指定apiObj所有的apiParam", notes = "查询指定apiObj所有的apiParam",
       response = ResultOfApiParamDTO.class, tags = {"ApiParam"})
   @ApiResponses(

@@ -1,3 +1,6 @@
+import java.util.Arrays;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +11,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.changan.code.Application;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.service.IProjectService;
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Joiner;
 
 /**
  * @author wenxing
@@ -16,25 +21,25 @@ import com.changan.code.service.IProjectService;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ProjectServiceTest {
-  
+
   @Autowired
   IProjectService projectService;
 
-//  @Test
+  // @Test
   public void crudTest() {
     ProjectPO updateProject = new ProjectPO();
-//    updateProject.setId("6e89a8c3-c7e1-4f8b-9947-ac43bf4a28d6");
+    // updateProject.setId("6e89a8c3-c7e1-4f8b-9947-ac43bf4a28d6");
     updateProject.setName("测试项目002");
     updateProject.setPackages("com.changan.testproj");
     updateProject.setComponents("springsecurity");
     updateProject.setDescription("测试项目002");
-//    projectService.updateProject(updateProject);
+    // projectService.updateProject(updateProject);
     projectService.saveProject(updateProject);
   }
-  
+
   @Test
   public void genTest() {
-    projectService.generateCodeFiles("34c2396e-0c38-4c40-ad8d-d769d3849e9c");
+    
   }
-  
+
 }

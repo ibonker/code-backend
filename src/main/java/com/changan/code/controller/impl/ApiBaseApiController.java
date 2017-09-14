@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.RestStatus;
 import com.changan.code.controller.ApiBaseApi;
 import com.changan.code.dto.ResultOfApiBaseDTO;
 import com.changan.code.entity.ApiBasePO;
@@ -39,8 +40,8 @@ public class ApiBaseApiController implements ApiBaseApi {
     // 获得所有的api
     List<ApiBasePO> allApiBases = apiBaseService.findAllApiBase(projectId);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(new ResultOfApiBaseDTO().apiBases(allApiBases)
-        .message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfApiBaseDTO().apiBases(allApiBases)
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
   /**
@@ -48,7 +49,7 @@ public class ApiBaseApiController implements ApiBaseApi {
    */
   @Override
   public ResponseEntity<ResultDTO> apiBaseSavePost(@RequestBody ApiBasePO apiBase) {
-    ApiBasePO newApiBase = new ApiBasePO();
+    ApiBasePO newApiBase;
     if (apiBase.isNew()) {
       // 保存api
       newApiBase = apiBaseService.saveApiBase(apiBase);
@@ -57,7 +58,7 @@ public class ApiBaseApiController implements ApiBaseApi {
       newApiBase = apiBaseService.updateApiBase(apiBase);
     }
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(new ResultOfApiBaseDTO().apiBase(newApiBase).message("成功")
+    return new ResponseEntity<>(new ResultOfApiBaseDTO().apiBase(newApiBase).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
@@ -69,7 +70,7 @@ public class ApiBaseApiController implements ApiBaseApi {
     // 根据id删除api
     apiBaseService.deleteApiBaseById(id);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(
-        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(
+        new ResultDTO().message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 }

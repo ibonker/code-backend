@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.changan.code.common.Constants;
 import com.changan.code.entity.ApiBasePO;
+import com.changan.code.entity.ApiObjPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ApiBaseRepository;
 import com.changan.code.service.IApiBaseService;
@@ -40,15 +41,12 @@ public class ApiBaseServiceImpl implements IApiBaseService {
   @Override
   @Transactional("jpaTransactionManager")
   public ApiBasePO saveApiBase(ApiBasePO apiBase) {
-    // 重复数
-    int sameCount = 0;
     // 查询是否有重复数
-    sameCount = apiBaseRepo.countByVersionNameAndProjectIdAndDelFlag(apiBase.getVersionName(),
+    int sameCount = apiBaseRepo.countByVersionNameAndProjectIdAndDelFlag(apiBase.getVersionName(),
         apiBase.getProjectId(), Constants.DATA_IS_NORMAL);
     if (sameCount == 0) {
       // 保存api
-      apiBase = apiBaseRepo.save(apiBase);
-      return apiBase;
+      return apiBaseRepo.save(apiBase);
     } else {
       throw new CodeCommonException("添加失败，版本号已存在!");
     }
@@ -69,15 +67,13 @@ public class ApiBaseServiceImpl implements IApiBaseService {
       List<ApiBasePO> apiBases =
           apiBaseRepo.findByVersionNameAndProjectIdAndDelFlag(updateApiBasePO.getVersionName(),
               updateApiBasePO.getProjectId(), Constants.DATA_IS_NORMAL);
-      if (apiBases.size() == 0) {
+      if (apiBases.isEmpty()) {
         // 保存更新
-        apiBaseRepo.save(updateApiBasePO);
-        return updateApiBasePO;
+        return apiBaseRepo.save(updateApiBasePO);
       } else {
         if (apiBases.get(0).getId().equals(updateApiBasePO.getId())) {
           // 保存更新
-          apiBaseRepo.save(updateApiBasePO);
-          return updateApiBasePO;
+          return apiBaseRepo.save(updateApiBasePO);
         } else {
           throw new CodeCommonException("更新失败，versionName重复！");
         }
@@ -101,11 +97,9 @@ public class ApiBaseServiceImpl implements IApiBaseService {
    */
   @Override
   public List<ApiBasePO> findAllApiBase(String projectId) {
-    // 查询所有的API
-    List<ApiBasePO> apiBases =
-        apiBaseRepo.findByProjectIdAndDelFlag(projectId, Constants.DATA_IS_NORMAL);
     // 返回查询结果
-    return apiBases;
+    return apiBaseRepo.findByProjectIdAndDelFlagOrderByVersionName(projectId,
+        Constants.DATA_IS_NORMAL);
   }
 
   /**
@@ -120,6 +114,15 @@ public class ApiBaseServiceImpl implements IApiBaseService {
       // 执行删除
       apiBase.setDelFlag(Constants.DATA_IS_INVALID);
       apiBaseRepo.save(apiBase);
+      //查询apiBase下所有的方法
+      List<ApiObjPO> apiObjs = apiObjService.findAllApiObj(id);
+      //如果apiobj不为空则执行apiParam删除
+      if(!apiObjs.isEmpty() && apiObjs != null){
+        for(ApiObjPO apiObj : apiObjs){
+          //删除apiObj下所有的参数s
+          apiObjService.deleteApiObj(apiObj.getId());
+        }
+      }
     } else {
       throw new CodeCommonException("删除失败，删除的数据不存在！");
     }
@@ -153,11 +156,8 @@ public class ApiBaseServiceImpl implements IApiBaseService {
    */
   @Override
   public ApiBasePO findApiBase(String id) {
-    ApiBasePO apibase = new ApiBasePO();
-    // 根据id查询ApiBase
-    apibase = apiBaseRepo.findByIdAndDelFlag(id, Constants.DATA_IS_NORMAL);
     // 返回查询结果
-    return apibase;
+    return apiBaseRepo.findByIdAndDelFlag(id, Constants.DATA_IS_NORMAL);
   }
 
 }

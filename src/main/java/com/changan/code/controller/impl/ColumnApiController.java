@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.RestStatus;
 import com.changan.code.controller.ColumnApi;
 import com.changan.code.dto.ResultOfColumnDTO;
 import com.changan.code.dto.ResultOfColumnsDTO;
@@ -49,7 +50,7 @@ public class ColumnApiController extends BaseController implements ColumnApi {
   @Override
   public ResponseEntity<ResultDTO> columnsSavePost(@RequestBody List<ColumnPO> columns) {
     columns = columnService.saveConfigColumns(columns);
-    return new ResponseEntity<ResultDTO>(new ResultOfColumnsDTO().columns(columns).message("成功")
+    return new ResponseEntity<>(new ResultOfColumnsDTO().columns(columns).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
   
@@ -59,8 +60,7 @@ public class ColumnApiController extends BaseController implements ColumnApi {
   @Override
   public ResponseEntity<ResultDTO> columnSavePost(@RequestBody ColumnPO column) {
     column = columnService.saveConfigColumn(column);
-    return new ResponseEntity<ResultDTO>(new ResultOfColumnDTO().column(column).message("成功")
+    return new ResponseEntity<>(new ResultOfColumnDTO().column(column).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
-
 }

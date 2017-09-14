@@ -15,6 +15,8 @@ public enum BaseFormat {
   Float(""),
   Double(""),
   BigDecimal("java.math.BigDecimal"),
+  Date("java.util.Date"),
+  Timestamp("java.sql.Timestamp"),
   LocalDateTime("java.time.LocalDateTime");
   
   // 包名

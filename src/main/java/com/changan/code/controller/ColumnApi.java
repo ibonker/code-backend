@@ -61,6 +61,5 @@ public interface ColumnApi {
           @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/column/save", produces = {"application/json"},
       method = RequestMethod.POST)
-  public ResponseEntity<ResultDTO> columnSavePost(@RequestBody ColumnPO column);
-
+  public ResponseEntity<ResultDTO> columnSavePost(@RequestBody ColumnPO column);  
 }

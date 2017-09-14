@@ -12,7 +12,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.anywhere.common.utils.StringUtils;
 import com.changan.code.common.Constants;
-import com.changan.code.common.ParamerConstant;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.CaseFormat;
@@ -25,7 +24,7 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "columnd")
 @Entity
 @EntityListeners(value = {AuditingEntityListener.class})
@@ -34,67 +33,67 @@ public class ColumnPO extends BaseEntity {
    * 
    */
   private static final long serialVersionUID = 3980144310483390653L;
-  
+
   @Column(name = "table_id")
   @JsonProperty(value = "tableId")
   @JsonPropertyDescription("归属表")
   private String tableId; // 归属表
-  
+
   @Column(name = "name")
   @JsonProperty(value = "name")
   @JsonPropertyDescription("列名")
   private String name; // 列名
-  
+
   @Column(name = "comments")
   @JsonProperty(value = "comments")
   @JsonPropertyDescription("描述")
   private String comments; // 描述
-  
+
   @Column(name = "jdbc_type")
   @JsonProperty(value = "jdbcType")
   @JsonPropertyDescription("JDBC类型")
   private String jdbcType; // JDBC类型
-  
+
   @Column(name = "java_type")
   @JsonProperty(value = "javaType")
   @JsonPropertyDescription("JAVA类型")
   private String javaType; // JAVA类型
-  
+
   @Column(name = "java_field")
   @JsonProperty(value = "javaField")
   @JsonPropertyDescription("JAVA字段名")
   private String javaField; // JAVA字段名
-  
+
   @Column(name = "is_pk")
   @JsonProperty(value = "isPk")
   @JsonPropertyDescription("是否主键（1：主键；0：一般字段）")
   private String isPk = Constants.IS_INACTIVE; // 是否主键（1：主键）
-  
+
   @Column(name = "is_nullable")
   @JsonProperty(value = "isNullable")
   @JsonPropertyDescription("是否可为空（1：可为空；0：不能空）")
-  private String isNullable; // 是否可为空（1：可为空；0：不能空）
-  
+  private String isNullable = Constants.IS_ACTIVE; // 是否可为空（1：可为空；0：不能空）
+
   @Column(name = "read_only")
   @JsonProperty(value = "readOnly")
   @JsonPropertyDescription("是否只读（1：只读；0：可修改）")
-  private String readOnly; // 是否只读（1：只读；0：可修改）
-  
+  private String readOnly = Constants.IS_INACTIVE; // 是否只读（1：只读；0：可修改）
+
   @Column(name = "pattern")
   @JsonProperty(value = "pattern")
   @JsonPropertyDescription("正则表达式")
   private String pattern; // 正则表达式
-  
+
   @Column(name = "min")
   @JsonProperty(value = "min")
   @JsonPropertyDescription("最小值")
   private Integer min; // 最小值、字符串最小长度
-  
+
   @Column(name = "max")
   @JsonProperty(value = "max")
   @JsonPropertyDescription("最大值")
   private Integer max; // 最大值、 字符串最大长度
-  
+
   /**
    * 设置java类型
    * 
@@ -116,17 +115,10 @@ public class ColumnPO extends BaseEntity {
     } else if (StringUtils.startsWithIgnoreCase(this.getJdbcType(), "DATE") // 当数据库中该字段类型为DATE型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "TIME") // 当数据库中该字段类型为TIME型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "YEAR") // 当数据库中该字段类型为YEAR型时
-        || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "DATETIME") // 当数据库中该字段类型为DATETIME型时
-        || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "TIMESTAMP")) { // 当数据库中该字段类型为TIMESTAMP型时
-      if (StringUtils.toCamelCase(this.getName()).equals(ParamerConstant.DATABASE_CONS_UPDATED_AT)
-          || StringUtils.toCamelCase(this.getName()) // 当数据库中该字段名为创建字段常量或修改字段常量时
-              .equals(ParamerConstant.DATABASE_CONS_CREATED_AT)) {
-        // 设置为java8的日期时间类型
-        this.javaType = "LocalDateTime";
-      } else {
-        // 设置为java8的日期时间类型
-        this.javaType = "LocalDateTime";
-      }
+        || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "DATETIME")) { // 当数据库中该字段类型为DATETIME型时
+      this.javaType = "Date";
+    } else if (StringUtils.startsWithIgnoreCase(this.getJdbcType(), "TIMESTAMP")) { // 当数据库中该字段类型为TIMESTAMP型时
+      this.javaType = "Timestamp";
     } else if (StringUtils.startsWithIgnoreCase(this.getJdbcType(), "DECIMAL")) { // 当数据库中该字段类型为DECIMAL型时
       // 设置该字段的java类型为BigDecimal类型
       this.javaType = "BigDecimal";
@@ -162,12 +154,13 @@ public class ColumnPO extends BaseEntity {
         this.javaType = "Long";
       }
     }
-    
+
     return this;
   }
-  
+
   /**
    * 设置配置后的属性
+   * 
    * @param column
    * @return
    */
@@ -186,18 +179,18 @@ public class ColumnPO extends BaseEntity {
         this.comments = column.getComments();
       }
     }
-    
+
     return this;
   }
-  
+
   /**
    * 字段名转为java属性名
+   * 
    * @return
    */
   public ColumnPO javaFieldName() {
-    this.setJavaField(
-        CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.getName()));
-    
+    this.setJavaField(CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.getName()));
+
     return this;
   }
 

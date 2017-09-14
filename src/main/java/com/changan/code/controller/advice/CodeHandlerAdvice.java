@@ -3,6 +3,7 @@
  */
 package com.changan.code.controller.advice;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,6 +29,16 @@ public class CodeHandlerAdvice {
     String code = Constants.EXCEPTION_API_CODE;
     log.error("**** 发生异常 ****", exception);
     errorMsg = exception.getMessage();
+    ResponseEntity<ResultDTO> resultDto = new ResponseEntity<ResultDTO>(
+        new ResultDTO().statusCode(code).message(errorMsg), HttpStatus.OK);
+    return resultDto;
+  }
+  
+  @ExceptionHandler(value = DataAccessException.class)
+  public ResponseEntity<ResultDTO> msqlException(DataAccessException exception) {
+    String errorMsg;
+    String code = Constants.EXCEPTION_API_CODE;
+    errorMsg = "操作失败";
     ResponseEntity<ResultDTO> resultDto = new ResponseEntity<ResultDTO>(
         new ResultDTO().statusCode(code).message(errorMsg), HttpStatus.OK);
     return resultDto;

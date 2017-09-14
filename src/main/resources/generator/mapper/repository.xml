@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+	<name>repository</name>
+	<filePath>src/main/java/${packageName}/repository/${module}</filePath>
+	<fileName>${className}Repository.java</fileName>
+	<content><![CDATA[
+package ${packageName}.repository.${module};
+	
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import ${packageName}.entity.${module}.${className}PO;
+	
+public interface ${className}Repository
+    extends JpaRepository<${className}PO, String>, JpaSpecificationExecutor<${className}PO> {
+    
+    }
+	]]>
+	</content>
+</template>

@@ -6,24 +6,21 @@
 	<content><![CDATA[
 package ${packageName}.dto.${transferObj.packageName};
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-<#if (transferObj.inheritObjName)??>
+<#if ((transferObj.inheritObjName)??) && transferObj.inheritObjName != "" >
 	<#list BaseDTO as b>
 		<#if b == transferObj.inheritObjName>
 import ${b.getPackageName()};
 		</#if>
 	</#list>
 </#if>
-<#list transferObjFileds as t>
-	<#if t.type == "po" || t.type == "dto" || t.type == "array">
-import ${packageName}.entity.${t.format};
-	</#if>
+<#list typeImports as t>
+import ${packageName}.${t};
 </#list>
 <#list imports as i>
-<#if i == "length">
-import org.hibernate.validator.constraints.Length;
+<#if i == "size">
+import javax.validation.constraints.Size;
 </#if>
 <#if i == "isNullable">
 import javax.validation.constraints.NotNull;
@@ -40,6 +37,21 @@ import javax.validation.constraints.Min;
 <#if i == "pattern">
 import javax.validation.constraints.Pattern;
 </#if>
+<#if i == "Timestamp">
+import java.time.Timestamp;
+</#if>
+<#if i == "Date">
+import java.util.Date;
+</#if>
+<#if i == "JsonFormat">
+import com.fasterxml.jackson.annotation.JsonFormat;
+</#if>
+<#if i == "array">
+import java.util.List;
+</#if>
+<#if i == "BigDecimal">
+import java.math.BigDecimal;
+</#if>
 </#list>
 
 import io.swagger.annotations.ApiModelProperty;
@@ -49,31 +61,34 @@ import lombok.ToString;
 
  /**
   *
-  * <#if (transferObj.comments)??> ${transferObj.comments}</#if>
+  * <#if (transferObj.comments)?? && transferObj.comments != ""> ${transferObj.comments}</#if>
   */
 @Data
-@EqualsAndHashCode(callSuper = <#if (transferObj.inheritObjName)??>true<#else>false</#if>)
+@EqualsAndHashCode(callSuper = <#if (transferObj.inheritObjName)?? && transferObj.inheritObjName != "">true<#else>false</#if>)
 @ToString(callSuper = true)
-public class ${transferObj.name} <#if (transferObj.inheritObjName)??>extends ${transferObj.inheritObjName}</#if>{
+public class ${transferObj.name} <#if (transferObj.inheritObjName) ?? && transferObj.inheritObjName != "">extends ${transferObj.inheritObjName}</#if>{
 
 	<#list transferObjFileds as t>
 	<#if (t.isNullable)?? && t.isNullable == "1">
   	@NotNull
   	</#if>
-  	<#if (t.pattern)??>
+  	<#if (t.pattern)?? && t.pattern != "">
   	@Pattern(regexp = "${t.pattern}")
   	</#if>
   	<#if t.type == "String" && ((t.min)?? || (t.max)??)>
-  	@Length(<#if (t.max)??>max = ${t.max?replace(",","")}</#if><#if (t.min)??>,min = ${t.min?replace(",","")}</#if>)
+  	@Length(<#if (t.max)??>Max = ${t.max?replace(",","")}</#if><#if (t.min)??>,Min = ${t.min?replace(",","")}</#if>)
   	<#else>
   	<#if t.type != "String" && ((t.min)?? || (t.max)??)>
-  	<#if (t.max)??>@max = (${t.max?replace(",","")})</#if><#if (t.min)??>@min = (${t.min?replace(",","")})</#if>
+  	<#if (t.max)??>@Max(${t.max?replace(",","")})</#if>
+  	<#if (t.min)??>@Min(${t.min?replace(",","")})</#if>
   	</#if>
   	</#if>
-	@JsonProperty("${t.name}"<#if (t.readOnly)?? && t.readOnly == "1">, access = Access.READ_ONLY</#if>)
+	@JsonProperty(value = "${t.name}"<#if (t.readOnly)?? && t.readOnly == "1">, access = Access.READ_ONLY</#if>)
 	@JsonPropertyDescription("${t.description}")				
 	@ApiModelProperty(value = "${t.description}")
-	
+	<#if (c.format)?? && (c.format == "Date" || c.format == "Timestamp")>
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    </#if>
 		<#if t.type == "array">
 			<#assign format= t.format?split(".")>
 			<#list format as f>
@@ -83,12 +98,10 @@ public class ${transferObj.name} <#if (transferObj.inheritObjName)??>extends ${t
 				</#if>
 			</#list> 
 		</#if>
-		
 		<#if t.type == "base">
 	private ${t.format} ${t.name};
 	
 		</#if>
-		
 		<#if t.type == "po" || t.type == "dto">
 		<#assign format= t.format?split(".")>
 			<#list format as f>

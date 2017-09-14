@@ -3,15 +3,20 @@
  */
 package com.changan.code.controller;
 
+import java.io.FileNotFoundException;
+
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.dto.RequestOfTableIdsDTO;
 import com.changan.code.dto.ResultOfColumnsDTO;
+import com.changan.code.dto.ResultOfMsgDataDTO;
 import com.changan.code.dto.ResultOfTransferObjDTO;
 import com.changan.code.entity.TablePO;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
@@ -93,4 +98,24 @@ public interface TableApi {
           required = true) @PathVariable String status,
       @ApiParam(value = "表id列表", required = false) @RequestBody RequestOfTableIdsDTO tableIds);
 
+  @ApiOperation(value = "生成项目实体代码", notes = "生成项目实体代码", response = ResultOfMsgDataDTO.class,
+      tags = {"Table"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfMsgDataDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfMsgDataDTO.class)})
+  @RequestMapping(value = "/tables/{tableId}/generate/code", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> columnsGenerateCodeGet(
+      @ApiParam(value = "tableId", required = true) @PathVariable String tableId);
+
+  @ApiOperation(value = "下载项目代码", notes = "下载项目代码", response = InputStreamResource.class,
+      tags = {"Table"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = InputStreamResource.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = InputStreamResource.class)})
+  @RequestMapping(value = "/tables/download",
+      produces = {"application/octet-stream"}, method = RequestMethod.GET)
+  ResponseEntity<InputStreamResource> projectsDownloadGet(
+      @ApiParam(value = "tableId", required = true) @RequestParam String tableId)
+      throws FileNotFoundException;
 }

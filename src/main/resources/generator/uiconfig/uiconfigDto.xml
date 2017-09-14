@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>uiconfigDto</name>
+	<filePath>src/main/java/${packageName}/dto/other</filePath>
+	<fileName>UiConfigDTO.java</fileName>
+	<content><![CDATA[
+package ${packageName}.dto.other;
+	
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+	
+/**
+ * 
+ * @author TitanCode2
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@JsonInclude(Include.NON_NULL)
+public class UiConfigDTO extends ResultDTO {
+
+  // 配置数据
+  @JsonProperty("data")
+  @JsonPropertyDescription("配置数据")
+  @ApiModelProperty(value = "配置数据")
+  private JsonNode data;
+  
+  public UiConfigDTO data(JsonNode data) {
+    this.data = data;
+    return this;
+  }
+  
+}
+	]]>
+	</content>
+</template>

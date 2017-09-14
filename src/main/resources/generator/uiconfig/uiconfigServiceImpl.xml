@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>uiconfigServiceImpl</name>
+	<filePath>src/main/java/${packageName}/service/impl</filePath>
+	<fileName>UiConfigServiceImpl.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service.impl;
+	
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.changan.anywhere.common.utils.FileUtils;
+import ${packageName}.common.RestStatus;
+import ${packageName}.exception.CodeCommonException;
+import ${packageName}.service.IUiConfigService;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+	
+	
+/**
+ * 
+ * @author TitanCode2
+ */
+@Service
+public class UiConfigServiceImpl implements IUiConfigService {
+  
+  @Value("${r'$'}{uiconfig.path}")
+  private String configPath;
+
+  @Override
+  public JsonNode getUiConfig() {
+    File file = new File(configPath);
+    StringBuilder sb = new StringBuilder();
+    // 读取文件
+    if (file.exists()) {
+      try (BufferedReader br =
+          new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+        String line = "";
+        while ((line = br.readLine()) != null) {
+          sb.append(line);
+        }
+      } catch (IOException e) {
+        // 抛出异常
+        throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
+            RestStatus.RESULT_SYSTEM_ERROR.message(), e);
+      }
+    }
+
+    // 解析文件内容到json node
+    ObjectMapper mapper = new ObjectMapper();
+    JsonFactory factory = mapper.getFactory();
+    JsonParser parser;
+    JsonNode actualObj = null;
+    try {
+      parser = factory.createParser(sb.toString());
+      actualObj = mapper.readTree(parser);
+    } catch (IOException e) {
+      // 抛出异常
+      throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
+          RestStatus.RESULT_SYSTEM_ERROR.message(), e);
+    }
+
+    return actualObj;
+  }
+
+  @Override
+  public void saveUiConfig(String data) {
+    // 配置文件
+    FileUtils.createFile(configPath);
+    // 将配置写入文件
+    try (FileWriter fw = new FileWriter(configPath)) {
+      fw.write(data.replace("'", "\""));
+    } catch (IOException e) {
+      // 抛出异常
+      throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
+          RestStatus.RESULT_SYSTEM_ERROR.message(), e);
+    }
+  }
+
+}
+	]]>
+	</content>
+</template>

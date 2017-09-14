@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>advice</name>
+  <filePath>src/main/java/${packageName}/controller/advice</filePath>
+  <fileName>CodeHandlerAdvice.java</fileName>
+  <content><![CDATA[
+package ${packageName}.controller.advice;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import ${packageName}.exception.CodeCommonException;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @author wenxing
+ *
+ */
+@ControllerAdvice
+@Slf4j
+public class CodeHandlerAdvice {
+  
+  @ExceptionHandler(value = CodeCommonException.class)
+  public ResponseEntity<ResultDTO> exception(CodeCommonException exception) {
+    log.error("**** 发生异常 ****", exception);
+    ResponseEntity<ResultDTO> resultDto = new ResponseEntity<ResultDTO>(
+        new ResultDTO().statusCode(exception.getCode()).message(exception.getMessage()), HttpStatus.OK);
+    return resultDto;
+  }
+}
+  ]]>
+  </content>
+</template>

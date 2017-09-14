@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>serviceImpl</name>
+  <filePath>src/main/java/${packageName}/JPAservice/JPAimpl/${moduleName}</filePath>
+  <fileName>${className}ServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.JPAservice.JPAimpl.${moduleName};
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import ${packageName}.entity.${moduleName}.${className}PO;
+import ${packageName}.repository.${moduleName}.${className}Repository;
+import ${packageName}.JPAservice.${moduleName}.I${className}Service;
+
+
+/**
+ * ${className}ServiceImpl
+ */
+@Service
+public class ${className}ServiceImpl implements I${className}Service {
+  
+  @Autowired
+  private ${className}Repository ${lowerName}Repo;
+  
+  //新增
+  @Override
+  public ${className}PO insert${className}(${className}PO ${lowerName}) {
+    // 设置值
+    ${lowerName} = ${lowerName}Repo.save(${lowerName});
+    return ${lowerName};
+  }
+
+  //修改
+  @Override
+  public ${className}PO update${className}(${className}PO ${lowerName}) {
+    ${lowerName} = ${lowerName}Repo.save(${lowerName});
+    return ${lowerName};
+  }
+
+  //通过id查询
+  @Override
+  public ${className}PO findById(String id) {
+    return ${lowerName}Repo.findOne(id);
+  }
+
+  //通过id删除
+  @Override
+  public void delete${className}(String id) {
+    ${lowerName}Repo.delete(id);
+  }
+
+  //分页查询
+  @Override
+  public Page<${className}PO> get${className}List(Pageable pageable){
+  	return ${lowerName}Repo.findAll(pageable);
+  }
+}
+]]>
+  </content>
+</template>

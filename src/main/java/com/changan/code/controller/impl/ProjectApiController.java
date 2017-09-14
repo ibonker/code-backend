@@ -21,8 +21,8 @@ import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultJsonSchemaDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
-import com.changan.code.common.Constants;
-import com.changan.code.common.DtoType;
+import com.changan.code.common.BaseType;
+import com.changan.code.common.RestStatus;
 import com.changan.code.config.property.ApiProperties;
 import com.changan.code.controller.ProjectApi;
 import com.changan.code.dto.JavaTypeDTO;
@@ -54,8 +54,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
   @Override
   public ResponseEntity<ResultDTO> projectsSchemaGet() {
     JsonSchema jsonSchema = this.getJsonSchemaByJavaType(new TypeReference<ProjectPO>() {});
-    return new ResponseEntity<ResultDTO>(new ResultJsonSchemaDTO().jsonSchema(jsonSchema)
-        .message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(new ResultJsonSchemaDTO().jsonSchema(jsonSchema)
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
   }
 
   /**
@@ -64,10 +65,10 @@ public class ProjectApiController extends BaseController implements ProjectApi {
   @Override
   public ResponseEntity<ResultDTO> projectsGet(@RequestBody PageDTO searchParams) {
     Page<ProjectPO> result = projectService.findProjecsPage(searchParams);
-    return new ResponseEntity<ResultDTO>(
-        new ResultPageDTO<ProjectPO>().totalElements(result.getTotalElements())
-            .pageNumber(result.getNumber()).pageSize(result.getSize()).data(result.getContent())
-            .message("成功").statusCode(Constants.SUCCESS_API_CODE),
+    return new ResponseEntity<>(new ResultPageDTO<ProjectPO>()
+        .totalElements(result.getTotalElements()).pageNumber(result.getNumber())
+        .pageSize(result.getSize()).data(result.getContent())
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
         HttpStatus.OK);
   }
 
@@ -77,8 +78,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
   @Override
   public ResponseEntity<ResultDTO> projectsShowGet(@PathVariable String id) {
     ProjectPO project = projectService.getProjectById(id);
-    return new ResponseEntity<ResultDTO>(new ResultOfProjectDTO().project(project).message("成功")
-        .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfProjectDTO().project(project)
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
   }
 
   /**
@@ -91,8 +93,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
     } else {
       project = projectService.updateProject(project);
     }
-    return new ResponseEntity<ResultDTO>(new ResultOfProjectDTO().project(project).message("成功")
-        .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfProjectDTO().project(project)
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
   }
 
   /**
@@ -100,9 +103,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectDtoPoGet(@PathVariable String id) {
-    return new ResponseEntity<ResultDTO>(new ResultOfTypeDTO().dto(projectService.getProjectDTO(id))
-        .po(projectService.getProjectPO(id)).message("成功").statusCode(Constants.SUCCESS_API_CODE),
-        HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfTypeDTO().dto(projectService.getProjectDTO(id))
+        .po(projectService.getProjectPO(id)).message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
 
   /**
@@ -110,13 +113,14 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectDataTypeGet(@PathVariable String id) {
-    return new ResponseEntity<ResultDTO>(new ResultOfTypeDTO()
-        .base(new JavaTypeDTO(DtoType.BASE.toString().toLowerCase(), DtoType.BASE.getCname(),
+    return new ResponseEntity<>(new ResultOfTypeDTO()
+        .base(new JavaTypeDTO(BaseType.BASE.toString().toLowerCase(), BaseType.BASE.getCname(),
             apis.getBaseType()))
-        .array(new JavaTypeDTO(DtoType.ARRAY.toString().toLowerCase(), DtoType.ARRAY.getCname(),
+        .array(new JavaTypeDTO(BaseType.ARRAY.toString().toLowerCase(), BaseType.ARRAY.getCname(),
             apis.getArrayType()))
-        .dto(projectService.getProjectDTO(id)).po(projectService.getProjectPO(id)).message("成功")
-        .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+        .dto(projectService.getProjectDTO(id)).po(projectService.getProjectPO(id))
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
   }
 
   /**
@@ -124,10 +128,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectsComponentsDefaultGet() {
-    return new ResponseEntity<ResultDTO>(
-        new ResultOfComponentsDTO().categories(projectService.getComponents()).message("成功")
-            .statusCode(Constants.SUCCESS_API_CODE),
-        HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfComponentsDTO()
+        .categories(projectService.getComponents()).message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
 
   /**
@@ -135,10 +138,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectsGenerateCodeGet(@PathVariable String id) {
-    return new ResponseEntity<ResultDTO>(
-        new ResultOfMsgDataDTO().msgData(projectService.generateCodeFiles(id)).message("成功")
-            .statusCode(Constants.SUCCESS_API_CODE),
-        HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfMsgDataDTO()
+        .msgData(projectService.generateCodeFiles(id)).message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
 
   /**

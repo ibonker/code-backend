@@ -31,7 +31,7 @@ public interface ApiBaseRepository
    * @param projectId
    * @return
    */
-  public List<ApiBasePO> findByProjectIdAndDelFlag(String projectId, String delFlag);
+  public List<ApiBasePO> findByProjectIdAndDelFlagOrderByVersionName(String projectId, String delFlag);
 
   /**
    * 根据id查询Api

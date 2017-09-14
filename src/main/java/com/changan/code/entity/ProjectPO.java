@@ -5,6 +5,7 @@ package com.changan.code.entity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -65,6 +66,11 @@ public class ProjectPO extends BaseEntity {
   @JsonPropertyDescription("数据源列表")
   @JsonSchemaLink(href = "/codegen/api/v1/datasources")
   private List<DatasourcePO> datasources; // 数据源
+  
+  @Transient
+  @JsonProperty("componentsMap")
+  @JsonPropertyDescription("项目组件选中")
+  private Map<String, Object> componentsMap; // 项目组件选中
   
   /**
    * 可以更新的属性

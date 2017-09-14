@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>uiconfigService</name>
+	<filePath>src/main/java/${packageName}/service</filePath>
+	<fileName>IUiConfigService.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service;
+	
+import com.fasterxml.jackson.databind.JsonNode;
+
+/**
+ * @author TitanCode2
+ *
+ */
+public interface IUiConfigService {
+  
+  /**
+   * 获取ui配置
+   * @return
+   */
+  public JsonNode getUiConfig();
+
+  /**
+   * 保存ui配置
+   * @param data
+   */
+  public void saveUiConfig(String data);
+}
+	]]>
+	</content>
+</template>

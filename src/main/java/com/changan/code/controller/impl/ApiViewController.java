@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.RestStatus;
 import com.changan.code.controller.ApiView;
 import com.changan.code.dto.RequestApiViewConfigDTO;
 import com.changan.code.dto.ResultOfApiViewDTO;
@@ -39,7 +40,7 @@ public class ApiViewController extends BaseController implements ApiView {
   @Override
   public ResponseEntity<ResultDTO> viewConfigList(@PathVariable(name="id") String projectId) {
     List<ApiViewPO> apiViews = apiViewService.findApiViewPO(projectId);
-    return new ResponseEntity<ResultDTO>(new ResultOfApiViewDTO().apiViews(apiViews).message("成功")
+    return new ResponseEntity<>(new ResultOfApiViewDTO().apiViews(apiViews).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
   
@@ -49,7 +50,7 @@ public class ApiViewController extends BaseController implements ApiView {
   @Override
   public ResponseEntity<ResultDTO> dtoApiList(@PathVariable(name="id") String projectId) {
     List<TablePO> tableApis = apiViewService.findApiTableList(projectId);
-    return new ResponseEntity<ResultDTO>(new ResultOfApiViewDTO().tableApis(tableApis).message("成功")
+    return new ResponseEntity<>(new ResultOfApiViewDTO().tableApis(tableApis).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
@@ -59,7 +60,7 @@ public class ApiViewController extends BaseController implements ApiView {
   @Override
   public ResponseEntity<ResultDTO> tableConfigs(@PathVariable(name="id") String tableId) {
     List<ApiViewTableConfigPO> tableConfigs = apiViewService.findTableConfigList(tableId);
-    return new ResponseEntity<ResultDTO>(new ResultOfApiViewDTO().tableConfigs(tableConfigs).message("成功")
+    return new ResponseEntity<>(new ResultOfApiViewDTO().tableConfigs(tableConfigs).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
   
@@ -69,7 +70,7 @@ public class ApiViewController extends BaseController implements ApiView {
   @Override
   public ResponseEntity<ResultDTO> formConfigs(@PathVariable(name="id") String tableId) {
     List<ApiViewFormConfigPO> formConfigs = apiViewService.findFormConfigList(tableId);
-    return new ResponseEntity<ResultDTO>(new ResultOfApiViewDTO().formConfigs(formConfigs).message("成功")
+    return new ResponseEntity<>(new ResultOfApiViewDTO().formConfigs(formConfigs).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
   
@@ -80,8 +81,8 @@ public class ApiViewController extends BaseController implements ApiView {
   public ResponseEntity<ResultDTO> apiViewSavePost(@RequestBody ApiViewPO apiViewPO) {
     // 保存apiViewPO
     apiViewService.saveApiView(apiViewPO);
-    return new ResponseEntity<ResultDTO>(
-        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(
+        new ResultDTO().message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
   
   /**
@@ -93,8 +94,8 @@ public class ApiViewController extends BaseController implements ApiView {
     // 保存apiViewPO
     apiViewService.saveApiViewConfig(
         requestApiViewConfigDTO.getApiViewPO(), requestApiViewConfigDTO.getTableConfigs(), requestApiViewConfigDTO.getFormConfigs());
-    return new ResponseEntity<ResultDTO>(
-        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(
+        new ResultDTO().message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
 

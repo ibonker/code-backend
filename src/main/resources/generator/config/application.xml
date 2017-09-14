@@ -6,7 +6,6 @@
 	<content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>;
 
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
@@ -15,7 +14,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
-import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 
 /** 
  * Application 
@@ -24,11 +22,12 @@ import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
  * @version  
  * @since JDK 1.8 
  */
+<#if components?seq_contains("rescentersecurity")>@EnableFeignClients(basePackages = {"com.changan.rescenter.auth"})</#if>
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class,
     DataSourceTransactionManagerAutoConfiguration.class<#if dbcount gt 1>,
     MybatisAutoConfiguration.class, PageHelperAutoConfiguration.class</#if>})
-@ComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>"})
+@ComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>"<#if components?seq_contains("rescentersecurity")>, "com.changan.rescenter.auth"</#if>})
 public class Application {
   
   /**

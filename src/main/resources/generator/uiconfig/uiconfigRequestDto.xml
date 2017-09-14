@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>RequestUiConfigDTO</name>
+	<filePath>src/main/java/${packageName}/dto/other</filePath>
+	<fileName>RequestUiConfigDTO.java</fileName>
+	<content><![CDATA[
+package ${packageName}.dto.other;
+	
+import lombok.Data;
+
+/**
+ * 
+ * @author TitanCode2
+ */
+@Data
+public class RequestUiConfigDTO {
+
+  private String data;
+  
+}
+	]]>
+	</content>
+</template>

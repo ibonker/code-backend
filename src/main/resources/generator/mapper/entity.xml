@@ -6,15 +6,12 @@
 	<content><![CDATA[
 package ${packageName}.entity.${moduleName};
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import ${packageName}.common.BaseEntity;
 
 <#list imports as i>
-<#if i == "length">
-import org.hibernate.validator.constraints.Length;
+<#if i == "size">
+import javax.validation.constraints.Size;
 </#if>
 <#if i == "isNullable">
 import javax.validation.constraints.NotNull;
@@ -30,6 +27,18 @@ import javax.validation.constraints.Min;
 </#if>
 <#if i == "pattern">
 import javax.validation.constraints.Pattern;
+</#if>
+<#if i == "Timestamp">
+import java.time.Timestamp;
+</#if>
+<#if i == "Date">
+import java.util.Date;
+</#if>
+<#if i == "JsonFormat">
+import com.fasterxml.jackson.annotation.JsonFormat;
+</#if>
+<#if i == "BigDecimal">
+import java.math.BigDecimal;
 </#if>
 </#list>
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -52,23 +61,30 @@ public class ${className} extends BaseEntity {
   <#if (c.isNullable)?? && c.isNullable == "1">
   @NotNull
   </#if>
-  <#if (c.pattern)??>
+  <#if (c.pattern)?? && c.pattern != "">
   @Pattern(regexp = "${c.pattern}")
   </#if>
-  <#if c.javaType == "String" && ((c.min)?? || (c.max)??)>
-  @Length(<#if (c.max)??>max = ${c.max}</#if><#if (c.min)??>,min = ${c.min}</#if>)
-  <#elseif c.javaType != "String" && ((c.min)?? || (c.max)??)>
-  <#if (c.max)??>@max = (${c.max})</#if>
-  <#if (c.min)??>@min = (${c.min})</#if>
+  <#if c.javaType == "String" && (c.max)??>
+  @Size(max = ${c.max?replace(",","")})
   </#if>
+  <#if c.javaType == "String" && (c.min)??>
+  @Size(min = ${c.min?replace(",","")})
+  </#if>
+  <#if c.javaType == "String" && (c.max)?? && (c.min)??>
+  @Size(max = ${c.max?replace(",","")}, min = ${c.min?replace(",","")})
+  </#if>
+  <#if c.javaType != "String" && ((c.min)?? || (c.max)??)>
+  <#if (c.max) ??>@Max(${c.max?replace(",","")})</#if>
+  <#if (c.min) ??>@Min(${c.min?replace(",","")})</#if>
   </#if>
   @Column(name = "${c.name}")
   @JsonProperty(value = "${c.javaField}"<#if (c.readOnly)?? && c.readOnly == "1">, access = Access.READ_ONLY</#if>)
   @JsonPropertyDescription("${c.comments}")
-  <#if c.javaType == "LocalDateTime">
+  <#if c.javaType == "Date" || c.javaType == "Timestamp">
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   </#if>
   private ${c.javaType} ${c.javaField};
+  </#if>
   
   </#list>
 }

@@ -7,7 +7,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import com.changan.code.entity.ApiObjPO;
-
+/**
+ * ApiObj  JPA数据库操作
+ * @author xuyufeng
+ *
+ */
 public interface ApiObjRepository
     extends JpaRepository<ApiObjPO, String>, JpaSpecificationExecutor<ApiObjPO> {
 
@@ -25,7 +29,7 @@ public interface ApiObjRepository
    * 
    * @return
    */
-  public List<ApiObjPO> findByApiBaseIdAndDelFlag(String apiBaseId, String delFlag);
+  public List<ApiObjPO> findByApiBaseIdAndDelFlagOrderByUri(String apiBaseId, String delFlag);
 
   /**
    * 根据id查询ApiObj

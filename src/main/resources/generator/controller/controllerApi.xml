@@ -7,8 +7,7 @@
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.${versionName};
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -28,7 +27,7 @@ import io.swagger.annotations.ApiResponses;
  * @version  
  * @since JDK 1.8 
  */
-@Api(value = "${controllerName}", description = "the ${controllerName} API")
+@Api(value = "${controllerName}")
 @RequestMapping(value = "${basePath}")
 public interface ${controllerName}Api {
   
@@ -36,14 +35,13 @@ public interface ${controllerName}Api {
   /**
    * ${apiObj.summary}
    */
-  @ApiOperation(value = "${apiObj.summary}", notes = "${apiObj.description}", response = ${apiObj.responseObjNameNoPack}.class,
-      tags = {"${apiObj.tag}"})
+  @ApiOperation(value = "${apiObj.summary}", notes = "${apiObj.description}", response = ${apiObj.responseObjNameNoPack}.class)
   @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ${apiObj.responseObjNameNoPack}.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ${apiObj.responseObjNameNoPack}.class)})
-  @RequestMapping(value = "/${apiObj.uri}", produces = {"${apiObj.produces}"},
+      value = {@ApiResponse(code = 200, message = "返回结果信息", response = ${apiObj.responseObjNameNoPack}.class),
+          @ApiResponse(code = 401, message = "返回认证错误信息")})
+  @RequestMapping(value = "${apiObj.uri}", produces = <#if apiObj.produces == "application/json">MediaType.APPLICATION_JSON_UTF8_VALUE<#else>{"${apiObj.produces}"}</#if>,
       method = RequestMethod.${apiObj.requestMethod})
-  ResponseEntity<ResultDTO> ${apiObj.name}(<#list apiObj.apiParam as apiParam>@ApiParam(value = "${apiParam.name}", required = <#if apiParam.isRequired == "1">true<#else>false</#if>) ${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
+  ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam>@ApiParam(value = "${apiParam.name}", required = <#if apiParam.isRequired == "1">true<#else>false</#if>) ${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
   </#list>
   
 }

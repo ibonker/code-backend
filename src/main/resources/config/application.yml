@@ -24,7 +24,8 @@ apis:
     - Float
     - Double
     - BigDecimal
-    - LocalDateTime
+    - Date
+    - Timestamp
   arrayType:
     - base
     - po

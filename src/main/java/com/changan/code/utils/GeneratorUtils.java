@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 public class GeneratorUtils {
   // 压缩文件后缀
   private static final String ZIP_FILE_EXTENSION = ".zip";
+  // 实体文件后缀
+  private static final String JAVA_FILE_EXTENSION = ".java";
 
   /**
    * XML文件转换为对象
@@ -88,5 +90,21 @@ public class GeneratorUtils {
         "E:/" + name + File.separator + "src" + File.separator + "main" + ZIP_FILE_EXTENSION);
     projectZipPath = f.toString();
     return projectZipPath;
+  }
+  
+  /**
+   * 获取实体下载路径
+   * 
+   * @return
+   */
+  public static String getEntityPath(String projectPath, String name) {
+    // 如果配置了工程路径，则直接返回，否则自动获取。
+    if (StringUtils.isNotBlank(projectPath)) {
+      return projectPath + File.separator + name + JAVA_FILE_EXTENSION;
+    }
+    File f = new File(
+        "E:/" + name + File.separator + "src" + File.separator + "main" + JAVA_FILE_EXTENSION);
+    String returnPath = f.toString();
+    return returnPath;
   }
 }

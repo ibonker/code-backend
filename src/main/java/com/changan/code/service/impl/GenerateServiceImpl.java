@@ -20,20 +20,24 @@ import com.changan.anywhere.common.utils.FreeMarkerUtils;
 import com.changan.anywhere.common.utils.StringUtils;
 import com.changan.code.common.BaseDTO;
 import com.changan.code.common.BaseFormat;
+import com.changan.code.common.BaseParamIn;
+import com.changan.code.common.BaseProfile;
+import com.changan.code.common.BaseType;
 import com.changan.code.common.Constants;
-import com.changan.code.common.DtoType;
 import com.changan.code.common.ParamerConstant;
+import com.changan.code.common.template.AdviceFile;
 import com.changan.code.common.template.ConfigFile;
 import com.changan.code.common.template.DAOFile;
 import com.changan.code.common.template.DTOFile;
 import com.changan.code.common.template.EntityFile;
 import com.changan.code.common.template.GeneratorConfigFile;
+import com.changan.code.common.template.JPAFile;
 import com.changan.code.common.template.MvcFile;
 import com.changan.code.common.template.ServiceFile;
 import com.changan.code.common.template.ServiceImplFile;
+import com.changan.code.common.template.UiFile;
 import com.changan.code.config.property.GenerateProperties;
 import com.changan.code.dto.ApiServiceName;
-import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.dto.Template;
 import com.changan.code.entity.ApiBasePO;
 import com.changan.code.entity.ApiObjPO;
@@ -107,16 +111,18 @@ public class GenerateServiceImpl implements IGenerateService {
   }
 
   @Override
-  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources) {
+  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources, String basePath) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     model.put("packageName", project.getPackages().toLowerCase());
+    model.put("mainpath", basePath.toLowerCase().split("/")[1]);
     model.put("projectDesc", StringUtils.trimToEmpty(project.getDescription()));
     model.put("datasourcelist", datasources);
     model.put("moduleName", "");
     model.put("projectName", project.getName());
     model.put("hasMysql", "0");
     model.put("hasOracle", "0");
+    model.put("components", project.getComponents().split(","));
     model.put("dbcount", null == datasources ? 0 : datasources.size());
     // 生成数据库配置文件
     if (null != datasources) {
@@ -135,10 +141,23 @@ public class GenerateServiceImpl implements IGenerateService {
     }
     // 生成普通配置文件
     for (ConfigFile configFile : ConfigFile.values()) {
-      if (!ConfigFile.datasourceConfig.equals(configFile)) {
+      if (!ConfigFile.datasourceConfig.equals(configFile)
+          && !ConfigFile.applicationYml.equals(configFile)) {
         this.generateToFile(null, GeneratorUtils.fileToObject(configFile.getPath(), Template.class),
             model, true);
       }
+    }
+    // 生成yml配置文件
+    for (BaseProfile profile : BaseProfile.values()) {
+      model.put("postfix", profile.equals(BaseProfile.main) ? "" : "-".concat(profile.name()));
+      this.generateToFile(null,
+          GeneratorUtils.fileToObject(ConfigFile.applicationYml.getPath(), Template.class), model,
+          true);
+    }
+    // 生成ui配置文件
+    for (UiFile uiFile : UiFile.values()) {
+      this.generateToFile(null, GeneratorUtils.fileToObject(uiFile.getPath(), Template.class),
+          model, true);
     }
   }
 
@@ -147,23 +166,43 @@ public class GenerateServiceImpl implements IGenerateService {
    */
   @Override
   public void generateEntityFiles(String moduleName, String projectName, String packageName,
-      SimpleDataObj table, List<ColumnPO> columns) {
-    //定义需要传入的包
-    HashSet<String> imports = new HashSet<String>();
-    for(ColumnPO column : columns){
-      if( "1".equals(column.getReadOnly())){
+      TablePO table, List<ColumnPO> columns) {
+    // 定义需要传入的包
+    HashSet<String> imports = new HashSet<>();
+    for (ColumnPO column : columns) {
+      if("createdAt".equals(column.getJavaField()) || 
+          "updatedAt".equals(column.getJavaField()) || "id".equals(column.getJavaField())){
+        continue;
+      }
+      if ("1".equals(column.getReadOnly())) {
         imports.add("readOnly");
-      }if("1".equals(column.getIsNullable())){
+      }
+      if ("1".equals(column.getIsNullable())) {
         imports.add("isNullable");
-      }if("1".equals(column.getPattern())){
+      }
+      if (!"".equals(column.getPattern()) && column.getPattern() != null) {
         imports.add("pattern");
-      }if("String".equals(column.getJavaType()) && 
-          (Integer.valueOf(1).equals(column.getMax()) || Integer.valueOf(1).equals(column.getMax()))){
-        imports.add("length");
-      }if(!("String".equals(column.getJavaType())) && (Integer.valueOf(1).equals(column.getMax()))){
+      }
+      if ("String".equals(column.getJavaType())
+          && (column.getMax() != null || column.getMin() != null)) {
+        imports.add("size");
+      }
+      if (!"String".equals(column.getJavaType()) && column.getMax() != null) {
         imports.add("constraintsMax");
-      }if(!("String".equals(column.getJavaType())) && (Integer.valueOf(1).equals(column.getMin()))){
+      }
+      if (!"String".equals(column.getJavaType()) && column.getMin() != null) {
         imports.add("constraintsMin");
+      }
+      if ("Date".equals(column.getJavaType())) {
+        imports.add("Date");
+        imports.add("JsonFormat");
+      }
+      if ("Timestamp".equals(column.getJavaType())) {
+        imports.add("Timestamp");
+        imports.add("JsonFormat");
+      }
+      if ("BigDecimal".equals(column.getJavaType())) {
+        imports.add("BigDecimal");
       }
     }
     // 添加model
@@ -186,31 +225,60 @@ public class GenerateServiceImpl implements IGenerateService {
   @Override
   public void generateDTOFiles(String projectName, String packageName, TransferObjPO transferObj,
       List<TransferObjFieldPO> transferObjFileds) {
-    HashSet<String> imports= new HashSet<String>();
-    for(TransferObjFieldPO transferObjFiled : transferObjFileds){
-      if( "1".equals(transferObjFiled.getReadOnly())){
-        imports.add("readOnly");
-      }if("1".equals(transferObjFiled.getIsNullable())){
-        imports.add("isNullable");
-      }if("1".equals(transferObjFiled.getPattern())){
-        imports.add("pattern");
-      }if("String".equals(transferObjFiled.getType()) && (
-          Integer.valueOf(1).equals(transferObjFiled.getMax()) || Integer.valueOf(1).equals(transferObjFiled.getMin()))){
-        imports.add("length");
-      }if(!("String".equals(transferObjFiled.getType())) && Integer.valueOf(1).equals(transferObjFiled.getMax())){
-        imports.add("constraintsMax");
-      }if(!("String".equals(transferObjFiled.getType())) && Integer.valueOf(1).equals(transferObjFiled.getMin())){
-        imports.add("constraintsMin");
-      }
-    }
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
+    // 注解引入包
+    HashSet<String> imports = new HashSet<>();
+    // dto，entity引入包
+    HashSet<String> typeImports = new HashSet<>();
+    for (TransferObjFieldPO transferObjFiled : transferObjFileds) {
+      if ("1".equals(transferObjFiled.getReadOnly())) {
+        imports.add("readOnly");
+      }
+      if ("1".equals(transferObjFiled.getIsNullable())) {
+        imports.add("isNullable");
+      }
+      if ("".equals(transferObjFiled.getPattern()) || transferObjFiled.getPattern() != null) {
+        imports.add("pattern");
+      }
+      if ("String".equals(transferObjFiled.getType())
+          && (transferObjFiled.getMax() != null || transferObjFiled.getMin() != null)) {
+        imports.add("size");
+      }
+      if (!"String".equals(transferObjFiled.getType()) && (transferObjFiled.getMax() != null)) {
+        imports.add("constraintsMax");
+      }
+      if (!"String".equals(transferObjFiled.getType()) && (transferObjFiled.getMin() != null)) {
+        imports.add("constraintsMin");
+      }
+      if (("array".equals(transferObjFiled.getType()) && "po".equals(transferObjFiled.getArrayType()))
+          ||("po").equals(transferObjFiled.getType())) {
+        typeImports.add("entity." + transferObjFiled.getFormat());
+      }
+      if (("array".equals(transferObjFiled.getType()) && "dto".equals(transferObjFiled.getArrayType()))
+          ||("dto").equals(transferObjFiled.getType())) {
+        typeImports.add("dto." + transferObjFiled.getFormat());
+      }
+      if ("base".equals(transferObjFiled.getType()) && "Date".equals(transferObjFiled.getFormat())) {
+        imports.add("Date");
+      }
+      if ("base".equals(transferObjFiled.getType()) && "Timestamp".equals(transferObjFiled.getFormat())) {
+        imports.add("Timestamp");
+      }
+      if ("BigDecimal".equals(transferObjFiled.getFormat())) {
+        imports.add("BigDecimal");
+      }
+      if ("array".equals(transferObjFiled.getType())) {
+        imports.add("array");
+      }
+    }
     model.put("packageName", packageName);
     model.put("transferObj", transferObj);
     model.put("transferObjFileds", transferObjFileds);
     model.put("projectName", projectName);
     model.put("BaseDTO", BaseDTO.values());
     model.put("imports", imports);
+    model.put("typeImports", typeImports);
     // 生成DTO文件
     this.generateToFile(null, GeneratorUtils.fileToObject(DTOFile.dto.getPath(), Template.class),
         model, true);
@@ -249,8 +317,6 @@ public class GenerateServiceImpl implements IGenerateService {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     String str = table.getName().toLowerCase();
-    // 按下划线拆分
-    String[] strs = str.split("_");
     // 首字母大写
     String className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str);
     model.put("className", className);
@@ -303,10 +369,18 @@ public class GenerateServiceImpl implements IGenerateService {
             .concat(apiobj.getResponseObjName()));
       }
       // api param
-      for (ApiParamPO apiparam : apiobj.getApiParam()) {
+      for (ApiParamPO apiparam : apiobj.getApiParams()) {
         // 设置api param的包
-        setPackageByTypeAndFormat(project, basedtoNames, importIFPackSet, apiparam.getType(),
-            apiparam.getFormat());
+        if (BaseType.ARRAY.equals(BaseType.valueOf(apiparam.getType().toUpperCase()))) {
+          importIFPackSet.add("java.util.List");
+          setPackageByTypeAndFormat(project, basedtoNames, importIFPackSet, apiparam.getArrayType(),
+              apiparam.getFormat());
+        } else {
+          setPackageByTypeAndFormat(project, basedtoNames, importIFPackSet, apiparam.getType(),
+              apiparam.getFormat());
+        }
+        // 参数类型包
+        importIFPackSet.add(BaseParamIn.valueOf(apiparam.getForm().toUpperCase()).getAnnotationPack());
       }
       // service name
       if (StringUtils.isNotBlank(apiobj.getServiceName())) {
@@ -319,8 +393,15 @@ public class GenerateServiceImpl implements IGenerateService {
       }
       // 返回值泛型包名
       if (StringUtils.isNotBlank(apiobj.getResponseObjGenericType())) {
-        setPackageByTypeAndFormat(project, basedtoNames, importImplPackSet,
-            apiobj.getResponseObjGenericType(), apiobj.getResponseObjGenericFormat());
+        if (BaseType.ARRAY
+            .equals(BaseType.valueOf(apiobj.getResponseObjGenericType().toUpperCase()))) {
+          importImplPackSet.add("java.util.List");
+          setPackageByTypeAndFormat(project, basedtoNames, importImplPackSet,
+              apiobj.getResponseObjGenericArrayType(), apiobj.getResponseObjGenericFormat());
+        } else {
+          setPackageByTypeAndFormat(project, basedtoNames, importImplPackSet,
+              apiobj.getResponseObjGenericType(), apiobj.getResponseObjGenericFormat());
+        }
       }
     }
     // 获得包名list
@@ -348,13 +429,11 @@ public class GenerateServiceImpl implements IGenerateService {
   private static void setPackageByTypeAndFormat(ProjectPO project, List<String> basedtoNames,
       Set<String> importPackSet, String type, String format) {
     // 不同类型包
-    switch (DtoType.valueOf(type.toUpperCase())) {
+    switch (BaseType.valueOf(type.toUpperCase())) {
       case BASE:
-        setBaseFormatPackage(importPackSet, format);
-        break;
-      case ARRAY:
-        importPackSet.add("java.util.List");
-        setBaseFormatPackage(importPackSet, format);
+        if (StringUtils.isNotBlank(BaseFormat.valueOf(format).getPackageName())) {
+          importPackSet.add(BaseFormat.valueOf(format).getPackageName());
+        }
         break;
       case DTO:
         if (basedtoNames.contains(format)) {
@@ -366,19 +445,8 @@ public class GenerateServiceImpl implements IGenerateService {
       case PO:
         importPackSet.add(project.getPackages().toLowerCase().concat(".entity.").concat(format));
         break;
-    }
-  }
-
-  /**
-   * 设置基本类型包
-   * 
-   * @param importIFPackSet
-   * @param format
-   * @return
-   */
-  private static void setBaseFormatPackage(Set<String> importPackSet, String format) {
-    if (StringUtils.isNotBlank(BaseFormat.valueOf(format).getPackageName())) {
-      importPackSet.add(BaseFormat.valueOf(format).getPackageName());
+      default:
+        break;
     }
   }
 
@@ -424,17 +492,21 @@ public class GenerateServiceImpl implements IGenerateService {
     String shFile = "";
     for (String filename : configfiles) {
       InputStream inputStream = null;
-      String filepath = Constants.MYBATIS_GEN_CONFIG_ROOT + "\\" + projectName + "\\" + filename; 
+      String filepath = Constants.MYBATIS_GEN_CONFIG_ROOT + File.separator + projectName
+          + File.separator + filename;
       try {
         if (os.toLowerCase().startsWith("win")) {
-          shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.bat").toAbsolutePath().toString();
+          shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.bat").toAbsolutePath()
+              .toString();
           cmd = "cmd /c start /b " + shFile + " " + filepath;
         } else {
-          shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.sh").toAbsolutePath().toString();
+          shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.sh").toAbsolutePath()
+              .toString();
           cmd = "/bin/sh " + shFile + " " + filepath;
         }
         log.info("开始进行mybatis代码生成任务: {}", cmd);
-        Process ps = Runtime.getRuntime().exec(cmd, null, new File(genProperties.getMybatisGenlibsPath()));
+        Process ps =
+            Runtime.getRuntime().exec(cmd, null, new File(genProperties.getMybatisGenlibsPath()));
         inputStream = ps.getInputStream();
         byte[] by = new byte[1024];
         while (inputStream.read(by) != -1) {
@@ -448,6 +520,65 @@ public class GenerateServiceImpl implements IGenerateService {
         log.error("任务发生错误", e);
       }
     }
+  }
+
+  /**
+   * 生成JPA Repository
+   */
+  @Override
+  public void generateRepository(String module, String projectName, String packageName, String name) {
+    // 添加model
+    Map<String, Object> model = Maps.newHashMap();
+    String str = name.toLowerCase();
+    // 首字母大写
+    String className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str);
+    model.put("module", module);
+    model.put("projectName", projectName);
+    model.put("packageName", packageName);
+    model.put("className", className);
+    // 生成JPA Repository文件
+    this.generateToFile(null,
+        GeneratorUtils.fileToObject(JPAFile.repository.getPath(), Template.class), model, true);
+  }
+
+  /**
+   * 生成JPAService和JPAServiceImpl
+   * 
+   */
+  @Override
+  public void generateJPAServiceAndJPAServiceImpl(String moduleName, String projectName,
+      String packageName, TablePO table, String DTOPackageName) {
+    // 添加model
+    Map<String, Object> model = Maps.newHashMap();
+    String str = table.getName().toLowerCase();
+    // 首字母大写
+    String className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str);
+    model.put("className", className);
+    String lowerName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, str);
+    model.put("lowerName", lowerName);
+    model.put("packageName", packageName);
+    model.put("projectName", projectName);
+    model.put("moduleName", moduleName);
+    // 生成JPAService
+    this.generateToFile(null,
+        GeneratorUtils.fileToObject(JPAFile.JPAservice.getPath(), Template.class), model, true);
+    // 生成JPAServiceImpl
+    this.generateToFile(null,
+        GeneratorUtils.fileToObject(JPAFile.JPAserviceImpl.getPath(), Template.class), model, true);
+  }
+
+  /**
+   * 生成advice代码
+   */
+  @Override
+  public void generateAdvice(String packageName, String projectName) {
+    // 添加model
+    Map<String, Object> model = Maps.newHashMap();
+    model.put("packageName", packageName);
+    model.put("projectName", projectName);
+    // 生成advice文件
+    this.generateToFile(null,
+        GeneratorUtils.fileToObject(AdviceFile.advice.getPath(), Template.class), model, true);
   }
 
 }

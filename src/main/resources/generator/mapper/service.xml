@@ -4,16 +4,23 @@
   <filePath>src/main/java/${packageName}/service/${moduleName}</filePath>
   <fileName>I${className}Service.java</fileName>
   <content><![CDATA[
-package ${packageName}.service.${DTOPackageName};
+package ${packageName}.service.${moduleName};
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
-import ${packageName}.entity.${DTOPackageName}.${className}PO;
+import ${packageName}.entity.${moduleName}.${className}PO;
 
 /** 
  * I${className}Service
  */
 public interface I${className}Service {
+
+  /**
+   * @Description 获取${className}的jsonschema
+   * 
+   * @return
+   */
+  public JsonSchema get${className}JsonSchema(String url);
 
   /**
    * @Description datatable 分页查询
@@ -37,7 +44,7 @@ public interface I${className}Service {
    * @param ${lowerName}
    * @return
    */
-  public int update${className}(${className}PO ${lowerName});
+  public int update${className}(String id, ${className}PO ${lowerName});
     
   /**
    * @Description 根据ID查找

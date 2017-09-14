@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.changan.code.common.BaseDTO;
 import com.changan.code.common.Constants;
-import com.changan.code.common.DtoType;
+import com.changan.code.common.BaseType;
 import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
@@ -63,15 +63,13 @@ public class TransferObjServiceImpl implements ITransferObjService {
       List<TransferObjPO> transferObjs = transferObjRePo.findByNameAndProjectIdAndDelFlag(
           updateTransferObj.getName(), updateTransferObj.getProjectId(), Constants.DATA_IS_NORMAL);
       // 若长度为0则直接更新、若长度为1则判断id是否相同，若不相同则保存失败
-      if (transferObjs.size() == 0) {
+      if (transferObjs.isEmpty()) {
         // 保存更新
-        transferObjRePo.save(updateTransferObj);
-        return updateTransferObj;
+        return transferObjRePo.save(updateTransferObj);
       } else {
         if (transferObjs.get(0).getId().equals(updateTransferObj.getId())) {
           // 保存更新
-          transferObjRePo.save(updateTransferObj);
-          return updateTransferObj;
+          return transferObjRePo.save(updateTransferObj);
         } else {
           throw new CodeCommonException("更新失败！参数名重复！");
         }
@@ -87,16 +85,13 @@ public class TransferObjServiceImpl implements ITransferObjService {
   @Override
   @Transactional("jpaTransactionManager")
   public TransferObjPO saveTransferObj(TransferObjPO transferObj) {
-    // 重复条数
-    int sameCount = 0;
     // 查询数据库中重复条数
-    sameCount = transferObjRePo.countByNameAndProjectIdAndDelFlag(transferObj.getName(),
+    int sameCount = transferObjRePo.countByNameAndProjectIdAndDelFlag(transferObj.getName(),
         transferObj.getProjectId(), Constants.DATA_IS_NORMAL);
     // 若重复条数为0
     if (sameCount == 0) {
       // 保存TransferObj
-      transferObj = transferObjRePo.save(transferObj);
-      return transferObj;
+      return transferObjRePo.save(transferObj);
     } else {
       throw new CodeCommonException("保存失败，DTO名称重复！");
     }
@@ -156,10 +151,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
   @Override
   public List<TransferObjPO> findAllTransferObj(String projectId) {
     // 获取查询结果
-    List<TransferObjPO> allTransferObj =
-        transferObjRePo.findByProjectIdAndDelFlag(projectId, Constants.DATA_IS_NORMAL);
-    // 返回结果
-    return allTransferObj;
+    return transferObjRePo.findByProjectIdAndDelFlag(projectId, Constants.DATA_IS_NORMAL);
   }
 
   @Override
@@ -169,7 +161,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     for (Object[] data : results) {
       // 生成新对象
       SimpleDataObj dataobj =
-          new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE, null);
+          new SimpleDataObj((String) data[0], (String) data[1], (String) data[3], null);
       // 根据packagename获取list
       List<SimpleDataObj> objLists = datamaps.get((String) data[2]);
       if (null != objLists) {
@@ -196,7 +188,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     showPO = transferObjRePo.save(showPO);
     // 实体属性
     TransferObjFieldPO showPOField = this.genTransferObjFieldPO(showPO.getId(), tableName, "",
-        DtoType.PO, className, tableName.concat("对象"));
+        BaseType.PO, className, tableName.concat("对象"));
     transferObjFieldRePo.save(showPOField);
     // 列表实体暂时不需要
 //    TransferObjPO listPO = this.genTransferObjPO(projectId, tableId, tableName, "s",
@@ -244,7 +236,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
    * @return
    */
   private TransferObjFieldPO genTransferObjFieldPO(String transferObjId, String tableName,
-      String postfix, DtoType type, String format, String description) {
+      String postfix, BaseType type, String format, String description) {
     TransferObjFieldPO po = new TransferObjFieldPO();
     po.setName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName).concat(postfix));
     po.setType(type.toString().toLowerCase());

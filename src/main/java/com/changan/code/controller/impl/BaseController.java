@@ -3,8 +3,8 @@
  */
 package com.changan.code.controller.impl;
 
+import com.changan.anywhere.common.mvc.page.rest.response.ValidationSchemaFactoryWrapperExtend;
 import com.changan.code.exception.CodeCommonException;
-import com.changan.code.extend.ValidationSchemaFactoryWrapperExtend;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;

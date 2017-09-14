@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 /**
- * TransferObj API
+ * TransferObj RESTful接口
  * 
  * @author xuyufeng
  *
@@ -26,6 +26,11 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping(value = "/codegen/api/v1")
 public interface TransferObjApi {
 
+  /**
+   * 根据id获取dto
+   * @param id
+   * @return
+   */
   @ApiOperation(value = "根据id获取DTO", notes = "根据id获取DTO", response = ResultOfTransferObjDTO.class,
       tags = {"TransferObj"})
   @ApiResponses(value = {
@@ -36,6 +41,11 @@ public interface TransferObjApi {
   ResponseEntity<ResultDTO> transferObjShowGet(
       @ApiParam(value = "id") @PathVariable(value = "id", required = true) String id);
 
+  /**
+   * 保存dto
+   * @param transferObj
+   * @return
+   */
   @ApiOperation(value = "保存DTO", notes = "保存DTO", response = ResultOfTransferObjDTO.class,
       tags = {"TransferObj"})
   @ApiResponses(value = {
@@ -46,16 +56,26 @@ public interface TransferObjApi {
   ResponseEntity<ResultDTO> transferObjSavePost(
       @ApiParam(value = "DTO对象") @RequestBody TransferObjPO transferObj);
 
-  @ApiOperation(value = "删除DTO", notes = "删除DTO", response = ResultOfTransferObjDTO.class,
+  /**
+   * 根据id删除dto
+   * @param id
+   * @return
+   */
+  @ApiOperation(value = "删除DTO", notes = "删除DTO", response = ResultDTO.class,
       tags = {"TransferObj"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfTransferObjDTO.class),
-      @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfTransferObjDTO.class)})
+      @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/transferObj/{id}/delete", produces = {"application/json"},
       method = RequestMethod.DELETE)
   ResponseEntity<ResultDTO> transferObjDelete(
       @ApiParam(value = "id", required = true) @PathVariable String id);
 
+  /**
+   * 查询指定项目下的所有dto
+   * @param projectId
+   * @return
+   */
   @ApiOperation(value = "查询所有项目下所有DTO", notes = "查询所有项目下所有DTO",
       response = ResultOfTransferObjDTO.class, tags = {"TransferObj"})
   @ApiResponses(value = {

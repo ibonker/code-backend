@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.changan.code.entity.ApiParamPO;
 
+/**
+ * ApiParam Service接口
+ * @author xuyufeng
+ *
+ */
 public interface IApiParamService {
 
 

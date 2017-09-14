@@ -8,6 +8,8 @@ import java.util.List;
 import com.changan.code.entity.ApiViewFormConfigPO;
 import com.changan.code.entity.ApiViewPO;
 import com.changan.code.entity.ApiViewTableConfigPO;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +20,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@JsonInclude(value = Include.NON_NULL)
 public class RequestApiViewConfigDTO {
 
    private ApiViewPO apiViewPO; //api配置

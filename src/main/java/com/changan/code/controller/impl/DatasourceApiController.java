@@ -15,6 +15,7 @@ import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.RestStatus;
 import com.changan.code.controller.DatasourceApi;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.TablePO;
@@ -57,7 +58,7 @@ public class DatasourceApiController extends BaseController implements Datasourc
     if (datasourceService.checkDatasource(datasource)) {
       msg = "数据源连接成功";
     }
-    return new ResponseEntity<ResultDTO>(
+    return new ResponseEntity<>(
         new ResultDTO().message(msg).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
@@ -67,7 +68,7 @@ public class DatasourceApiController extends BaseController implements Datasourc
   @Override
   public ResponseEntity<ResultDTO> datasourcesTablesSyncGet(@PathVariable String id) {
     datasourceService.syncTableFromOriginalDatasource(id);
-    return new ResponseEntity<ResultDTO>(
+    return new ResponseEntity<>(
         new ResultDTO().message("同步成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
@@ -78,10 +79,10 @@ public class DatasourceApiController extends BaseController implements Datasourc
   public ResponseEntity<ResultDTO> projectsGet(@PathVariable String id,
       @RequestBody PageDTO searchParams) {
     Page<TablePO> result = tableService.findTablesPage(id, searchParams);
-    return new ResponseEntity<ResultDTO>(
+    return new ResponseEntity<>(
         new ResultPageDTO<TablePO>().totalElements(result.getTotalElements())
             .pageNumber(result.getNumber()).pageSize(result.getSize()).data(result.getContent())
-            .message("成功").statusCode(Constants.SUCCESS_API_CODE),
+            .message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE),
         HttpStatus.OK);
   }
 

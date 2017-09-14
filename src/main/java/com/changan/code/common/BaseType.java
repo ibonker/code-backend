@@ -7,14 +7,14 @@ package com.changan.code.common;
  * @author wenxing
  *
  */
-public enum DtoType {
+public enum BaseType {
 
   BASE("基本类型"), ARRAY("集合类型"), PO("PO实体"), DTO("DTO实体");
   
   // 中文名
   private final String cname;
 
-  private DtoType(String cname) {
+  private BaseType(String cname) {
     this.cname = cname;
   }
 

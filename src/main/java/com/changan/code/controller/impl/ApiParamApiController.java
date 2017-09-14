@@ -12,11 +12,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.RestStatus;
 import com.changan.code.controller.ApiParamApi;
 import com.changan.code.dto.ResultOfApiParamDTO;
 import com.changan.code.entity.ApiParamPO;
 import com.changan.code.service.IApiParamService;
-
+/**
+ * ApiParam Contoller
+ * @author xuyufeng
+ *
+ */
 @Controller
 public class ApiParamApiController implements ApiParamApi {
 
@@ -34,8 +39,8 @@ public class ApiParamApiController implements ApiParamApi {
     // 执行保存
     apiParamService.saveApiParam(apiParams, apiObjId);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(
-        new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(
+        new ResultDTO().message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 
   /**
@@ -46,7 +51,7 @@ public class ApiParamApiController implements ApiParamApi {
     // 查询指定ApiObj的ApiParam
     List<ApiParamPO> apiParams = apiParamService.findAllApiParam(apiObjId);
     // 返回成功信息
-    return new ResponseEntity<ResultDTO>(new ResultOfApiParamDTO().apiParams(apiParams)
-        .message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfApiParamDTO().apiParams(apiParams)
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 }

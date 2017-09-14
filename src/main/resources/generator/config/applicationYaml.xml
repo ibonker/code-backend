@@ -2,8 +2,9 @@
 <template>
     <name>applicationYaml</name>
     <filePath>src/main/resources/config</filePath>
-    <fileName>application.yml</fileName>
+    <fileName>application${postfix}.yml</fileName>
     <content><![CDATA[
+<#if postfix == "">
 info:
   app_name: TITAN::${projectName}
   app_version: 0.1-SNAPSHOT
@@ -23,6 +24,27 @@ server:
 spring:
   profiles:
     active: local
+  <#if components?seq_contains("rescentersecurity")>  
+  security:
+    rest:
+      ignorePath: /login
+      matchPath: /${mainpath}/**,/logout
+  </#if>
+<#if dbcount == 1>
+mybatis:
+  type-aliases-package: ${packageName}.entity
+  mapper-locations: classpath:/mappings/*.xml,classpath:/mappings/**/*.xml
+</#if>
+<#else>
+spring:
+<#if components?seq_contains("rescentersecurity")> 
+  <#if postfix == "-test" || postfix == "-local">
+  redis:
+    database: 0
+    host: 10.64.13.80
+    port: 6379
+  </#if>
+</#if>
   datasource:
     <#list datasourcelist as datasource>
     druid:
@@ -34,19 +56,22 @@ spring:
         filters: stat
         connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     </#list>
-
-<#if dbcount == 1>
-mybatis:
-  type-aliases-package: ${packageName}.entity
-  mapper-locations: classpath:/mappings/*.xml,classpath:/mappings/**/*.xml
-</#if>
-
 logging:
   file: logs/application_log
   level:
     ROOT: INFO
     org.springframework.boot: INFO
     org.springframework.web: INFO
-    com.changan.anywhere: DEBUG]]>
+    com.changan.anywhere: DEBUG
+uiconfig:
+  path: ./ui-config/config.txt
+<#if components?seq_contains("rescentersecurity")>  
+  <#if postfix == "-test" || postfix == "-local">
+res:
+  center:
+    server: 10.64.19.104:8085
+  </#if>
+</#if>
+</#if>]]>
     </content>
 </template>

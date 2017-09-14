@@ -3,6 +3,7 @@
  */
 package com.changan.code.entity;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -17,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.changan.code.common.BaseDTO;
 import com.changan.code.common.Constants;
+import com.changan.code.common.BaseType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.CaseFormat;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -69,6 +73,10 @@ public class ApiObjPO extends BaseEntity {
   @JsonProperty("responseObjGenericType")
   private String responseObjGenericType; // 泛型类型
 
+  @Column(name = "response_obj_generic_array_type")
+  @JsonProperty("responseObjGenericArrayType")
+  private String responseObjGenericArrayType; // 泛型array的格式
+
   @Column(name = "response_obj_generic_format")
   @JsonProperty("responseObjGenericFormat")
   private String responseObjGenericFormat; // 泛型格式
@@ -98,7 +106,7 @@ public class ApiObjPO extends BaseEntity {
   private String genBasedTableId; // 自动生成表id
 
   @Transient
-  private List<ApiParamPO> apiParam; // api方法参数
+  private List<ApiParamPO> apiParams; // api方法参数
 
   @Transient
   private String serviceName; // 包含的service名称
@@ -125,7 +133,25 @@ public class ApiObjPO extends BaseEntity {
     this.summary = apiObj.getSummary();
     this.description = apiObj.getDescription();
     this.tag = apiObj.getTag();
-    this.apiParam = apiObj.getApiParam();
+    this.apiParams = apiObj.getApiParams();
+
+    return this;
+  }
+
+  /**
+   * 设置array type
+   * 
+   * @return
+   */
+  public ApiObjPO setArrayType() {
+    if (StringUtils.isNotBlank(this.responseObjGenericType)
+        && BaseType.ARRAY.equals(BaseType.valueOf(this.responseObjGenericType.toUpperCase()))) {
+      String[] array = this.responseObjGenericFormat.split("\\.");
+      this.responseObjGenericArrayType = array[0];
+      List<String> formats = Lists.newArrayList(Arrays.asList(array));
+      formats.remove(0);
+      this.responseObjGenericFormat = Joiner.on(".").join(formats);
+    }
 
     return this;
   }

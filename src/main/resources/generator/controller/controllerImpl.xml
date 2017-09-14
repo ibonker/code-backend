@@ -10,12 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base.BaseController;
-import ${packageName}<#if moduleName != "">.${moduleName}</#if>.common.Constants;
+import ${packageName}<#if moduleName != "">.${moduleName}</#if>.common.RestStatus;
 <#list importImplPackageList as package>
 import ${package};
 </#list>
@@ -40,33 +38,41 @@ public class ${controllerName}ApiController extends BaseController implements ${
    * ${apiObj.summary}
    */
   @Override
-  public ResponseEntity<ResultDTO> ${apiObj.name}(<#list apiObj.apiParam as apiParam>${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>) {
+  public ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam>${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>) {
     <#if apiObj.apiType == "general">
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}${apiObj.responseObjGenericNoPack}().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "page">
     return new ResponseEntity<ResultDTO>(${apiObj.attrServiceNameNoPack}.get${apiObj.tableAttrNameCap}List(searchParams)
-        .message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+        .message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "insert">
     ${apiObj.attrServiceNameNoPack}.insert${apiObj.tableAttrNameCap}(${apiObj.tableAttrName});
-    return new ResponseEntity<ResultDTO>(new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "update">
-    ${apiObj.attrServiceNameNoPack}.update${apiObj.tableAttrNameCap}(${apiObj.tableAttrName});
-    return new ResponseEntity<ResultDTO>(new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    ${apiObj.attrServiceNameNoPack}.update${apiObj.tableAttrNameCap}(${apiObj.tableAttrName}Id, ${apiObj.tableAttrName});
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "delete">
     ${apiObj.attrServiceNameNoPack}.delete${apiObj.tableAttrNameCap}(${apiObj.tableAttrName}Id);
-    return new ResponseEntity<ResultDTO>(new ResultDTO().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "jsonschema">
     return new ResponseEntity<ResultDTO>(new ResultJsonSchemaDTO()
-        .jsonSchema(this.getJsonSchemaByJavaType(new TypeReference${apiObj.responseObjGenericNoPack}() {})).message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+        .jsonSchema(${apiObj.attrServiceNameNoPack}.get${apiObj.tableAttrNameCap}JsonSchema(req.getRequestURI()))
+        .message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "show">
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}()
-        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findById(${apiObj.tableAttrName}Id)).message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findById(${apiObj.tableAttrName}Id))
+        .message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
   }
   </#list>

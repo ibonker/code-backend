@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>metaConfiguration</name>
+	<filePath>src/main/java/${packageName}/${moduleName}/config</filePath>
+	<fileName>ResourceMetadataConfiguration.java</fileName>
+	<content><![CDATA[
+package ${packageName}<#if moduleName != "">.${moduleName}</#if>.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.changan.jsonmeta.ResourceMetaManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * ResourceMetadataConfiguration
+ *
+ * @author TitanCode2
+ *
+ */
+@Configuration
+public class ResourceMetadataConfiguration {
+
+  @Autowired
+  private ObjectMapper objectMapper;
+  
+  @Bean
+  public ResourceMetaManager resourceMetaManager() {
+    return new ResourceMetaManager(objectMapper);
+  }
+  
+}
+]]>
+	</content>
+</template>

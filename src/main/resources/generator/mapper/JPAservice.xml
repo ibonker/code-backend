@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>service</name>
+  <filePath>src/main/java/${packageName}/JPAservice/${moduleName}</filePath>
+  <fileName>I${className}Service.java</fileName>
+  <content><![CDATA[
+package ${packageName}.JPAservice.${DTOPackageName};
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import ${packageName}.entity.${DTOPackageName}.${className}PO;
+
+/** 
+ * I${className}Service
+ */
+public interface I${className}Service {
+
+  /**
+   * @Description datatable 分页查询
+   * 
+   * @param pageable
+   * @return
+   */
+  public Page<${className}PO> get${className}List(Pageable pageable);
+    
+  /**
+   * @Description 新增
+   * 
+   * @param ${lowerName}
+   * @return
+   */
+  public ${className}PO insert${className}(${className}PO ${lowerName});
+    
+  /**
+   * @Description 修改
+   * 
+   * @param ${lowerName}
+   * @return
+   */
+  public ${className}PO update${className}(${className}PO ${lowerName});
+    
+  /**
+   * @Description 根据ID查找
+   *  
+   * @param id
+   * @return
+   */
+  public ${className}PO findById(String id);
+    
+  /**
+   * @Description 删除
+   * 
+   * @param ${lowerName}
+   */
+  public void delete${className}(String id);
+
+}
+]]>
+  </content>
+</template>
