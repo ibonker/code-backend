@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import com.changan.anywhere.common.utils.IdGen;
 import com.changan.anywhere.common.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -78,6 +79,7 @@ public class BaseEntity implements Serializable {
    * 
    * @return
    */
+  @JsonIgnore 
   public boolean isNew() {
     return StringUtils.isEmpty(getId());
   }
