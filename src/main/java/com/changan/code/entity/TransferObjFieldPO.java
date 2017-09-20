@@ -17,8 +17,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * 
@@ -27,6 +29,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "transfer_obj_field")
 @Entity
 @EntityListeners(value = {AuditingEntityListener.class})
@@ -85,6 +89,13 @@ public class TransferObjFieldPO extends BaseEntity {
   @JsonProperty(value = "max")
   @JsonPropertyDescription("最大值")
   private Integer max; // 最大值、 字符串最大长度
+  
+  public TransferObjFieldPO(String name, String type, String format, String description) {
+    this.name = name;
+    this.type = type;
+    this.format = format;
+    this.description = description;
+  }
 
   /**
    * 可以更新的属性

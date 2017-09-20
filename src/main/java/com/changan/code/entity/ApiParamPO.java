@@ -71,6 +71,10 @@ public class ApiParamPO extends BaseEntity {
   @Column(name = "format")
   @JsonProperty("format")
   private String format; // 参数格式
+  
+  @Column(name = "sort")
+  @JsonProperty("sort")
+  private int sort; // 参数排序
 
   /**
    * 可以更新的属性

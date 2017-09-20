@@ -12,25 +12,36 @@ import com.google.common.collect.Lists;
  *
  */
 public enum BaseDTO {
-  
-  ResultDTO("com.changan.anywhere.common.mvc.page.rest.response.ResultDTO"), 
-  ResultPageDTO("com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO"), 
-  PageDTO("com.changan.anywhere.common.mvc.page.rest.request.PageDTO"), 
-  ResultJsonSchemaDTO("com.changan.anywhere.common.mvc.page.rest.response.ResultJsonSchemaDTO");
-  
+
+  ResultDTO("com.changan.anywhere.common.mvc.page.rest.response.ResultDTO", "返回值基类"), ResultPageDTO(
+      "com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO",
+      "分页返回值基类(泛型)"), PageDTO("com.changan.anywhere.common.mvc.page.rest.request.PageDTO",
+          "分页查询参数类"), ResultJsonSchemaDTO(
+              "com.changan.anywhere.common.mvc.page.rest.response.ResultJsonSchemaDTO",
+              "json schema返回值基类");
+
   // 包名
   private final String packageName;
 
-  private BaseDTO(String packageName) {
+  // 描述
+  private final String comments;
+
+  private BaseDTO(String packageName, String comments) {
     this.packageName = packageName;
+    this.comments = comments;
   }
 
   public String getPackageName() {
     return packageName;
   }
-  
+
+  public String getComments() {
+    return comments;
+  }
+
   /**
    * 获取所有枚举名称
+   * 
    * @return
    */
   public static List<String> getNameList() {
@@ -40,5 +51,5 @@ public enum BaseDTO {
     }
     return result;
   }
-  
+
 }

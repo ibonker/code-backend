@@ -17,6 +17,7 @@ import ${packageName}.dao.${moduleName}.${className}POMapper;
 import com.changan.anywhere.common.utils.MybatisFilterUtils;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import com.changan.anywhere.common.mvc.page.rest.request.Filter;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.changan.jsonmeta.JsonSchema;
@@ -91,6 +92,66 @@ public class ${className}ServiceImpl implements I${className}Service {
     result.setTotalElements(list.getTotal());
     return result;
   }
+  
+  <#list tableRelations as tableRelation>
+  /**
+   * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}分页查询
+   * 
+   * @param page
+   * @return
+   */
+  public ResultPageDTO<${className}PO> get${className}ListBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, PageDTO page){
+  	ResultPageDTO<${className}PO> result = new ResultPageDTO<${className}PO>();
+	
+	// 注入主表字段查询条件
+	Filter masterFilter = new Filter("${tableRelation.slaveColumnNameLower}", ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+	page.getCollection().getFilters().add(masterFilter);
+	
+    ${className}POExample ce = new ${className}POExample();
+    // 获取json schema
+    JsonSchema jsonschema = metaManager.fetchJsonSchema(${className}PO.class);
+    // 查询
+    MybatisFilterUtils.transformForMybatis(ce.createCriteria(), page.getCollection(), jsonschema);
+    // 分页
+    PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
+    // 排序
+    PageHelper.orderBy(MybatisFilterUtils.transformOrderBy(page, jsonschema));
+    PageInfo<${className}PO> list = new PageInfo<>(${lowerName}POMapper.selectByExample(ce));
+
+    result.setData(list.getList());
+    result.setPageNumber(list.getPageNum());
+    result.setPageSize(list.getPageSize());
+    result.setTotalElements(list.getTotal());
+    return result;
+  }
+    
+  /**
+   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}新增
+   * 
+   * @param ${lowerName}
+   * @return
+   */
+  public int insert${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName}){
+  	// 设置值
+  	${lowerName}.set${tableRelation.slaveColumnNameCap}(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+    ${lowerName}.preInsert();
+    return ${lowerName}POMapper.insertSelective(${lowerName});
+  }
+    
+  /**
+   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}修改
+   * 
+   * @param ${lowerName}
+   * @return
+   */
+  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName}){
+  	// 设置值
+  	${lowerName}.set${tableRelation.slaveColumnNameCap}(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+  	${lowerName}.preUpdate();
+    ${lowerName}.setId(id);
+    return ${lowerName}POMapper.updateByPrimaryKeySelective(${lowerName});
+  }
+  </#list>
   
 }
 ]]>

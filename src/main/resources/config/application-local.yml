@@ -7,7 +7,7 @@ spring:
       username: root
       password: Root123456
       type: com.alibaba.druid.pool.DruidDataSource
-      filters: stat
+      filters: stat,wall
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   jpa:
     show-sql: true
@@ -17,4 +17,5 @@ spring:
 generate:
   projectPath: D:/
   projectZipPath: D:/zip/
+  projectUiPath: D:/ui-code/
   mybatisGenlibsPath: D:/mybatis-genlibs/

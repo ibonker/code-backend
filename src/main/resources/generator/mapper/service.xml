@@ -60,6 +60,32 @@ public interface I${className}Service {
    * @param ${lowerName}
    */
   public int delete${className}(String id);
+  
+  <#list tableRelations as tableRelation>
+  /**
+   * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}分页查询
+   * 
+   * @param page
+   * @return
+   */
+  public ResultPageDTO<${className}PO> get${className}ListBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, PageDTO page);
+    
+  /**
+   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}新增
+   * 
+   * @param ${lowerName}
+   * @return
+   */
+  public int insert${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName});
+    
+  /**
+   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}修改
+   * 
+   * @param ${lowerName}
+   * @return
+   */
+  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName});
+  </#list>
 
 }
 ]]>

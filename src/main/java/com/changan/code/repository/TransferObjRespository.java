@@ -32,7 +32,7 @@ public interface TransferObjRespository
    * @param datasourceId
    * @return
    */
-  @Query("SELECT t.id as id, t.name as name, t.packageName as packageName, t.isGeneric as isGeneric FROM TransferObjPO t WHERE t.projectId = ?1 and t.delFlag = '0'")
+  @Query("SELECT t.id as id, t.name as name, t.packageName as packageName, t.isGeneric as isGeneric, t.comments as comments FROM TransferObjPO t WHERE t.projectId = ?1 and t.delFlag = '0'")
   List<Object[]> findClassNameByProjectId(String projectId);
 
   /**

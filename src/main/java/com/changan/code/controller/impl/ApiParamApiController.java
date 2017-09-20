@@ -44,12 +44,13 @@ public class ApiParamApiController implements ApiParamApi {
   }
 
   /**
-   * 查询指定ApiObj的ApiParam
+   * 查询指定ApiObj的ApiParam(有排序)
+   * 
    */
   @Override
   public ResponseEntity<ResultDTO> apiObjAllShowGet(@PathVariable String apiObjId) {
     // 查询指定ApiObj的ApiParam
-    List<ApiParamPO> apiParams = apiParamService.findAllApiParam(apiObjId);
+    List<ApiParamPO> apiParams = apiParamService.findAllApiParamOrderBySort(apiObjId);
     // 返回成功信息
     return new ResponseEntity<>(new ResultOfApiParamDTO().apiParams(apiParams)
         .message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);

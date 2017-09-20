@@ -43,22 +43,22 @@ public class ${controllerName}ApiController extends BaseController implements ${
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}${apiObj.responseObjGenericNoPack}().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "page">
-    return new ResponseEntity<ResultDTO>(${apiObj.attrServiceNameNoPack}.get${apiObj.tableAttrNameCap}List(searchParams)
+    return new ResponseEntity<ResultDTO>(${apiObj.attrServiceNameNoPack}.get${apiObj.tableAttrNameCap}List<#if apiObj.isSlaveUri>By${apiObj.firstPathVarCap}</#if>(<#list apiObj.apiParams as apiParam>${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>)
         .message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "insert">
-    ${apiObj.attrServiceNameNoPack}.insert${apiObj.tableAttrNameCap}(${apiObj.tableAttrName});
-    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+    ${apiObj.attrServiceNameNoPack}.insert${apiObj.tableAttrNameCap}<#if apiObj.isSlaveUri>By${apiObj.firstPathVarCap}</#if>(<#list apiObj.apiParams as apiParam>${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
+    return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}().message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "update">
-    ${apiObj.attrServiceNameNoPack}.update${apiObj.tableAttrNameCap}(${apiObj.tableAttrName}Id, ${apiObj.tableAttrName});
-    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+    ${apiObj.attrServiceNameNoPack}.update${apiObj.tableAttrNameCap}<#if apiObj.isSlaveUri>By${apiObj.firstPathVarCap}</#if>(<#list apiObj.apiParams as apiParam>${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
+    return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}().message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "delete">
-    ${apiObj.attrServiceNameNoPack}.delete${apiObj.tableAttrNameCap}(${apiObj.tableAttrName}Id);
+    ${apiObj.attrServiceNameNoPack}.delete${apiObj.tableAttrNameCap}(${apiObj.lastPathVar});
     return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
@@ -70,7 +70,7 @@ public class ${controllerName}ApiController extends BaseController implements ${
     </#if>
     <#if apiObj.apiType == "show">
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}()
-        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findById(${apiObj.tableAttrName}Id))
+        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findById(${apiObj.lastPathVar}))
         .message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>

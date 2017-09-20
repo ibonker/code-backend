@@ -21,6 +21,14 @@ public interface ApiParamRepository
    * @return
    */
   public List<ApiParamPO> findByApiObjIdAndDelFlag(String apiObjId, String delFlag);
+  
+  /**
+   * 通过ApiObj查询参数并sort排序
+   * 
+   * @param apiObjId
+   * @return
+   */
+  public List<ApiParamPO> findByApiObjIdAndDelFlagOrderBySortAsc(String apiObjId, String delFlag);
 
   /**
    * 根据id查询ApiParam

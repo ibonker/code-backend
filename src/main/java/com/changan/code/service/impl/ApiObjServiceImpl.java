@@ -191,53 +191,57 @@ public class ApiObjServiceImpl implements IApiObjService {
   @Override
   @Transactional("jpaTransactionManager")
   public void createAutoCrudApi(String apiBaseId, String tableId, String tableName,
-      String tableComment, String dtoName, String className, String datasourcePName, String dbname,
+      String tableComment, String dtoName, String className, String dbname,
       Long dbcount) {
     // table名称转换
     String tableParamName =
         CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName.toLowerCase());
     // 分页列表列表接口
     ApiObjPO pageApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
-        BaseDTO.ResultPageDTO.toString(), className, className, datasourcePName, dbname, dbcount,
+        BaseDTO.ResultPageDTO.toString(), className, className, dbname, dbcount,
         "s/pages", Constants.API_PRODUCES, "分页列表", RequestMethod.POST.toString());
     pageApiObj = apiObjRepo.save(pageApiObj);
     // 分页列表接口参数
     ApiParamPO pageApiparam = this.genApiParamPO(pageApiObj.getId(), "searchParams", "分页参数",
         BaseParamIn.BODY, BaseType.DTO, BaseDTO.PageDTO.toString());
+    pageApiparam.setSort(0);
     apiParamRepo.save(pageApiparam);
     // 详情接口
     ApiObjPO showApiObj =
         this.genApiObjPO(apiBaseId, tableId, tableName, tableComment, dtoName, null, className,
-            datasourcePName, dbname, dbcount, "s/{".concat(tableParamName.concat("Id}")),
+            dbname, dbcount, "s/{".concat(tableParamName.concat("Id}")),
             Constants.API_PRODUCES, "详情", RequestMethod.GET.toString());
     showApiObj = apiObjRepo.save(showApiObj);
     // 详情接口参数
     ApiParamPO showApiparam = this.genApiParamPO(showApiObj.getId(), tableParamName.concat("Id"),
         tableParamName.concat("对象id"), BaseParamIn.PATH, BaseType.BASE, "String");
+    showApiparam.setSort(0);
     apiParamRepo.save(showApiparam);
     // 删除接口
     ApiObjPO delApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
-        BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount,
+        BaseDTO.ResultDTO.toString(), null, className, dbname, dbcount,
         "s/{".concat(tableParamName.concat("Id}")), Constants.API_PRODUCES, "删除",
         RequestMethod.DELETE.toString());
     showApiObj = apiObjRepo.save(delApiObj);
     // 删除接口参数
     ApiParamPO delApiparam = this.genApiParamPO(delApiObj.getId(), tableParamName.concat("Id"),
         tableParamName.concat("对象id"), BaseParamIn.PATH, BaseType.BASE, "String");
+    delApiparam.setSort(0);
     apiParamRepo.save(delApiparam);
     // 新增接口
     ApiObjPO saveApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
-        BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount, "s",
+        BaseDTO.ResultDTO.toString(), null, className, dbname, dbcount, "s",
         Constants.API_PRODUCES, "新增", RequestMethod.POST.toString());
     saveApiObj = apiObjRepo.save(saveApiObj);
     // 新增接口参数
     ApiParamPO saveApiparam = this.genApiParamPO(saveApiObj.getId(),
         CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName), "实体对象参数",
         BaseParamIn.BODY, BaseType.PO, className);
+    saveApiparam.setSort(0);
     apiParamRepo.save(saveApiparam);
     // 更新接口
     ApiObjPO updateApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
-        BaseDTO.ResultDTO.toString(), null, className, datasourcePName, dbname, dbcount,
+        BaseDTO.ResultDTO.toString(), null, className, dbname, dbcount,
         "s/{".concat(tableParamName.concat("Id}")), Constants.API_PRODUCES, "修改",
         RequestMethod.PUT.toString());
     updateApiObj = apiObjRepo.save(updateApiObj);
@@ -245,15 +249,17 @@ public class ApiObjServiceImpl implements IApiObjService {
     ApiParamPO updateIdApiparam =
         this.genApiParamPO(updateApiObj.getId(), tableParamName.concat("Id"),
             tableParamName.concat("对象id"), BaseParamIn.PATH, BaseType.BASE, "String");
+    updateIdApiparam.setSort(0);
     apiParamRepo.save(updateIdApiparam);
     // 更新接口参数 - 实体参数
     ApiParamPO updateEntityApiparam = this.genApiParamPO(updateApiObj.getId(),
         CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName), "实体对象参数",
         BaseParamIn.BODY, BaseType.PO, className);
+    updateIdApiparam.setSort(1);
     apiParamRepo.save(updateEntityApiparam);
     // jsonschema接口
     ApiObjPO schemaApiObj = this.genApiObjPO(apiBaseId, tableId, tableName, tableComment,
-        BaseDTO.ResultJsonSchemaDTO.toString(), className, className, datasourcePName, dbname,
+        BaseDTO.ResultJsonSchemaDTO.toString(), className, className, dbname,
         dbcount, "s", "application/schema+json", "的json-schema", RequestMethod.GET.toString());
     schemaApiObj = apiObjRepo.save(schemaApiObj);
   }
@@ -275,9 +281,8 @@ public class ApiObjServiceImpl implements IApiObjService {
    * @return
    */
   private ApiObjPO genApiObjPO(String apiBaseId, String tableId, String tableName,
-      String tableComment, String dtoName, String genericName, String className,
-      String datasourcePName, String dbname, Long dbcount, String urlPostfix, String produces,
-      String description, String requestMethod) {
+      String tableComment, String dtoName, String genericName, String className, String dbname,
+      Long dbcount, String urlPostfix, String produces, String description, String requestMethod) {
     ApiObjPO apiObj = new ApiObjPO();
     apiObj.setApiBaseId(apiBaseId);
     String urlPrefix = "";

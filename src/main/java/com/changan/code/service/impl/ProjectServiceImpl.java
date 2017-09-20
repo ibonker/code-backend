@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -15,6 +16,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,8 +32,8 @@ import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.utils.FileUtil;
 import com.changan.anywhere.common.utils.FileUtils;
 import com.changan.code.common.BaseDTO;
-import com.changan.code.common.Constants;
 import com.changan.code.common.BaseType;
+import com.changan.code.common.Constants;
 import com.changan.code.common.PredictUtils;
 import com.changan.code.common.component.Consul;
 import com.changan.code.common.component.Security;
@@ -48,11 +50,11 @@ import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TableRelationPO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ProjectRepository;
-import com.changan.code.repository.TableRepository;
 import com.changan.code.service.IApiBaseService;
 import com.changan.code.service.IApiObjService;
 import com.changan.code.service.IApiParamService;
@@ -63,6 +65,7 @@ import com.changan.code.service.ITableService;
 import com.changan.code.service.ITransferObjFieldService;
 import com.changan.code.service.ITransferObjService;
 import com.changan.code.utils.GeneratorUtils;
+import com.changan.code.utils.PatternUtils;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -107,9 +110,6 @@ public class ProjectServiceImpl implements IProjectService {
 
   @Autowired
   private IApiParamService apiParamService;
-
-  @Autowired
-  private TableRepository tableRepo;
 
   /**
    * 分页查询project
@@ -255,9 +255,9 @@ public class ProjectServiceImpl implements IProjectService {
     // 添加默认类型
     List<SimpleDataObj> defaultdtos = Lists.newArrayList();
     for (BaseDTO basedto : BaseDTO.values()) {
-      defaultdtos.add(new SimpleDataObj("", basedto.toString(),
+      defaultdtos.add(new SimpleDataObj(basedto.name(), basedto.toString(),
           basedto.equals(BaseDTO.ResultPageDTO) ? Constants.IS_ACTIVE : Constants.IS_INACTIVE,
-          null));
+          "default", basedto.getComments()));
     }
     PackObj defaultPackobj = new PackObj("default", defaultdtos);
     dtoPacks.add(defaultPackobj);
@@ -294,13 +294,15 @@ public class ProjectServiceImpl implements IProjectService {
     // 获得数据源
     List<DatasourcePO> datasources = datasourceService.findByProjectId(id);
     // 获取表map
-    Map<String, TablePO> tablemap = Maps.newHashMap();
+    Map<String, TablePO> alltablemap = Maps.newHashMap();
     // 获取最新的apibase
     ApiBasePO firstApibase = apiBaseService.findEarlestApiBaseByProjectId(id);
     // 生成配置文件代码
     generateService.generateConfigFiles(project, datasources, firstApibase.getBasePath());
     // 查询对应项目下的DTO信息
     List<TransferObjPO> transferObjs = transObjService.findAllTransferObj(id);
+    // 需要创建service的表
+    Set<String> tableNeedServiceCreated = Sets.newHashSet();
     for (TransferObjPO transferObj : transferObjs) {
       // 查询DTO下对应DTO属性
       List<TransferObjFieldPO> transferObjFileds =
@@ -310,24 +312,62 @@ public class ProjectServiceImpl implements IProjectService {
           transferObj, transferObjFileds);
     }
 
-    //生成advice代码
+    // 生成advice代码
     generateService.generateAdvice(project.getPackages(), project.getName());
-    
+
+    // 取出表和字段方便之后使用
+    for (DatasourcePO datasource : datasources) {
+      // 查询对应数据源下的所有表
+      List<TablePO> tables = tableService.findByDatasourceId(datasource.getId());
+      Map<String, TablePO> tableMaps = Maps.newHashMap();
+      for (TablePO table : tables) {
+        // 该数据库所有表
+        tableMaps.put(table.getId(), table);
+        // 所有数据库所有表
+        alltablemap.put(table.getId(), table);
+        List<ColumnPO> columns = tableService.findMergedColumns(table.getId());
+        Map<String, ColumnPO> columnMaps = Maps.newHashMap();
+        for (ColumnPO column : columns) {
+          // 该表所有字段
+          columnMaps.put(column.getName(), column);
+        }
+        table.setColumnMaps(columnMaps);
+        // 获取主表关系表
+        List<TableRelationPO> tableRelations =
+            tableService.findSlaveTableRelationList(table.getId());
+        if (Constants.IS_ACTIVE.equals(table.getIsAutoCrud())) {
+          tableNeedServiceCreated.add(table.getId());
+        }
+        // 注入从表数据库类型
+        for (TableRelationPO tableRelation : tableRelations) {
+          tableRelation.setMasterColumnJavaType(
+              datasource.getTableMaps().get(tableRelation.getMasterTableId()).getColumnMaps()
+                  .get(tableRelation.getMasterColumnName()).getJavaType());
+          tableNeedServiceCreated.add(tableRelation.getMasterTableId());
+          tableNeedServiceCreated.add(tableRelation.getSlaveTableId());
+        }
+        table.setMasterTableRelations(tableRelations);
+      }
+      datasource.setTableMaps(tableMaps);
+    }
+
     // 获取需要自动生成crud的table
     boolean isAutoGen = false;
     for (DatasourcePO datasource : datasources) {
-      // 查询对应数据源下的所有表
-      List<TablePO> tables = tableRepo.findByDatasourceIdAndIsAutoCrudAndDelFlag(datasource.getId(),
-          Constants.IS_ACTIVE, Constants.DATA_IS_NORMAL);
-      for (TablePO table : tables) {
-        table.setPackageName(datasource.getPackageName());
-        tablemap.put(table.getId(), table);
-        // 生成servcie和serviceImpl
-        generateService.generateIServiceAndServiceImpl(datasource.getPackageName(),
-            project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
-        // TODO 判断mybatis和jpa 生成JPAService和JPAServiceImpl
-        // generateService.generateJPAServiceAndJPAServiceImpl(datasource.getPackageName(),
-        // project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
+      // 获得对应数据源下的所有表
+      Set<TablePO> tables = Sets.newHashSet();
+      for (TablePO table : datasource.getTableMaps().values()) {
+        if (tableNeedServiceCreated.contains(table.getId())) {
+          tables.add(table);
+          table.setPackageName(datasource.getPackageName());
+          // 生成servcie和serviceImpl
+          generateService.generateIServiceAndServiceImpl(datasource.getPackageName(),
+              project.getName(), project.getPackages(), table, table.getMasterTableRelations(),
+              transferObjs.get(0).getPackageName());
+          // TODO 判断mybatis和jpa 生成JPAService和JPAServiceImpl
+          // generateService.generateJPAServiceAndJPAServiceImpl(datasource.getPackageName(),
+          // project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
+        }
       }
       // 数据库代码生成xml
       if (!tables.isEmpty()) {
@@ -345,17 +385,17 @@ public class ProjectServiceImpl implements IProjectService {
     // 获取实体表名
     for (DatasourcePO datasource : datasources) {
       // 查询对应数据源下的所有表
-      List<TablePO> tables = tableService.findByDatasourceId(datasource.getId());
-      for (TablePO table : tables) {
-        List<ColumnPO> columns = tableService.findMergedColumns(table.getId());
+      for (TablePO table : datasource.getTableMaps().values()) {
         // 生成实体文件代码
         generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
-            project.getPackages().toLowerCase(), table, columns);
+            project.getPackages().toLowerCase(), table,
+            Lists.newArrayList(table.getColumnMaps().values()));
         // TODO 判断mybatis和jpa 生成Jpa Repository
-//        generateService.generateRepository(datasource.getPackageName(), project.getName(),
-//            project.getPackages().toLowerCase(), table.getName());
+        // generateService.generateRepository(datasource.getPackageName(), project.getName(),
+        // project.getPackages().toLowerCase(), table.getName());
       }
     }
+
     // 获取apibase
     List<ApiBasePO> apibases = apiBaseService.findAllApiBase(project.getId());
     for (ApiBasePO apibase : apibases) {
@@ -364,17 +404,45 @@ public class ProjectServiceImpl implements IProjectService {
       Map<String, List<ApiObjPO>> controllerMap = Maps.newHashMap();
       for (ApiObjPO apiobj : apiobjs) {
         // 获取api param
-        List<ApiParamPO> apiparams = apiParamService.findAllApiParam(apiobj.getId());
+        List<ApiParamPO> apiparams = apiParamService.findAllApiParamOrderBySort(apiobj.getId());
         apiobj.setApiParams(apiparams);
         // 添加包名
         if (Constants.IS_ACTIVE.equals(apiobj.getIsAutoGen())) {
-          String tableName = tablemap.get(apiobj.getGenBasedTableId()).getName();
-          apiobj.setServiceName(tablemap.get(apiobj.getGenBasedTableId()).getPackageName()
+          // 判断是否为从表
+          String tableName;
+          if (apiobj.getUri().contains("}/")) {
+            apiobj.setSlaveUri(true);
+            List<String> substrs = PatternUtils.getMatchedSubString(apiobj.getUri().concat("/"),
+                "(?<=\\}/)(.+?)(?=\\/)");
+            String tableNameSuf = substrs.get(substrs.size() - 1);
+            // 去掉添加的"s"结尾
+            tableName = tableNameSuf.substring(0, tableNameSuf.length() - 1);
+          } else {
+            // 如果是主表则取直接取表名
+            tableName = alltablemap.get(apiobj.getGenBasedTableId()).getName();
+          }
+          apiobj.setServiceName(alltablemap.get(apiobj.getGenBasedTableId()).getPackageName()
               .concat(".I")
               .concat(
                   CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName.toLowerCase()))
               .concat("Service"));
           apiobj.setRelateTableName(tableName);
+          // 获取表主键名
+          List<String> substrs =
+              PatternUtils.getMatchedSubString(apiobj.getUri(), "(?<=\\{)(.+?)(?=\\})");
+          if (apiobj.isSlaveUri()) {
+            if (substrs.size() > 1) {
+              // uri的结构为"/a/{aid}/b/{bid}";
+              apiobj.setFirstPathVar(substrs.get(substrs.size() - 2));
+              apiobj.setLastPathVar(substrs.get(substrs.size() - 1));
+            }
+          } else {
+            if (substrs.size() == 1) {
+              // uri的结构为"/a/{aid}";
+              apiobj.setLastPathVar(substrs.get(0));
+            }
+          }
+
         }
         // controller分类
         List<ApiObjPO> apilist = controllerMap.get(apiobj.getControllerName());

@@ -25,9 +25,11 @@ import com.changan.code.controller.TableApi;
 import com.changan.code.dto.RequestOfTableIdsDTO;
 import com.changan.code.dto.ResultOfColumnsDTO;
 import com.changan.code.dto.ResultOfMsgDataDTO;
+import com.changan.code.dto.ResultOfTableRelationDTO;
 import com.changan.code.dto.ResultOfTransferObjDTO;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TableRelationPO;
 import com.changan.code.service.ITableService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
@@ -123,5 +125,36 @@ public class TableApiController extends BaseController implements TableApi {
     headers.add("Expires", "0");
     return ResponseEntity.ok().headers(headers).contentLength(file.length())
         .body(new InputStreamResource(new FileInputStream(file)));
+  }
+  
+  /**
+   * 新增restFul关联表
+   */
+  @Override
+  public ResponseEntity<ResultDTO> tablesRelationSavePut(@RequestBody TableRelationPO tableRelation) {
+    ResultOfTableRelationDTO result = new ResultOfTableRelationDTO().tableRelation(tableService.saveTableRelation(tableRelation));
+    return new ResponseEntity<>(
+        result.message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
+  
+  /**
+   * 根据id删除tableRelation
+   */
+  @Override
+  public ResponseEntity<ResultDTO> deletTableRelation(@PathVariable String id) {
+    tableService.deletTableRelation(id);
+    return new ResponseEntity<>(
+        new ResultDTO().message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  
+  }
+  
+  /**
+   * 根据id获取所有关联关系表
+   */
+  @Override
+  public ResponseEntity<ResultDTO> tableRelationList(@PathVariable String id) {
+    ResultOfTableRelationDTO result = new ResultOfTableRelationDTO().tableRelations(tableService.findTableRelationList(id));
+    return new ResponseEntity<>(
+        result.message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
 }

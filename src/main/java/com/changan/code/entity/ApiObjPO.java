@@ -104,6 +104,10 @@ public class ApiObjPO extends BaseEntity {
   @Column(name = "gen_based_table_id")
   @JsonProperty("genBasedTableId")
   private String genBasedTableId; // 自动生成表id
+  
+  @Column(name = "gen_related_table_id")
+  @JsonProperty("genRelatedTableId")
+  private String genRelatedTableId; // 自动生成关联表id
 
   @Transient
   private List<ApiParamPO> apiParams; // api方法参数
@@ -113,6 +117,15 @@ public class ApiObjPO extends BaseEntity {
 
   @Transient
   private String relateTableName; // 对应的表名
+  
+  @Transient
+  private boolean isSlaveUri; // 从表uri
+  
+  @Transient
+  private String firstPathVar; // uri中最后一个参数名（自动生成的api中为从表外键关联的主表字段）
+  
+  @Transient
+  private String lastPathVar; // uri中最后一个参数名（自动生成的api中为从表主键）
 
   /**
    * 更新属性
@@ -282,6 +295,15 @@ public class ApiObjPO extends BaseEntity {
   public String getControllerName() {
     return this.prefixName.concat(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL,
         this.uri.split("/")[1].toLowerCase()));
+  }
+  
+  /**
+   * 首字母大写
+   * @return
+   */
+  @JsonIgnore
+  public String getFirstPathVarCap() {
+    return StringUtils.capitalize(this.firstPathVar);
   }
 
 }

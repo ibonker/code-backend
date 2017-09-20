@@ -1,6 +1,6 @@
-import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.changan.code.Application;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.service.IProjectService;
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Joiner;
 
 /**
  * @author wenxing
@@ -39,7 +37,14 @@ public class ProjectServiceTest {
 
   @Test
   public void genTest() {
-    
+    String str = "/apps/{appName}/applogs/pages/";
+    Pattern pattern = Pattern.compile("(?<=\\{)(.+?)(?=\\})");
+    Pattern pattern2 = Pattern.compile("(?<=\\}/)(.+?)(?=\\/)");
+    Matcher matcher = pattern2.matcher(str);
+    while(matcher.find()) {
+      System.err.println(matcher.group());
+    }
+    System.err.println(str.substring(0, str.length() - 1));
   }
 
 }

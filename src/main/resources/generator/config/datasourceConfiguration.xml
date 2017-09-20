@@ -63,7 +63,7 @@ public class ${datasource.upperCamelPackageName}DatasourceConfiguration implemen
     DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
 
     try {
-      dataSource.setFilters("stat");
+      dataSource.setFilters("stat,wall");
     } catch (SQLException e) {
       e.printStackTrace();
     }

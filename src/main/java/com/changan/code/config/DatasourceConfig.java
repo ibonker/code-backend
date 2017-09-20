@@ -50,7 +50,7 @@ public class DatasourceConfig implements TransactionManagementConfigurer {
     DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
 
     try {
-      dataSource.setFilters("stat");
+      dataSource.setFilters("stat,wall");
     } catch (SQLException e) {
       e.printStackTrace();
     }

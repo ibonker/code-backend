@@ -17,4 +17,5 @@ spring:
 generate:
   projectPath: /home/titan-code2/codedir/
   projectZipPath: /home/titan-code2/codedir/zip/
+  projectUiPath: /home/titan-code2/ui-code/
   mybatisGenlibsPath: /home/titan-code2/mybatis-genlibs/

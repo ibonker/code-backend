@@ -23,4 +23,6 @@ public class GenerateProperties {
   
   private String mybatisGenlibsPath;
   
+  private String projectUiPath;
+  
 }

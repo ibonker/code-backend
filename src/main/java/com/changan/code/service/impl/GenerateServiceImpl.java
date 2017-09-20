@@ -46,6 +46,7 @@ import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TableRelationPO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 import com.changan.code.service.IGenerateService;
@@ -111,7 +112,8 @@ public class GenerateServiceImpl implements IGenerateService {
   }
 
   @Override
-  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources, String basePath) {
+  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources,
+      String basePath) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     model.put("packageName", project.getPackages().toLowerCase());
@@ -170,8 +172,8 @@ public class GenerateServiceImpl implements IGenerateService {
     // 定义需要传入的包
     HashSet<String> imports = new HashSet<>();
     for (ColumnPO column : columns) {
-      if("createdAt".equals(column.getJavaField()) || 
-          "updatedAt".equals(column.getJavaField()) || "id".equals(column.getJavaField())){
+      if ("createdAt".equals(column.getJavaField()) || "updatedAt".equals(column.getJavaField())
+          || "id".equals(column.getJavaField())) {
         continue;
       }
       if ("1".equals(column.getReadOnly())) {
@@ -251,18 +253,22 @@ public class GenerateServiceImpl implements IGenerateService {
       if (!"String".equals(transferObjFiled.getType()) && (transferObjFiled.getMin() != null)) {
         imports.add("constraintsMin");
       }
-      if (("array".equals(transferObjFiled.getType()) && "po".equals(transferObjFiled.getArrayType()))
-          ||("po").equals(transferObjFiled.getType())) {
+      if (("array".equals(transferObjFiled.getType())
+          && "po".equals(transferObjFiled.getArrayType()))
+          || ("po").equals(transferObjFiled.getType())) {
         typeImports.add("entity." + transferObjFiled.getFormat());
       }
-      if (("array".equals(transferObjFiled.getType()) && "dto".equals(transferObjFiled.getArrayType()))
-          ||("dto").equals(transferObjFiled.getType())) {
+      if (("array".equals(transferObjFiled.getType())
+          && "dto".equals(transferObjFiled.getArrayType()))
+          || ("dto").equals(transferObjFiled.getType())) {
         typeImports.add("dto." + transferObjFiled.getFormat());
       }
-      if ("base".equals(transferObjFiled.getType()) && "Date".equals(transferObjFiled.getFormat())) {
+      if ("base".equals(transferObjFiled.getType())
+          && "Date".equals(transferObjFiled.getFormat())) {
         imports.add("Date");
       }
-      if ("base".equals(transferObjFiled.getType()) && "Timestamp".equals(transferObjFiled.getFormat())) {
+      if ("base".equals(transferObjFiled.getType())
+          && "Timestamp".equals(transferObjFiled.getFormat())) {
         imports.add("Timestamp");
       }
       if ("BigDecimal".equals(transferObjFiled.getFormat())) {
@@ -313,7 +319,8 @@ public class GenerateServiceImpl implements IGenerateService {
    */
   @Override
   public void generateIServiceAndServiceImpl(String moduleName, String projectName,
-      String packageName, TablePO table, String DTOPackageName) {
+      String packageName, TablePO table, List<TableRelationPO> tableRelation,
+      String DTOPackageName) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     String str = table.getName().toLowerCase();
@@ -326,6 +333,7 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("projectName", projectName);
     model.put("DTOPackageName", DTOPackageName);
     model.put("moduleName", moduleName);
+    model.put("tableRelations", tableRelation);
     // 生成service文件
     this.generateToFile(null,
         GeneratorUtils.fileToObject(ServiceFile.Service.getPath(), Template.class), model, true);
@@ -380,7 +388,8 @@ public class GenerateServiceImpl implements IGenerateService {
               apiparam.getFormat());
         }
         // 参数类型包
-        importIFPackSet.add(BaseParamIn.valueOf(apiparam.getForm().toUpperCase()).getAnnotationPack());
+        importIFPackSet
+            .add(BaseParamIn.valueOf(apiparam.getForm().toUpperCase()).getAnnotationPack());
       }
       // service name
       if (StringUtils.isNotBlank(apiobj.getServiceName())) {
@@ -459,7 +468,7 @@ public class GenerateServiceImpl implements IGenerateService {
    */
   @Override
   public void generateGeneratorConfigFiles(String projectName, String packageName,
-      DatasourcePO datasource, List<TablePO> tables) {
+      DatasourcePO datasource, Set<TablePO> tables) {
     // 修改数据库url
     String url = datasource.getDburl().replace("&", "&amp;");
     datasource.setDburl(url);
@@ -526,7 +535,8 @@ public class GenerateServiceImpl implements IGenerateService {
    * 生成JPA Repository
    */
   @Override
-  public void generateRepository(String module, String projectName, String packageName, String name) {
+  public void generateRepository(String module, String projectName, String packageName,
+      String name) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     String str = name.toLowerCase();

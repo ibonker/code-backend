@@ -74,4 +74,16 @@ public interface ITransferObjService {
    * @param tableId
    */
   public void deleteAutoCrudDTO(String tableId);
+  
+  /**
+   * 根据名称获取默认基础dto
+   * @param name
+   */
+  public TransferObjPO getDefaultDtoByName(String name);
+  
+  /**
+   * 确认是否为基础dto
+   * @param name
+   */
+  public boolean checkIfIsDefaultDto(String name);
 }

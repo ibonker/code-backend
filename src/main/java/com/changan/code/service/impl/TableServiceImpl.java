@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.changan.anywhere.common.datasource.annotation.ChangeDatasource;
 import com.changan.anywhere.common.mvc.page.rest.request.Filter;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
-import com.changan.code.common.Constants;
 import com.changan.code.common.BaseType;
+import com.changan.code.common.Constants;
 import com.changan.code.common.PredictUtils;
 import com.changan.code.config.property.GenerateProperties;
 import com.changan.code.dao.DatabaseDao;
@@ -38,10 +38,12 @@ import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TableRelationPO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ProjectRepository;
+import com.changan.code.repository.TableRelationRepository;
 import com.changan.code.repository.TableRepository;
 import com.changan.code.service.IApiBaseService;
 import com.changan.code.service.IApiObjService;
@@ -86,15 +88,18 @@ public class TableServiceImpl implements ITableService {
 
   @Autowired
   private ITransferObjService transobjService;
-  
+
   @Autowired
   private IGenerateService generateService;
-  
+
   @Autowired
   private GenerateProperties genProperties;
-  
+
   @Autowired
   private ProjectRepository projectRepo;
+
+  @Autowired
+  private TableRelationRepository tableRelationRepository;
 
   /**
    * 更新数据库表
@@ -218,8 +223,8 @@ public class TableServiceImpl implements ITableService {
     List<Object[]> results = tableRepository.findClassNameByDatasourceId(datasourceId);
     List<SimpleDataObj> dataobjs = Lists.newArrayList();
     for (Object[] data : results) {
-      SimpleDataObj dataobj =
-          new SimpleDataObj((String) data[0], (String) data[1], Constants.IS_INACTIVE, null);
+      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1],
+          Constants.IS_INACTIVE, null, (String) data[2]);
       dataobjs.add(dataobj);
     }
     return dataobjs;
@@ -270,7 +275,7 @@ public class TableServiceImpl implements ITableService {
       apiobjService.createAutoCrudApi(firstApibase.getId(), table.getId(),
           table.getName().toLowerCase(), table.getComments(),
           showdto.getPackageName().concat(".").concat(showdto.getName()), className,
-          datasource.getPackageName().toLowerCase(), datasource.getName().toLowerCase(), dbcount);
+          datasource.getName().toLowerCase(), dbcount);
     }
     // 保存tables
     this.saveNewTables(tables);
@@ -299,6 +304,9 @@ public class TableServiceImpl implements ITableService {
 
   @Override
   public TransferObjPO transColumnPOToTransPO(String tableId) {
+    if (transobjService.checkIfIsDefaultDto(tableId)) {
+      return transobjService.getDefaultDtoByName(tableId);
+    }
     // 获取表信息
     TablePO table = tableRepository.findOne(tableId);
     // 获取字段信息
@@ -340,40 +348,41 @@ public class TableServiceImpl implements ITableService {
    */
   @Override
   public String generateEntityCodeFiles(String tableId) {
-    //通过tableId 获取 table对象
+    // 通过tableId 获取 table对象
     TablePO table = tableRepository.findOne(tableId);
     // 获得数据源
     DatasourcePO datasource = datasourceService.findById(table.getDatasourceId());
-    //获取项目
+    // 获取项目
     ProjectPO project = projectRepo.findOne(datasource.getProjectId());
     // 获取实体表名
     List<ColumnPO> columns = this.findMergedColumns(tableId);
     // 生成实体文件代码
     generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
-            project.getPackages().toLowerCase(), table, columns);
-    return "/codegen/api/v1/" +table.getId()+ "/download";
+        project.getPackages().toLowerCase(), table, columns);
+    return "/codegen/api/v1/" + table.getId() + "/download";
   }
-  
+
   /**
    * 下载entity文件
    */
   @Override
   public File downLoadFile(String tableId) {
-    //通过tableId 获取 table对象
+    // 通过tableId 获取 table对象
     TablePO table = tableRepository.findOne(tableId);
     // 获得数据源
     DatasourcePO datasource = datasourceService.findById(table.getDatasourceId());
-    //获取项目
+    // 获取项目
     ProjectPO project = projectRepo.findOne(datasource.getProjectId());
     // 获取实体表名
     List<ColumnPO> columns = this.findMergedColumns(tableId);
     // 生成实体文件代码
     generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
-            project.getPackages().toLowerCase(), table, columns);
-    //设置项目下的文件路径
-    String projectZipPath =
-        GeneratorUtils.getEntityPath(genProperties.getProjectPath()+project.getName()+
-            "/src/main/java/"+project.getPackages().replace(".", "/")+"/entity/"+datasource.getName(), table.getClassName());
+        project.getPackages().toLowerCase(), table, columns);
+    // 设置项目下的文件路径
+    String projectZipPath = GeneratorUtils.getEntityPath(
+        genProperties.getProjectPath() + project.getName() + "/src/main/java/"
+            + project.getPackages().replace(".", "/") + "/entity/" + datasource.getName(),
+        table.getClassName());
     return new File(projectZipPath);
   }
 
@@ -382,8 +391,68 @@ public class TableServiceImpl implements ITableService {
    */
   @Override
   public List<TablePO> findByDatasourceId(String datasourceId) {
-    //通过数据源id查询表
+    // 通过数据源id查询表
     List<TablePO> tables = tableRepository.findByDatasourceId(datasourceId);
     return tables;
+  }
+
+  /**
+   * 新增restFul关联表
+   * 
+   * @param tableRelation
+   */
+  @Override
+  public TableRelationPO saveTableRelation(TableRelationPO tableRelation) {
+    TableRelationPO trp = tableRelationRepository.save(tableRelation);
+    TablePO tp = tableRepository.findOne(trp.getSlaveTableId());
+    trp.setSlaveTableName(tp.getName());
+    return trp;
+  }
+
+  /**
+   * 删除该表restFul关联关系
+   * 
+   * @param masterTableId
+   * @param slaveTableId
+   */
+  @Override
+  public void deletTableRelation(String id) {
+    tableRelationRepository.delete(id);
+  }
+
+  /**
+   * 查询该表所有restFul关联表
+   * 
+   * @param masterTableId
+   * @return
+   */
+  @Override
+  public List<TableRelationPO> findTableRelationList(String masterTableId) {
+    List<TableRelationPO> result =
+        tableRelationRepository.findByMasterTableIdOrderByCreatedAtAsc(masterTableId);
+    // 获取从表名称
+    for (TableRelationPO tableRelationPO : result) {
+      TablePO tp = tableRepository.findOne(tableRelationPO.getSlaveTableId());
+      tableRelationPO.setSlaveTableName(tp.getName());
+    }
+    return result;
+  }
+
+  /**
+   * 查询从表表所有restFul关联表
+   * 
+   * @param slaveTableId
+   * @return
+   */
+  @Override
+  public List<TableRelationPO> findSlaveTableRelationList(String slaveTableId) {
+    List<TableRelationPO> result =
+        tableRelationRepository.findBySlaveTableIdOrderByCreatedAtAsc(slaveTableId);
+    // 获取主表表名称
+    for (TableRelationPO tableRelationPO : result) {
+      TablePO tp = tableRepository.findOne(tableRelationPO.getMasterTableId());
+      tableRelationPO.setMasterTableName(tp.getName());
+    }
+    return result;
   }
 }

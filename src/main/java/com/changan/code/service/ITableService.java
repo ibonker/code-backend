@@ -15,6 +15,7 @@ import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TableRelationPO;
 import com.changan.code.entity.TransferObjPO;
 
 /**
@@ -129,4 +130,30 @@ public interface ITableService {
    * @return
    */
   public List<TablePO> findByDatasourceId(String datasourceId);
+  
+  /**
+   * 新增restFul关联表
+   * @param tableRelation
+   */
+  public TableRelationPO saveTableRelation(TableRelationPO tableRelation);
+  
+  /**
+   * 删除该表restFul关联关系
+   * @param id
+   */
+  public void deletTableRelation(String id);
+  
+  /**
+   * 查询该表所有restFul关联表
+   * @param masterTableId
+   * @return
+   */
+  public List<TableRelationPO> findTableRelationList(String masterTableId);
+  
+  /**
+   * 查询从表表所有restFul关联表
+   * @param slaveTableId
+   * @return
+   */
+  public List<TableRelationPO> findSlaveTableRelationList(String slaveTableId);
 }

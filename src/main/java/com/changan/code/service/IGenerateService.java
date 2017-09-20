@@ -5,6 +5,7 @@ package com.changan.code.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.changan.code.dto.Template;
 import com.changan.code.entity.ApiBasePO;
@@ -13,6 +14,7 @@ import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
+import com.changan.code.entity.TableRelationPO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 
@@ -39,7 +41,8 @@ public interface IGenerateService {
    * @param datasources
    * @return
    */
-  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources, String basepath);
+  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources,
+      String basepath);
 
   /**
    * 生成实体类
@@ -76,7 +79,8 @@ public interface IGenerateService {
    * @param ClassName
    */
   public void generateIServiceAndServiceImpl(String moduleName, String projectName,
-      String packageName, TablePO table, String dtoPackageName);
+      String packageName, TablePO table, List<TableRelationPO> tableRelation,
+      String dtoPackageName);
 
   /**
    * 生成controller文件
@@ -96,21 +100,24 @@ public interface IGenerateService {
    * @param datasource
    */
   public void generateGeneratorConfigFiles(String projectName, String packageName,
-      DatasourcePO datasource, List<TablePO> tables);
-  
+      DatasourcePO datasource, Set<TablePO> tables);
+
   /**
    * 通过mybatis generator生成mybatis相关文件
+   * 
    * @param projectName
    */
   public void generateMybatisFiles(String projectName);
-  
+
   /**
    * 生成JPA Repository
    */
-  public void generateRepository(String moduleName, String projectName, String packageName, String name);
-  
+  public void generateRepository(String moduleName, String projectName, String packageName,
+      String name);
+
   /**
    * 生成JPAService 和 JPAServiceImpl
+   * 
    * @param moduleName
    * @param projectName
    * @param packageName
@@ -119,9 +126,10 @@ public interface IGenerateService {
    */
   public void generateJPAServiceAndJPAServiceImpl(String module, String projectName,
       String packageName, TablePO table, String dtoPackageName);
-  
+
   /**
    * 生成advice文件
+   * 
    * @param packageName
    * @param module
    */

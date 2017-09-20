@@ -47,4 +47,11 @@ public interface IApiParamService {
    * @return
    */
   public void deleteByApiObjId(String apiObjId);
+  
+  /**
+   * 查询所有Api参数并根据sort排序
+   * 
+   * @return
+   */
+  public List<ApiParamPO> findAllApiParamOrderBySort(String apiObjId);
 }

@@ -40,11 +40,13 @@ public class ApiParamServiceImpl implements IApiParamService {
       Map<String, String> map = new HashMap<>();
       // 定义长度
       int length = 1;
+      int sort = 0;
       for (ApiParamPO apiParam : apiParams) {
         map.put(apiParam.getName(), null);
         // 给ApiParam设置ApiObjId
         apiParam.setApiObjId(apiObjId);
         apiParam.setArrayType();
+        apiParam.setSort(sort);
         if (map.size() != length) {
           throw new CodeCommonException("参数重复：" + apiParam.getName());
         }
@@ -139,5 +141,11 @@ public class ApiParamServiceImpl implements IApiParamService {
         this.deleteApiParamById(apiParamData.getId());
       }
     }
+  }
+
+  @Override
+  public List<ApiParamPO> findAllApiParamOrderBySort(String apiObjId) {
+    // 获取所有Api参数
+    return apiParamRepo.findByApiObjIdAndDelFlag(apiObjId, Constants.DATA_IS_NORMAL);
   }
 }

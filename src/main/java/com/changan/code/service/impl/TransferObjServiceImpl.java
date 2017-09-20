@@ -3,13 +3,16 @@ package com.changan.code.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.changan.code.common.BaseDTO;
-import com.changan.code.common.Constants;
+import com.changan.code.common.BaseFormat;
 import com.changan.code.common.BaseType;
+import com.changan.code.common.Constants;
 import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
@@ -22,13 +25,19 @@ import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 
  * @author xuyufeng
  *
  */
 @Service
+@Slf4j
 public class TransferObjServiceImpl implements ITransferObjService {
+
+  private static Map<String, TransferObjPO> defaultDtoMaps = Maps.newHashMap();
+  private static List<String> defaultDtoNames = Lists.newArrayList();
 
   /**
    * 注入TransferObj Respository对象
@@ -160,8 +169,8 @@ public class TransferObjServiceImpl implements ITransferObjService {
     Map<String, List<SimpleDataObj>> datamaps = Maps.newHashMap();
     for (Object[] data : results) {
       // 生成新对象
-      SimpleDataObj dataobj =
-          new SimpleDataObj((String) data[0], (String) data[1], (String) data[3], null);
+      SimpleDataObj dataobj = new SimpleDataObj((String) data[0], (String) data[1],
+          (String) data[3], (String) data[2], (String) data[4]);
       // 根据packagename获取list
       List<SimpleDataObj> objLists = datamaps.get((String) data[2]);
       if (null != objLists) {
@@ -191,14 +200,14 @@ public class TransferObjServiceImpl implements ITransferObjService {
         BaseType.PO, className, tableName.concat("对象"));
     transferObjFieldRePo.save(showPOField);
     // 列表实体暂时不需要
-//    TransferObjPO listPO = this.genTransferObjPO(projectId, tableId, tableName, "s",
-//        datasourcePName, tableName.concat("列表实体"));
-//    // 保存列表实体
-//    listPO = transferObjRePo.save(listPO);
-//    // 实体属性
-//    TransferObjFieldPO listPOField = this.genTransferObjFieldPO(listPO.getId(), tableName, "s",
-//        DtoType.ARRAY, className, tableName.concat("对象列表"));
-//    transferObjFieldRePo.save(listPOField);
+    // TransferObjPO listPO = this.genTransferObjPO(projectId, tableId, tableName, "s",
+    // datasourcePName, tableName.concat("列表实体"));
+    // // 保存列表实体
+    // listPO = transferObjRePo.save(listPO);
+    // // 实体属性
+    // TransferObjFieldPO listPOField = this.genTransferObjFieldPO(listPO.getId(), tableName, "s",
+    // DtoType.ARRAY, className, tableName.concat("对象列表"));
+    // transferObjFieldRePo.save(listPOField);
     return showPO;
   }
 
@@ -258,5 +267,87 @@ public class TransferObjServiceImpl implements ITransferObjService {
     }
     // 删除transferObj
     transferObjRePo.deleteByGenBasedTableId(tableId);
+  }
+  
+  /**
+   * 通过名称检查是否是默认dto
+   */
+  @Override
+  public boolean checkIfIsDefaultDto(String name) {
+    if (defaultDtoNames.contains(name)) {
+      return true;
+    }
+    return false;
+  }
+  
+  @Override
+  public TransferObjPO getDefaultDtoByName(String name) {
+    return defaultDtoMaps.get(name);
+  }
+
+  // 初始化默认提供的dto
+  @PostConstruct
+  private void generateDefaultDtoMaps() {
+    log.info("初始化基础实体");
+    // 创建临时实体 - pagedto
+    TransferObjPO pagedto = new TransferObjPO();
+    pagedto.setName(BaseDTO.PageDTO.name());
+    pagedto.setComments(BaseDTO.PageDTO.getComments());
+    pagedto.setGenBasedTableId("default");
+    // 字段 - pagedto
+    List<TransferObjFieldPO> pagedtofields = Lists.newArrayList();
+    pagedtofields.add(new TransferObjFieldPO("collection", BaseType.DTO.name().toLowerCase(),
+        "Collection", "过滤参数集合实体"));
+    pagedtofields.add(new TransferObjFieldPO("pageParms", BaseType.DTO.name().toLowerCase(),
+        "PageParms", "分页参数实体"));
+    pagedtofields.add(new TransferObjFieldPO("orders", BaseType.ARRAY.name().toLowerCase(),
+        "Order", "排序对象集合"));
+    pagedto.setTransferObjField(pagedtofields);
+    defaultDtoNames.add(BaseDTO.PageDTO.name());
+    defaultDtoMaps.put(BaseDTO.PageDTO.name(), pagedto);
+    // 创建临时实体 - resultdto
+    TransferObjPO resultdto = new TransferObjPO();
+    resultdto.setName(BaseDTO.ResultDTO.name());
+    resultdto.setComments(BaseDTO.ResultDTO.getComments());
+    resultdto.setGenBasedTableId("default");
+    // 字段 - resultdto
+    List<TransferObjFieldPO> resultdtofields = Lists.newArrayList();
+    resultdtofields.add(new TransferObjFieldPO("statusCode", BaseType.BASE.name().toLowerCase(),
+        BaseFormat.String.name(), "返回编码"));
+    resultdtofields.add(new TransferObjFieldPO("message", BaseType.BASE.name().toLowerCase(), 
+        BaseFormat.String.name(), "返回信息"));
+    resultdto.setTransferObjField(resultdtofields);
+    defaultDtoNames.add(BaseDTO.ResultDTO.name());
+    defaultDtoMaps.put(BaseDTO.ResultDTO.name(), resultdto);
+    // 创建临时实体 - resultpagedto
+    TransferObjPO resultpagedto = new TransferObjPO();
+    resultpagedto.setName(BaseDTO.ResultPageDTO.name());
+    resultpagedto.setComments(BaseDTO.ResultPageDTO.getComments());
+    resultpagedto.setGenBasedTableId("default");
+    // 字段 - resultpagedto
+    List<TransferObjFieldPO> resultpagedtofields = Lists.newArrayList();
+    resultpagedtofields.add(new TransferObjFieldPO("pageSize", BaseType.BASE.name().toLowerCase(),
+        BaseFormat.Long.name(), "每页大小"));
+    resultpagedtofields.add(new TransferObjFieldPO("totalElements", BaseType.BASE.name().toLowerCase(), 
+        BaseFormat.Long.name(), "总数"));
+    resultpagedtofields.add(new TransferObjFieldPO("pageNumber", BaseType.BASE.name().toLowerCase(),
+        BaseFormat.Long.name(), "页数"));
+    resultpagedtofields.add(new TransferObjFieldPO("data", BaseType.ARRAY.name().toLowerCase(), 
+        "T", "数据(泛型)"));
+    resultpagedto.setTransferObjField(resultpagedtofields);
+    defaultDtoNames.add(BaseDTO.ResultPageDTO.name());
+    defaultDtoMaps.put(BaseDTO.ResultPageDTO.name(), resultpagedto);
+    // 创建临时实体 - resultschemadto
+    TransferObjPO resultschemadto = new TransferObjPO();
+    resultschemadto.setName(BaseDTO.ResultJsonSchemaDTO.name());
+    resultschemadto.setComments(BaseDTO.ResultJsonSchemaDTO.getComments());
+    resultschemadto.setGenBasedTableId("default");
+    // 字段 - resultschemadto
+    List<TransferObjFieldPO> resultschemadtofields = Lists.newArrayList();
+    resultschemadtofields.add(new TransferObjFieldPO("jsonSchema", BaseType.DTO.name().toLowerCase(),
+        "JsonSchema", "jsonSchema实体"));
+    resultschemadto.setTransferObjField(resultschemadtofields);
+    defaultDtoNames.add(BaseDTO.ResultJsonSchemaDTO.name());
+    defaultDtoMaps.put(BaseDTO.ResultJsonSchemaDTO.name(), resultschemadto);
   }
 }

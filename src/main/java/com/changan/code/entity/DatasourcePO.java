@@ -3,19 +3,23 @@
  */
 package com.changan.code.entity;
 
+import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.code.common.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.CaseFormat;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -113,6 +117,13 @@ public class DatasourcePO extends BaseEntity {
   @JsonProperty(value = "packageName", required = false)
   @JsonPropertyDescription("数据库名称对应包名")
   private String packageName;
+  
+  /**
+   * table map
+   */
+  @Transient
+  @JsonIgnore
+  private Map<String, TablePO> tableMaps;
   
   /**
    * 用于class名前缀

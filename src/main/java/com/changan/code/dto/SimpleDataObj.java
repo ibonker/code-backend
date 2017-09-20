@@ -26,4 +26,6 @@ public class SimpleDataObj {
   
   private String packageName; // 包名
   
+  private String comments; // 描述
+  
 }

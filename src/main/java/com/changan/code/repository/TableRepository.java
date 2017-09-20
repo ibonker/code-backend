@@ -30,7 +30,7 @@ public interface TableRepository
    * @param datasourceId
    * @return
    */
-  @Query("SELECT t.id as id, t.className as className FROM TablePO t WHERE t.datasourceId = ?1")
+  @Query("SELECT t.id as id, t.className as className, t.comments as comments FROM TablePO t WHERE t.datasourceId = ?1")
   List<Object[]> findClassNameByDatasourceId(String datasourceId);
   
   /**

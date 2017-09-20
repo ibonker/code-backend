@@ -4,6 +4,7 @@
 package com.changan.code.entity;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -78,6 +79,20 @@ public class TablePO extends BaseEntity {
   @Transient
   @JsonIgnore
   private String packageName; // 包名
+  
+  /**
+   * column map
+   */
+  @Transient
+  @JsonIgnore
+  private Map<String, ColumnPO> columnMaps;
+  
+  /**
+   * 与主表的table relation list
+   */
+  @Transient
+  @JsonIgnore
+  private List<TableRelationPO> masterTableRelations;
   
   /**
    * 初始化值
