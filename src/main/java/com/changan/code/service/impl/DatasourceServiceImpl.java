@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.changan.code.common.Constants;
 import com.changan.code.entity.DatasourcePO;
+import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.repository.DatasourceRepository;
 import com.changan.code.service.IDatasourceService;
+import com.changan.code.service.IProjectService;
 import com.changan.code.service.ITableService;
 
 /**
@@ -30,6 +32,9 @@ public class DatasourceServiceImpl implements IDatasourceService {
   // 注入表service
   @Autowired
   private ITableService tableService;
+  // 注入项目service
+  @Autowired
+  private IProjectService projectService;
 
   /**
    * 检查数据源是否可用
@@ -99,12 +104,14 @@ public class DatasourceServiceImpl implements IDatasourceService {
   public void syncTableFromOriginalDatasource(String datasourceId) {
     // 获取datasource
     DatasourcePO datasource = this.findById(datasourceId);
+    // 获取项目
+    ProjectPO project = projectService.getProjectById(datasource.getProjectId());
     // 获取数据源的表
     List<TablePO> originTables = tableService.findTableListFromOriginalDatasource(datasource);
     // 获取保存的表
     List<TablePO> masterTables = tableService.findTableListFromMasterDatasource(datasourceId);
     // 同步数据库表
-    tableService.saveAndDelMasterTables(originTables, masterTables, datasourceId);
+    tableService.saveAndDelMasterTables(originTables, masterTables, datasource, project);
   }
 
   @Override

@@ -147,4 +147,21 @@ public class TransferObjFieldServiceImpl implements ITransferObjFieldService {
   public void deleteByTransferObjId(String transferObjId) {
     transferObjRePo.deleteByTransferObjId(transferObjId);
   }
+
+  /**
+   * 根据排序查询所有未逻辑删除的DTO属性
+   * 
+   * @param delFlag
+   * @return
+   */
+  @Override
+  public List<TransferObjFieldPO> findAllTransferObjFieldBySort(String transferObjId) {
+    // 获取查询结果
+    return transferObjRePo.findByTransferObjIdAndDelFlagOrderBySortAsc(transferObjId, Constants.DATA_IS_NORMAL);
+  }
+
+  @Override
+  public Long deleteByTransferObjIdIn(List<String> transferObjIds) {
+    return transferObjRePo.deleteByTransferObjIdIn(transferObjIds);
+  }
 }

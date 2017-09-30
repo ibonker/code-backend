@@ -3,9 +3,9 @@ spring:
   datasource:
     druid:
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://10.64.11.73:3306/new_titancode_test?useUnicode=true&characterEncoding=utf-8
+      url: jdbc:mysql://127.0.0.1:3306/new_titancode_test?useUnicode=true&characterEncoding=utf-8
       username: root
-      password: Root123456
+      password: X19890314
       type: com.alibaba.druid.pool.DruidDataSource
       filters: stat,wall
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
@@ -17,5 +17,5 @@ spring:
 generate:
   projectPath: D:/
   projectZipPath: D:/zip/
-  projectUiPath: D:/ui-code/
+  projectUiPath: D:/ui-code/mould/
   mybatisGenlibsPath: D:/mybatis-genlibs/

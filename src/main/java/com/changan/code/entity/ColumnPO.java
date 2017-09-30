@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -93,6 +94,14 @@ public class ColumnPO extends BaseEntity {
   @JsonProperty(value = "max")
   @JsonPropertyDescription("最大值")
   private Integer max; // 最大值、 字符串最大长度
+  
+  @Column(name = "dict_type_code")
+  @JsonProperty(value = "dictTypeCode")
+  @JsonPropertyDescription("字典表字段")
+  private String dictTypeCode; //字典表字段
+  
+  @Transient
+  private int sortWeight = 0; // 排序权重
 
   /**
    * 设置java类型
@@ -175,6 +184,7 @@ public class ColumnPO extends BaseEntity {
       this.pattern = column.getPattern();
       this.min = column.getMin();
       this.max = column.getMax();
+      this.dictTypeCode = column.getDictTypeCode();
       if (StringUtils.isNotBlank(column.getComments())) {
         this.comments = column.getComments();
       }

@@ -1,7 +1,8 @@
 package com.changan.code.common.template;
 
 public enum DAOFile {
-  dao("mapper/dao.xml");
+  dao("mapper/dao.xml"),
+  mapper("mapper/mapper.xml");
   
   private String path;
   

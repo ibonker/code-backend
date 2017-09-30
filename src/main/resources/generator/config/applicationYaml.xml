@@ -33,7 +33,7 @@ spring:
 <#if dbcount == 1>
 mybatis:
   type-aliases-package: ${packageName}.entity
-  mapper-locations: classpath:/mappings/*.xml,classpath:/mappings/**/*.xml
+  mapper-locations: classpath*:/mappings/*.xml,classpath*:/mappings/**/*.xml
 </#if>
 <#else>
 spring:

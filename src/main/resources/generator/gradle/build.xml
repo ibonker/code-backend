@@ -59,7 +59,7 @@ dependencies {
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${r'$'}{jackson_version}"
     compile "io.springfox:springfox-swagger2:${r'$'}{swagger_version}"
   	compile "io.springfox:springfox-swagger-ui:${r'$'}{swagger_version}"
-    compile "com.alibaba:druid-spring-boot-starter:1.1.0"
+    compile "com.alibaba:druid-spring-boot-starter:${r'$'}{druid_version}"
     <#if hasOracle == "1">
     compile "com.oracle:ojdbc14:${r'$'}{oracle_version}"
     </#if>
@@ -68,18 +68,21 @@ dependencies {
     </#if>
  
     compile "com.google.guava:guava"
-    compile "org.jadira.usertype:usertype.core:5.0.0.GA"
-    compile "org.projectlombok:lombok:1.16.16"
+    compile "org.jadira.usertype:usertype.core:${r'$'}{usertype_version}"
+    compile "org.projectlombok:lombok:${r'$'}{lombok_version}"
     compile "com.changan:titan-common:${r'$'}{titan_common_version}"
     compile "org.mybatis:mybatis-typehandlers-jsr310:${r'$'}{mybatis_typehandlers_jsr310_version}"
     compile "com.github.pagehelper:pagehelper:${r'$'}{pagehelper_version}"
     compile "com.github.pagehelper:pagehelper-spring-boot-starter:${r'$'}{pagehelper_spring_boot_starter_version}"
-    compile "org.hibernate:hibernate-java8:5.0.11.Final"
+    compile "org.hibernate:hibernate-java8:${r'$'}{hibernate_java8_version}"
     
     <#if components?seq_contains("rescentersecurity")>
-    compile "com.changan:spring-boot-starter-rescenter-rest:3.5.2-SNAPSHOT"
+    compile "com.changan:spring-boot-starter-rescenter-rest:${r'$'}{rescenter_rest_version}"
     </#if>
-    compile "com.changan:titan-jsonmeta:0.0.4-SNAPSHOT"
+    compile "com.changan:titan-jsonmeta:${r'$'}{titan_jsonmeta_version}"
+    <#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>
+    compile "com.changan:titan-dict:${r'$'}{titan_dict_version}"
+    </#if>
     
     testCompile "org.springframework.boot:spring-boot-starter-test"
     testCompile "org.powermock:powermock-module-junit4"

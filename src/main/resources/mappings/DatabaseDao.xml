@@ -12,7 +12,7 @@
 			WHERE t.table_name = c.table_name
 			<if test="name != null and name != ''">
 				AND t.TABLE_NAME = lower(#{name})
-			</if> 
+			</if>
 			AND t.TABLE_NAME != 'DICT_TYPE'
 			AND
 			t.TABLE_NAME != 'DICT_VALUE'
@@ -70,13 +70,17 @@
 				t.DATA_SCALE, -->
 			(CASE WHEN t.NULLABLE = 'Y' THEN '1' ELSE '0' END) AS isNullable,
 			c.COMMENTS AS comments,
-			decode(t.DATA_TYPE,'DATE',t.DATA_TYPE || '(' || t.DATA_LENGTH || ')',
-			'VARCHAR2', t.DATA_TYPE || '(' || t.DATA_LENGTH || ')',
+			decode(t.DATA_TYPE,'DATE',t.DATA_TYPE || '('
+			|| t.DATA_LENGTH || ')',
+			'VARCHAR2', t.DATA_TYPE || '(' ||
+			t.DATA_LENGTH || ')',
 			'VARCHAR',
-			t.DATA_TYPE || '(' || t.DATA_LENGTH || ')',
+			t.DATA_TYPE || '(' || t.DATA_LENGTH ||
+			')',
 			'NVARCHAR2', t.DATA_TYPE
 			|| '(' || t.DATA_LENGTH/2 || ')',
-			'CHAR', t.DATA_TYPE || '(' ||
+			'CHAR',
+			t.DATA_TYPE || '(' ||
 			t.DATA_LENGTH || ')',
 			'NUMBER',t.DATA_TYPE ||
 			(nvl2(t.DATA_PRECISION,nvl2(decode(t.DATA_SCALE,0,null,t.DATA_SCALE),
@@ -86,7 +90,8 @@
 			t.data_length as max
 			FROM
 			user_tab_columns t, user_col_comments c
-			WHERE t.TABLE_NAME =
+			WHERE
+			t.TABLE_NAME =
 			c.table_name
 			AND t.COLUMN_NAME = c.column_name
 			<if test="name != null and name != ''">
@@ -97,7 +102,8 @@
 		<if test="dbName == 'mysql'">
 			SELECT t.COLUMN_NAME AS name, (CASE WHEN t.IS_NULLABLE = 'YES' THEN
 			'1' ELSE '0' END) AS isNullable,
-			t.COLUMN_COMMENT AS comments,t.COLUMN_TYPE AS jdbcType,
+			t.COLUMN_COMMENT AS
+			comments,t.COLUMN_TYPE AS jdbcType,
 			t.CHARACTER_MAXIMUM_LENGTH as max
 			FROM
 			information_schema.`COLUMNS` t
@@ -144,8 +150,60 @@
 		<if test="dbName == 'mysql'">
 			select count(1)
 			from INFORMATION_SCHEMA.TABLES
-			where TABLE_SCHEMA=#{dataSourceName}
+			where
+			TABLE_SCHEMA=#{dataSourceName}
 			and TABLE_NAME=#{tableName}
 		</if>
 	</select>
+
+	<select id="findDictValueByCode" parameterType = "String" resultType="com.changan.code.entity.DictValuePO">
+		SELECT * FROM dict_value WHERE dict_code = #{dictCode} AND del_flag = #{delFlag}
+	</select>
+
+	<insert id="saveDictValue" parameterType="com.changan.code.entity.DictValuePO">
+		INSERT INTO
+		dict_value(id,name,value,dict_code,sort,created_by,created_at,updated_by,updated_at,del_flag)
+		VALUES
+		(#{dictValue.id}, #{dictValue.name}, #{dictValue.value},
+		#{dictValue.dictCode},
+		#{dictValue.sort},
+		#{dictValue.createdBy},
+		#{dictValue.createdAt}, #{dictValue.updatedBy},
+		#{dictValue.updatedAt}, #{dictValue.delFlag})
+	</insert>
+
+	<update id="updateDictValue" parameterType="com.changan.code.entity.DictValuePO">
+		UPDATE dict_value
+		SET
+		name = #{dictValue.name}, value = #{dictValue.value}, dict_code = #{dictValue.dictCode}, sort = #{dictValue.sort},
+		created_by = #{dictValue.createdBy}, created_at = #{dictValue.createdAt},updated_by = #{dictValue.updatedBy}, 
+		updated_at = #{dictValue.updatedAt}
+		WHERE id = #{dictValue.id}
+	</update>
+
+	<update id="deleteDictValue" parameterType="String">
+		UPDATE dict_value SET del_flag = #{delFlag} WHERE id = #{id}
+	</update>
+
+	<update id="deleteDictValues" parameterType="String">
+		UPDATE dict_value SET del_flag = #{delFlag}
+		WHERE
+		dict_code
+		= #{dictCode}
+	</update>
+
+	<select id="findDictTypeByCode" parameterType="String"
+		resultType="Integer">
+		SELECT count(1) FROM dict_type WHERE code = #{code} AND del_flag = #{delFlag}
+	</select>
+
+	<insert id="insertDictType" parameterType="com.changan.code.entity.DictTypePO">
+		INSERT INTO
+		dict_type(id, code, name, created_by, created_at, updated_by,
+		updated_at, del_flag)
+		VALUES
+		(#{dictType.id}, #{dictType.code},
+		#{dictType.name}, #{dictType.createdBy}, #{dictType.createdAt},
+		#{dictType.updatedBy}, #{dictType.updatedAt}, #{dictType.delFlag})
+	</insert>
 </mapper>

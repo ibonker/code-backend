@@ -32,10 +32,19 @@ public class ResultOfColumnsDTO extends ResultDTO {
   @JsonPropertyDescription("表字段")
   @ApiModelProperty(value = "表字段")
   private List<ColumnPO> columns;
+  
+  @JsonProperty("dictFlag")
+  @JsonPropertyDescription("是否启用字典表")
+  @ApiModelProperty(value = "是否启用字典表")
+  private Boolean dictFlag;
 
   public ResultOfColumnsDTO columns(List<ColumnPO> columns) {
     this.columns = columns;
     return this;
   }
 
+  public ResultOfColumnsDTO dictFlag(Boolean dictFlag){
+    this.dictFlag = dictFlag;
+    return this;
+  }
 }

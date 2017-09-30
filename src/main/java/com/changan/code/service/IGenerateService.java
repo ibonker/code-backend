@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.changan.code.dto.SeniorDtoAttribute;
+import com.changan.code.dto.SeniorDtoRelation;
 import com.changan.code.dto.Template;
 import com.changan.code.entity.ApiBasePO;
 import com.changan.code.entity.ApiObjPO;
@@ -15,6 +17,7 @@ import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.entity.TableRelationPO;
+import com.changan.code.entity.TableSeniorRelationPO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 
@@ -69,7 +72,9 @@ public interface IGenerateService {
    * @param table
    * @param columns
    */
-  public void generateDAOFiles(String projectName, String packageName, TablePO table);
+  public void generateDAOFiles(String moduleName, String projectName, String packageName,
+      String tableName, List<TableSeniorRelationPO> relations, List<SeniorDtoAttribute> attrs,
+      List<SeniorDtoRelation> relationMethods);
 
   /**
    * 生成Iservice文件
@@ -79,8 +84,8 @@ public interface IGenerateService {
    * @param ClassName
    */
   public void generateIServiceAndServiceImpl(String moduleName, String projectName,
-      String packageName, TablePO table, List<TableRelationPO> tableRelation,
-      String dtoPackageName);
+      String packageName, String tableName, List<TableRelationPO> tableRelation,
+      List<TableSeniorRelationPO> relations, boolean isSenior);
 
   /**
    * 生成controller文件
@@ -134,4 +139,23 @@ public interface IGenerateService {
    * @param module
    */
   public void generateAdvice(String packageName, String projectName);
+
+  /**
+   * 生成前台文件util、index
+   * 
+   * @param projectName
+   */
+  public void generateUIFiles(String projecTitle);
+
+  /**
+   * 生成前台文件
+   * 
+   * @param basePath
+   * @param tpl
+   * @param model
+   * @param isReplaceFile
+   * @return
+   */
+  public String generateToUIFile(String basePath, Template tpl, Map<String, Object> model,
+      boolean isReplaceFile);
 }

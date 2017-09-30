@@ -20,6 +20,7 @@ import com.changan.code.dto.ResultOfMsgDataDTO;
 import com.changan.code.dto.ResultOfTransferObjDTO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.entity.TableRelationPO;
+import com.changan.code.entity.TableSeniorRelationPO;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
 import io.swagger.annotations.Api;
@@ -157,4 +158,54 @@ public interface TableApi {
           @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/tables/{id}/relations", produces = {"application/json"},method = RequestMethod.GET)
   ResponseEntity<ResultDTO> tableRelationList(@ApiParam(value = "id", required = true) @PathVariable(name="id") String id);
+  
+  /**
+   * 新增高级关联表
+   */
+  @ApiOperation(value = "新增高级关联表", notes = "新增高级关联表", response = ResultDTO.class, tags = {"Table"})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/seniorRelations/save", produces = {"application/json"},
+      method = RequestMethod.PUT)
+  ResponseEntity<ResultDTO> tablesSeniorRelationSavePut(
+      @ApiParam(value = "表高级关联关系对象", required = false) @RequestBody TableSeniorRelationPO tableSeniorRelation);
+  
+  /**
+   * 根据id获取所有高级关联关系表
+   * @param id
+   * @return
+   */
+  @ApiOperation(value = "根据id获取所有高级关联关系", notes = "根据id获取所有高级关联关系", response = ResultDTO.class,tags = {"Table"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/{id}/seniorRelations", produces = {"application/json"},method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> tableSeniorRelationList(@ApiParam(value = "id", required = true) @PathVariable(name="id") String id);
+  
+  /**
+   * 根据id删除高级关联关系
+   * @param id
+   * @return
+   */
+  @ApiOperation(value = "根据id删除高级关联关系", notes = "根据id删除高级关联关系", response = ResultDTO.class,
+      tags = {"Table"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/seniorRelations/{id}/delete", produces = {"application/json"},
+      method = RequestMethod.DELETE)
+  ResponseEntity<ResultDTO> deletTableSeniorRelation(
+      @ApiParam(value = "id") @PathVariable(value = "id", required = true) String id);
+  
+  /**
+   * 根据id获取指定高级关联关系表
+   * @param id
+   * @return
+   */
+  @ApiOperation(value = "根据id获取指定高级关联关系表", notes = "根据id获取指定高级关联关系表", response = ResultDTO.class,tags = {"Table"})
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/seniorRelations/{id}", produces = {"application/json"},method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> tableSeniorRelation(@ApiParam(value = "id", required = true) @PathVariable(name="id") String id);
 }

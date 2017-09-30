@@ -95,6 +95,13 @@ public class TablePO extends BaseEntity {
   private List<TableRelationPO> masterTableRelations;
   
   /**
+   * 与从表的table relation list
+   */
+  @Transient
+  @JsonIgnore
+  private List<TableRelationPO> slaveTableRelations;
+  
+  /**
    * 初始化值
    * @param datasourceId
    * @return
@@ -121,6 +128,14 @@ public class TablePO extends BaseEntity {
       this.comments = newTable.getComments();
     }
     return this;
+  }
+  
+  /**
+   * 表名用作属性名
+   * @return
+   */
+  public String getTableAttrNameLower() {
+    return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.name.toLowerCase());
   }
 
 }

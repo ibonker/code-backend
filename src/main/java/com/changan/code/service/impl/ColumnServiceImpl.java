@@ -14,10 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.changan.anywhere.common.datasource.annotation.ChangeDatasource;
 import com.changan.code.common.Constants;
 import com.changan.code.dao.DatabaseDao;
+import com.changan.code.dto.ResultOfColumnDTO;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
+import com.changan.code.entity.DictTypePO;
+import com.changan.code.entity.DictValuePO;
 import com.changan.code.repository.ColumnRepository;
+import com.changan.code.repository.DatasourceRepository;
+import com.changan.code.repository.TableRepository;
 import com.changan.code.service.IColumnService;
+import com.changan.code.service.IDictService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -33,6 +39,15 @@ public class ColumnServiceImpl implements IColumnService {
 
   @Autowired
   private DatabaseDao databaseDao;
+
+  @Autowired
+  private IDictService dictService;
+
+  @Autowired
+  private DatasourceRepository dataSourceRepo;
+
+  @Autowired
+  private TableRepository tableRepo;
 
   @Override
   public List<ColumnPO> findColumnListFromMasterDatasource(String tableId) {
@@ -60,7 +75,7 @@ public class ColumnServiceImpl implements IColumnService {
   public void deleteNotExistColumns(List<ColumnPO> columns) {
     columnRepo.delete(columns);
   }
-  
+
   @Override
   @Transactional("jpaTransactionManager")
   public ColumnPO saveConfigColumn(ColumnPO column) {
@@ -76,7 +91,7 @@ public class ColumnServiceImpl implements IColumnService {
   @Override
   public List<ColumnPO> findMergedColumnsByTable(List<ColumnPO> masterColumns,
       List<ColumnPO> originColumns) {
-    // TODO　主键属性，用于JPA代码生成
+    // TODO 主键属性，用于JPA代码生成
     if (null != masterColumns && !masterColumns.isEmpty()) {
       // 合并配置表字段和数据库表字段
       Map<String, ColumnPO> mastermaps = Maps.newHashMap();
@@ -108,4 +123,62 @@ public class ColumnServiceImpl implements IColumnService {
     return originColumns;
   }
 
+  /**
+   * 保存字段和字典配置
+   */
+  @Override
+  @Transactional("jpaTransactionManager")
+  public ResultOfColumnDTO saveColumnAndDict(ResultOfColumnDTO column) {
+    if (column.getColumn().getDictTypeCode().indexOf(" ") != -1
+        || "".equals(column.getColumn().getDictTypeCode())) {
+      // 设置dictTypeCode为空
+      column.getColumn().setDictTypeCode(null);
+      // 设置Code
+      column.getDictType().setCode(null);
+      // 保存字段
+      column.setColumn(columnRepo.save(column.getColumn()));
+      // 返回保存信息
+      return column;
+    }
+    // 保存字段
+    column.setColumn(columnRepo.save(column.getColumn()));
+    if ("".equals(column.getDictType().getId()) || column.getDictType().getId() == null) {
+      column.setDictType(dictService.insertDictType(column.getDictType()));
+    } else {
+      // 保存字典表类型
+      column.setDictType(
+          dictService.updateDictType(column.getDictType().getId(), column.getDictType()));
+    }
+    // 返回保存信息
+    return column;
+  }
+
+  /**
+   * 获得数据源并执行数据库操作
+   */
+  @Override
+  public void getDataSource(String tableId, DictTypePO dictType, List<DictValuePO> dictValues) {
+    // 获取dataSourceId
+    String dataSourceId = tableRepo.findOne(tableId).getDatasourceId();
+    // 获取数据源
+    DatasourcePO datasource = dataSourceRepo.findOne(dataSourceId);
+    // 执行数据库操作
+    dictService.saveDictValues(datasource, dictType, dictValues);
+  }
+
+  /**
+   * 获得数据源并执行查询操作
+   * 
+   * @param tableId
+   * @param code
+   */
+  @Override
+  public List<DictValuePO> findTypeAndValue(String tableId, String code) {
+    // 获取dataSourceId
+    String dataSourceId = tableRepo.findOne(tableId).getDatasourceId();
+    // 获取数据源
+    DatasourcePO datasource = dataSourceRepo.findOne(dataSourceId);
+    // 执行查询操作
+    return dictService.findTypeAndValue(datasource, code);
+  }
 }

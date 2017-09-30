@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.changan.code.dto.SimpleDataObj;
+import com.changan.code.entity.TableSeniorRelationPO;
 import com.changan.code.entity.TransferObjPO;
 
 /**
@@ -35,6 +36,13 @@ public interface ITransferObjService {
   public void deleteTransferObj(String id);
 
   /**
+   * 删除高级关联DTO
+   * 
+   * @param transferObj
+   */
+  public void deleteSeniorTransferObj(String tableId);
+
+  /**
    * 根据id获取DTO
    * 
    * @param id
@@ -43,12 +51,28 @@ public interface ITransferObjService {
   public TransferObjPO findTransferObjById(String id);
 
   /**
+   * 根据table id获取DTO
+   * 
+   * @param id
+   * @return
+   */
+  public TransferObjPO findTransferObjByTableId(String tableId);
+
+  /**
+   * 根据table id获取高级关联DTO
+   * 
+   * @param id
+   * @return
+   */
+  public List<TransferObjPO> findSeniorTransferObjByTableId(String tableId);
+
+  /**
    * 查询所有的DTO
    * 
    * @return
    */
   public List<TransferObjPO> findAllTransferObj(String projectId);
-  
+
   /**
    * 获取自定义实体类名
    * 
@@ -69,21 +93,52 @@ public interface ITransferObjService {
       String datasourcePName, String className);
 
   /**
+   * 创建高级查询dto
+   * 
+   * @param projectId
+   * @param tableId
+   * @param tableName
+   * @param relation
+   * @return
+   */
+  public List<TransferObjPO> updateAutoCrudSeniorDTO(String projectId, String datasourcePname,
+      TableSeniorRelationPO relation);
+
+  /**
    * 根据tableId删除api
    * 
    * @param tableId
    */
   public void deleteAutoCrudDTO(String tableId);
-  
+
   /**
    * 根据名称获取默认基础dto
+   * 
    * @param name
    */
   public TransferObjPO getDefaultDtoByName(String name);
-  
+
   /**
    * 确认是否为基础dto
+   * 
    * @param name
    */
   public boolean checkIfIsDefaultDto(String name);
+  
+  
+  /**
+   * 根据genBasedTableId列表获取数据id
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  public List<String> findIdByGenBasedTableIdIn(List<String> genBasedTableIds);
+  
+  /**
+   * 根据genBasedTableId列表删除数据
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  public Long deleteByGenBasedTableIdIn(List<String> genBasedTableIds);
 }

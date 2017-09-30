@@ -120,5 +120,16 @@ public interface ProjectApi {
   ResponseEntity<InputStreamResource> projectsDownloadGet(
       @ApiParam(value = "projectName", required = true) @PathVariable String projectName)
       throws FileNotFoundException;
+  
+  @ApiOperation(value = "下载前台项目代码", notes = "下载前台项目代码", response = InputStreamResource.class,
+      tags = {"Project"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = InputStreamResource.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = InputStreamResource.class)})
+  @RequestMapping(value = "/projects/{projectName}/downloadUI",
+      produces = {"application/octet-stream"}, method = RequestMethod.GET)
+  ResponseEntity<InputStreamResource> projectsDownloadUIGet(
+      @ApiParam(value = "projectName", required = true) @PathVariable String projectName)
+      throws FileNotFoundException;
 
 }

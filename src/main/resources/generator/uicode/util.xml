@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>util</name>
+  <filePath>src/libs</filePath>
+  <fileName>util.js</fileName>
+  <content><![CDATA[
+import axios from 'axios';
+import env from '../config/env';
+let util = {
+    appName: '${projectTitle}'
+};
+let devUrl =  'http://10.64.13.39:8908';
+let testUrl = 'htpp://127.0.0.1:8080';
+let proUrl = 'htpp://127.0.0.1:8080';
+util.title = function(title) {
+    title = title ? title : '${projectTitle}';
+    window.document.title = title;
+};
+
+const ajaxUrl = env === 'development' ? devUrl : env === 'production' ? proUrl : testUrl;
+axios.defaults.baseURL = ajaxUrl
+util.ajax = axios.create({
+    baseURL: ajaxUrl,
+    timeout: 30000
+});
+
+util.ajaxUrl = ajaxUrl;
+
+export default util;
+]]>
+  </content>
+</template>

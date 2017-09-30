@@ -47,7 +47,7 @@ import com.github.pagehelper.PageInterceptor;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = {"${packageName}.dao.${datasource.packageName}"},
+@MapperScan(basePackages = {"${packageName}.dao.${datasource.packageName}"<#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>, "com.changan.dict.mapper"</#if>},
     sqlSessionFactoryRef = "<#if dbcount == 1>sqlSessionFactory<#else>${datasource.lowerCamelPackageName}SqlSessionFactory</#if>")
 public class ${datasource.upperCamelPackageName}DatasourceConfiguration implements TransactionManagementConfigurer {
 

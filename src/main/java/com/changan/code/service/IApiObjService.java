@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.changan.code.entity.ApiObjPO;
 import com.changan.code.entity.TableRelationPO;
+
 /**
  * ApiObj Service接口
+ * 
  * @author xuyufeng
  *
  */
@@ -59,8 +61,8 @@ public interface IApiObjService {
    * @param dbcount 1
    */
   public void createAutoCrudApi(String apiBaseId, String tableId, String tableName,
-      String tableComment, String dtoName, String className, String dbname,
-      Long dbcount);
+      String tableComment, String dtoName, String className, String dbname, Long dbcount,
+      List<String> relations);
 
   /**
    * 根据tableId删除api
@@ -69,5 +71,20 @@ public interface IApiObjService {
    */
   public void deleteAutoCrudApi(String tableId);
   
-  public void createAutoCruApiForRelation(String apiBaseId, TableRelationPO tableRelation, String dbname);
+  /**
+   * 根据tableId删除关联关系crud api
+   * 
+   * @param tableId
+   */
+  public void deleteRelationCrudApi(String masterTableId, String slaveTableId);
+
+  /**
+   * 创建主从表crud api
+   * 
+   * @param apiBaseId
+   * @param tableRelation
+   * @param dbname
+   */
+  public void createAutoCruApiForRelation(String apiBaseId, TableRelationPO tableRelation,
+      String dtoName, String dbname, Long dbcount);
 }

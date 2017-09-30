@@ -14,8 +14,10 @@ import com.changan.code.dto.RequestOfTableIdsDTO;
 import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
+import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.entity.TableRelationPO;
+import com.changan.code.entity.TableSeniorRelationPO;
 import com.changan.code.entity.TransferObjPO;
 
 /**
@@ -62,7 +64,7 @@ public interface ITableService {
    * @return
    */
   public void saveAndDelMasterTables(List<TablePO> originTables, List<TablePO> masterTables,
-      String datasourceId);
+      DatasourcePO datasource, ProjectPO project);
   
   /**
    * 分页查询table
@@ -156,4 +158,53 @@ public interface ITableService {
    * @return
    */
   public List<TableRelationPO> findSlaveTableRelationList(String slaveTableId);
+  
+  /**
+   * 新增高级关联表
+   * @param tableSeniorRelation
+   */
+  public TableSeniorRelationPO saveTableSeniorRelation(TableSeniorRelationPO tableSeniorRelation);
+  
+  /**
+   * 查询高级关联sql
+   * @param masterTableId
+   * @return
+   */
+  public List<TableSeniorRelationPO> findTableSeniorRelationSqlList(String masterTableId);
+  
+  /**
+   * 删除该表高级关联关系
+   * @param id
+   */
+  public void deletTableSeniorRelation(String id);
+  
+  /**
+   * 获取高级关联关系
+   * @param id
+   * @return
+   */
+  public TableSeniorRelationPO findOnetableSeniorRelation(String id);
+
+  
+  /**
+   * 根据datasourceId列表获取id
+   * @param datasourceId
+   * @return
+   */
+  public List<String> findIdByDatasourceIdIn(List<String> datasourceIds);
+  
+  /**
+   * 根据datasourceId列表删除数据
+   * @param transferObjIds
+   * @return
+   */
+  public Long deleteByDatasourceIdIn(List<String> datasourceIds);
+  
+  /**
+   * 是否启用表字段
+   * @param tableId
+   * @return
+   */
+  public Boolean isDictionary(String tableId);
+
 }

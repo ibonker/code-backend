@@ -52,7 +52,7 @@ public class TransferObjFieldPO extends BaseEntity {
   @Column(name = "type")
   @JsonProperty("type")
   private String type; // 属性类型
-  
+
   @Column(name = "array_type")
   @JsonProperty("arrayType")
   private String arrayType; // 参数array类型
@@ -90,6 +90,20 @@ public class TransferObjFieldPO extends BaseEntity {
   @JsonPropertyDescription("最大值")
   private Integer max; // 最大值、 字符串最大长度
   
+  @Column(name = "sort")
+  @JsonProperty(value = "sort")
+  @JsonPropertyDescription("排序")
+  private Integer sort; // 排序
+
+  public TransferObjFieldPO(String transferObjId, String name, String type, String format,
+      String description) {
+    this.transferObjId = transferObjId;
+    this.name = name;
+    this.type = type;
+    this.format = format;
+    this.description = description;
+  }
+
   public TransferObjFieldPO(String name, String type, String format, String description) {
     this.name = name;
     this.type = type;
@@ -115,20 +129,22 @@ public class TransferObjFieldPO extends BaseEntity {
     this.max = newTransferObjFieldPO.getMax();
     return this;
   }
-  
+
   /**
    * 设置array type
+   * 
    * @return
    */
   public TransferObjFieldPO setArrayType() {
-    if (StringUtils.isNotBlank(this.type) && BaseType.ARRAY.equals(BaseType.valueOf(this.type.toUpperCase()))) {
+    if (StringUtils.isNotBlank(this.type)
+        && BaseType.ARRAY.equals(BaseType.valueOf(this.type.toUpperCase()))) {
       String[] array = this.format.split("\\.");
       this.arrayType = array[0];
       List<String> formats = Lists.newArrayList(Arrays.asList(array));
       formats.remove(0);
       this.format = Joiner.on(".").join(formats);
     }
-    
+
     return this;
   }
 }

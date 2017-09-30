@@ -104,7 +104,7 @@ public class ApiObjPO extends BaseEntity {
   @Column(name = "gen_based_table_id")
   @JsonProperty("genBasedTableId")
   private String genBasedTableId; // 自动生成表id
-  
+
   @Column(name = "gen_related_table_id")
   @JsonProperty("genRelatedTableId")
   private String genRelatedTableId; // 自动生成关联表id
@@ -117,15 +117,22 @@ public class ApiObjPO extends BaseEntity {
 
   @Transient
   private String relateTableName; // 对应的表名
-  
+
   @Transient
   private boolean isSlaveUri; // 从表uri
-  
+
   @Transient
   private String firstPathVar; // uri中最后一个参数名（自动生成的api中为从表外键关联的主表字段）
-  
+
   @Transient
   private String lastPathVar; // uri中最后一个参数名（自动生成的api中为从表主键）
+
+  @Transient
+  private String seniorRelationVar; // 高级查询时关联查询名称
+
+  public boolean getIsSlaveUri() {
+    return isSlaveUri;
+  }
 
   /**
    * 更新属性
@@ -246,14 +253,12 @@ public class ApiObjPO extends BaseEntity {
     if (Constants.IS_ACTIVE.equals(this.getIsAutoGen())) {
       if (BaseDTO.ResultPageDTO.name().equals(this.responseObjName)) {
         return "page";
-      } else if (BaseDTO.ResultDTO.name().equals(this.responseObjName)
+      } else if (!BaseDTO.ResultPageDTO.name().equals(this.responseObjName)
           && RequestMethod.POST.name().equals(this.requestMethod)) {
         return "insert";
-      } else if (BaseDTO.ResultDTO.name().equals(this.responseObjName)
-          && RequestMethod.PUT.name().equals(this.requestMethod)) {
+      } else if (RequestMethod.PUT.name().equals(this.requestMethod)) {
         return "update";
-      } else if (BaseDTO.ResultDTO.name().equals(this.responseObjName)
-          && RequestMethod.DELETE.name().equals(this.requestMethod)) {
+      } else if (RequestMethod.DELETE.name().equals(this.requestMethod)) {
         return "delete";
       } else if (BaseDTO.ResultJsonSchemaDTO.name().equals(this.responseObjName)) {
         return "jsonschema";
@@ -296,14 +301,37 @@ public class ApiObjPO extends BaseEntity {
     return this.prefixName.concat(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL,
         this.uri.split("/")[1].toLowerCase()));
   }
-  
+
   /**
    * 首字母大写
+   * 
    * @return
    */
   @JsonIgnore
   public String getFirstPathVarCap() {
     return StringUtils.capitalize(this.firstPathVar);
+  }
+
+  /**
+   * 是否高级查询
+   * 
+   * @return
+   */
+  @JsonIgnore
+  public boolean getIsSenior() {
+    return Constants.API_SENIOR_TAG.equals(this.genRelatedTableId);
+  }
+
+  /**
+   * 大写驼峰
+   * 
+   * @return
+   */
+  public String getSeniorRelationVarCap() {
+    if (StringUtils.isNotBlank(this.seniorRelationVar)) {
+      return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, this.seniorRelationVar);
+    }
+    return null;
   }
 
 }

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.Maps;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -123,7 +124,7 @@ public class DatasourcePO extends BaseEntity {
    */
   @Transient
   @JsonIgnore
-  private Map<String, TablePO> tableMaps;
+  private Map<String, TablePO> tableMaps = Maps.newHashMap();
   
   /**
    * 用于class名前缀

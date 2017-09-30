@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>advice</name>
+  <filePath>src/main/resources/mappings/${moduleName}</filePath>
+  <fileName>${className}Mapper.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="${packageName}.dao.${moduleName}.${className}Mapper" >
+
+	<resultMap type="${packageName}.dto.${moduleName}.${className}DTO" id="${className}ResultMap">
+		<#list attrList as attr>
+		<association property="${attr.name}" javaType="${attr.type}">
+				<#list attr.columns as column>
+					<#if column.isPk == "1">
+			<id property="${column.javaField}" column="_${attr.tableName}_${column.name}"/>
+					<#else>
+			<result property="${column.javaField}" column="_${attr.tableName}_${column.name}"/>
+					</#if>
+				</#list>
+		</association>
+		</#list>
+	</resultMap> 
+	
+	<#list relationMethods as method>
+	<select id="findAppInfoSeniorBy${method.name}" resultMap="${className}ResultMap">
+		select
+		<#list method.attrs as attr>
+			<#list attr.columns as column>
+			${attr.name}.${column.name} as _${attr.tableName}_${column.name}<#if !attr_has_next && !column_has_next><#else>,</#if>
+			</#list>
+		</#list>
+		from
+			${masterTableName} ${masterTableAttrName}
+		<#list method.slaves as slave>
+		${slave.relation} 
+		    ${slave.slaveTableName} ${slave.slaveTableAttrName} 
+		on 
+		    <#list slave.relationColumns as relationColumn>
+		    ${masterTableAttrName}.${relationColumn.masterColumnName} = ${slave.slaveTableAttrName}.${relationColumn.slaveColumnName} 
+		    <#if relationColumn_has_next>
+		    and 
+		    </#if>
+		    </#list>
+		</#list>
+		<where>
+			${r'$'}{_parameter }
+		</where>
+	</select>
+	</#list>	
+</mapper>
+  ]]>
+  </content>
+</template>

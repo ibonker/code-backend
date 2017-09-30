@@ -146,6 +146,6 @@ public class ApiParamServiceImpl implements IApiParamService {
   @Override
   public List<ApiParamPO> findAllApiParamOrderBySort(String apiObjId) {
     // 获取所有Api参数
-    return apiParamRepo.findByApiObjIdAndDelFlag(apiObjId, Constants.DATA_IS_NORMAL);
+    return apiParamRepo.findByApiObjIdAndDelFlagOrderBySortAsc(apiObjId, Constants.DATA_IS_NORMAL);
   }
 }

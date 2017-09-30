@@ -59,6 +59,32 @@ public interface TransferObjRespository
    */
   @Query("SELECT t.id as id FROM TransferObjPO t WHERE t.genBasedTableId = ?1")
   List<String> findIdByGenBasedTableId(String genBasedTableId);
+  
+  /**
+   * 根据genBasedTableId列表获取数据id
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  @Query("SELECT t.id as id FROM TransferObjPO t WHERE t.genBasedTableId in ?1")
+  List<String> findIdByGenBasedTableIdIn(List<String> genBasedTableIds);
+  
+  /**
+   * 根据genBasedTableId获取数据id
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  @Query("SELECT t.id as id FROM TransferObjPO t WHERE t.genBasedTableId = ?1 and t.isSenior = '1'")
+  List<String> findSeniorIdByGenBasedTableId(String genBasedTableId);
+
+  /**
+   * 根据genBasedTableId获取数据
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  List<TransferObjPO> findByGenBasedTableId(String genBasedTableId);
 
   /**
    * 根据genBasedTableId删除数据
@@ -67,6 +93,22 @@ public interface TransferObjRespository
    * @return
    */
   Long deleteByGenBasedTableId(String genBasedTableId);
+  
+  /**
+   * 根据genBasedTableId列表删除数据
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  Long deleteByGenBasedTableIdIn(List<String> genBasedTableId);
+  
+  /**
+   * 根据genBasedTableId和is senior删除数据
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  Long deleteByGenBasedTableIdAndIsSenior(String genBasedTableId, String isSenior);
 
   /**
    * 根据name、projectId查询实体
@@ -78,4 +120,25 @@ public interface TransferObjRespository
    */
   public List<TransferObjPO> findByNameAndProjectIdAndDelFlag(String name, String projectId,
       String delFlag);
+
+  /**
+   * 查询DTO名称重复行数量
+   * 
+   * @param name
+   * @param projectId
+   * @return
+   */
+  public List<TransferObjPO> findByNameAndPackageNameAndProjectIdAndDelFlag(String name,
+      String packageName, String projectId, String delFlag);
+
+  /**
+   * 根据name、projectId查询实体
+   * 
+   * @param name
+   * @param ProjectId
+   * @param DelFlag
+   * @return
+   */
+  public List<TransferObjPO> findByGenBasedTableIdAndIsSeniorAndDelFlag(String genBasedTableId,
+      String isSenior, String delFlag);
 }

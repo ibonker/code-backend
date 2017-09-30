@@ -160,4 +160,18 @@ public class ProjectApiController extends BaseController implements ProjectApi {
         .body(new InputStreamResource(new FileInputStream(file)));
   }
 
+  @Override
+  public ResponseEntity<InputStreamResource> projectsDownloadUIGet(@PathVariable String projectName)
+      throws FileNotFoundException {
+    File file = projectService.downloadZipUIFiles(projectName);
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+    headers.add("Content-Disposition",
+        String.format("attachment; filename=\"%s\"", file.getName()));
+    headers.add("Pragma", "no-cache");
+    headers.add("Expires", "0");
+    return ResponseEntity.ok().headers(headers).contentLength(file.length())
+        .body(new InputStreamResource(new FileInputStream(file)));
+  }
+
 }

@@ -76,5 +76,12 @@ public interface IProjectService extends IComponentService {
    * @return
    */
   public File downloadZipFiles(String projectName);
+  
+  /**
+   * 下载前台文件
+   * @param projectName
+   * @return
+   */
+  public File downloadZipUIFiles(String projectName);
 
 }

@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import com.changan.anywhere.common.persistence.mybatis.annotation.MyBatisDao;
 import com.changan.anywhere.common.persistence.mybatis.dao.CrudDao;
 import com.changan.code.entity.ColumnPO;
+import com.changan.code.entity.DictTypePO;
+import com.changan.code.entity.DictValuePO;
 import com.changan.code.entity.TablePO;
 
 /**
@@ -61,4 +63,48 @@ public interface DatabaseDao extends CrudDao<ColumnPO> {
   int existTable(@Param("dbName") String dbName, @Param("dataSourceName") String dataSourceName,
       @Param("tableName") String tableName);
 
+  /**
+   * 查询dictCode下的value
+   * @param dictCode
+   * @return
+   */
+  List<DictValuePO> findDictValueByCode(@Param("dictCode") String dictCode, @Param("delFlag") String delFlag);
+  
+  /**
+   * 保存dictValue
+   * @param dictCode
+   * @param dictValue
+   */
+  void saveDictValue(@Param("dictValue")DictValuePO dictValue); 
+  
+  /**
+   * 更新dictValue
+   * @param dictValue
+   */
+  void updateDictValue(@Param("dictValue")DictValuePO dictValue);
+  
+  /**
+   * 根据id删除dictValue
+   * @param id
+   * @param delFlag
+   */
+  void deleteDictValue(@Param("id") String id, @Param("delFlag") String delFlag);
+  
+  /**
+   * 删除指定code下的dictValue
+   * @param dictCode
+   * @param delFlag
+   */
+  void deleteDictValues(@Param("dictCode") String dictCode, @Param("delFlag") String delFlag);
+  
+  /**
+   * 查询是否存在dictType
+   * @return
+   */
+  int findDictTypeByCode(@Param("code") String code, @Param("delFlag") String delFlag);
+  
+  /**
+   * 新增dictType
+   */
+  void insertDictType(@Param("dictType")DictTypePO dictType);
 }

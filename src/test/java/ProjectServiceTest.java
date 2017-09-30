@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.changan.code.Application;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.service.IProjectService;
+import com.google.common.base.CaseFormat;
 
 /**
  * @author wenxing
@@ -37,12 +38,13 @@ public class ProjectServiceTest {
 
   @Test
   public void genTest() {
-    String str = "/apps/{appName}/applogs/pages/";
+    String str = "/apps/relation_1/pages/";
     Pattern pattern = Pattern.compile("(?<=\\{)(.+?)(?=\\})");
     Pattern pattern2 = Pattern.compile("(?<=\\}/)(.+?)(?=\\/)");
-    Matcher matcher = pattern2.matcher(str);
+    Pattern pattern3 = Pattern.compile("(?<=apps\\/)(.+?)(?=\\/pages)");
+    Matcher matcher = pattern3.matcher(str);
     while(matcher.find()) {
-      System.err.println(matcher.group());
+      System.err.println(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, matcher.group()));
     }
     System.err.println(str.substring(0, str.length() - 1));
   }

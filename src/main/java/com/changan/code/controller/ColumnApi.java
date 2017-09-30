@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import com.changan.code.dto.ResultOfColumnDTO;
 import com.changan.code.entity.ColumnPO;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
@@ -62,4 +63,17 @@ public interface ColumnApi {
   @RequestMapping(value = "/column/save", produces = {"application/json"},
       method = RequestMethod.POST)
   public ResponseEntity<ResultDTO> columnSavePost(@RequestBody ColumnPO column);  
+  
+  /**
+   * 保存表字段配置和字典表
+   * @param column
+   * @return
+   */
+  @ApiOperation(value = "保存表字段配置和字典表", notes = "保存表字段配置和字典表", response = ResultPageDTO.class, tags = {"Column"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/column/dict/save", produces = {"application/json"},
+      method = RequestMethod.POST)
+  public ResponseEntity<ResultDTO> columnAndDictSavePost(@RequestBody ResultOfColumnDTO columnDTO);  
 }

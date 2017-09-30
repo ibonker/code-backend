@@ -63,4 +63,15 @@ public class ColumnApiController extends BaseController implements ColumnApi {
     return new ResponseEntity<>(new ResultOfColumnDTO().column(column).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }
+  
+  /**
+   * 保存表字段和字典表配置
+   */
+  @Override
+  public ResponseEntity<ResultDTO> columnAndDictSavePost(@RequestBody ResultOfColumnDTO column) {
+    //保存表字段和字典表配置
+    columnService.saveColumnAndDict(column);
+    return new ResponseEntity<>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+  }
 }

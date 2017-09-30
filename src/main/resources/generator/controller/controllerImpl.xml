@@ -6,12 +6,13 @@
   <content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.${versionName}.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base.BaseController;
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.common.RestStatus;
 <#list importImplPackageList as package>
@@ -40,10 +41,10 @@ public class ${controllerName}ApiController extends BaseController implements ${
   @Override
   public ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam>${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>) {
     <#if apiObj.apiType == "general">
-    return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}${apiObj.responseObjGenericNoPack}().message("成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+    return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}${apiObj.responseObjGenericNoPack}().message("成功").statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "page">
-    return new ResponseEntity<ResultDTO>(${apiObj.attrServiceNameNoPack}.get${apiObj.tableAttrNameCap}List<#if apiObj.isSlaveUri>By${apiObj.firstPathVarCap}</#if>(<#list apiObj.apiParams as apiParam>${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>)
+    return new ResponseEntity<ResultDTO>(${apiObj.attrServiceNameNoPack}.get${apiObj.tableAttrNameCap}List<#if apiObj.isSlaveUri>By${apiObj.firstPathVarCap}<#elseif apiObj.isSenior>By${apiObj.seniorRelationVarCap}</#if>(<#list apiObj.apiParams as apiParam>${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>)
         .message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
@@ -70,7 +71,7 @@ public class ${controllerName}ApiController extends BaseController implements ${
     </#if>
     <#if apiObj.apiType == "show">
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}()
-        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findById(${apiObj.lastPathVar}))
+        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findById(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>))
         .message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>

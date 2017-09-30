@@ -5,8 +5,11 @@ package com.changan.code.service;
 
 import java.util.List;
 
+import com.changan.code.dto.ResultOfColumnDTO;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DatasourcePO;
+import com.changan.code.entity.DictTypePO;
+import com.changan.code.entity.DictValuePO;
 
 /**
  * @author wenxing
@@ -62,4 +65,28 @@ public interface IColumnService {
   public List<ColumnPO> findMergedColumnsByTable(List<ColumnPO> masterColumns,
       List<ColumnPO> originColumns);
 
+  /**
+   * 保存字段和字典配置
+   * @param column
+   * @return
+   */
+  public ResultOfColumnDTO saveColumnAndDict(ResultOfColumnDTO column);
+  
+  
+  /**
+   * 获得数据源并执行数据库操作
+   * @param dataSourceId
+   * @param dbName
+   * @param dictCode
+   * @param dictValues
+   */
+  public void getDataSource(String tableId, DictTypePO dictType, List<DictValuePO> dictValues);
+  
+  /**
+   * 获得数据源并查询
+   * @param tableId
+   * @param code
+   * @return
+   */
+  public List<DictValuePO>  findTypeAndValue(String tableId, String code);
 }

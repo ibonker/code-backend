@@ -34,6 +34,21 @@ public interface TableRepository
   List<Object[]> findClassNameByDatasourceId(String datasourceId);
   
   /**
+   * 根据datasourceId列表获取id
+   * @param datasourceId
+   * @return
+   */
+  @Query("SELECT t.id as id FROM TablePO t WHERE t.datasourceId in ?1")
+  List<String> findIdByDatasourceIdIn(List<String> datasourceIds);
+  
+  /**
+   * 根据datasourceId列表删除数据
+   * @param transferObjIds
+   * @return
+   */
+  Long deleteByDatasourceIdIn(List<String> datasourceIds);
+  
+  /**
    * 通过id列表获取table列表
    * @param ids
    * @return

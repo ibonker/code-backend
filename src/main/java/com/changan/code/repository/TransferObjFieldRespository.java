@@ -33,6 +33,15 @@ public interface TransferObjFieldRespository extends JpaRepository<TransferObjFi
    */
   public List<TransferObjFieldPO> findByTransferObjIdAndDelFlag(String transferObjId,
       String delFlag);
+  
+  /**
+   * 根据排序查询所有未逻辑删除的DTO属性
+   * 
+   * @param delFlag
+   * @return
+   */
+  public List<TransferObjFieldPO> findByTransferObjIdAndDelFlagOrderBySortAsc(String transferObjId,
+      String delFlag);
 
   /**
    * 根据id查询DTO属性
@@ -50,6 +59,14 @@ public interface TransferObjFieldRespository extends JpaRepository<TransferObjFi
    * @return
    */
   public Long deleteByTransferObjId(String transferObjId);
+  
+  /**
+   * 根据transferObjId列表删除数据
+   * 
+   * @param apiObjId
+   * @return
+   */
+  public Long deleteByTransferObjIdIn(List<String> transferObjId);
 
   /**
    * 根据项目id、name查询属性

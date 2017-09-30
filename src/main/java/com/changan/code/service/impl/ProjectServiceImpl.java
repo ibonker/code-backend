@@ -16,7 +16,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.util.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,12 +35,15 @@ import com.changan.code.common.BaseType;
 import com.changan.code.common.Constants;
 import com.changan.code.common.PredictUtils;
 import com.changan.code.common.component.Consul;
+import com.changan.code.common.component.Dictionary;
 import com.changan.code.common.component.Security;
 import com.changan.code.config.property.GenerateProperties;
 import com.changan.code.dto.Component;
 import com.changan.code.dto.ComponentCategory;
 import com.changan.code.dto.PackObj;
 import com.changan.code.dto.RefObjDTO;
+import com.changan.code.dto.SeniorDtoAttribute;
+import com.changan.code.dto.SeniorDtoRelation;
 import com.changan.code.dto.SimpleDataObj;
 import com.changan.code.entity.ApiBasePO;
 import com.changan.code.entity.ApiObjPO;
@@ -51,10 +53,15 @@ import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.entity.TableRelationPO;
+import com.changan.code.entity.TableSeniorRelationPO;
+import com.changan.code.entity.TableSeniorSlavePO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ProjectRepository;
+import com.changan.code.repository.TableSeniorColumnRepository;
+import com.changan.code.repository.TableSeniorRelationRepository;
+import com.changan.code.repository.TableSeniorSlaveRepository;
 import com.changan.code.service.IApiBaseService;
 import com.changan.code.service.IApiObjService;
 import com.changan.code.service.IApiParamService;
@@ -69,6 +76,7 @@ import com.changan.code.utils.PatternUtils;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * 项目Project Service
@@ -110,6 +118,15 @@ public class ProjectServiceImpl implements IProjectService {
 
   @Autowired
   private IApiParamService apiParamService;
+
+  @Autowired
+  private TableSeniorSlaveRepository tableSeniorSlaveRepository;
+
+  @Autowired
+  private TableSeniorRelationRepository seniorRelationRepository;
+
+  @Autowired
+  private TableSeniorColumnRepository tableSeniorColumnRepository;
 
   /**
    * 分页查询project
@@ -184,8 +201,26 @@ public class ProjectServiceImpl implements IProjectService {
       for (Entry<String, DatasourcePO> entry : oldDbMap.entrySet()) {
         delDbs.add(entry.getValue());
       }
-      // 删除数据源
-      datasourceService.deleteDatasources(delDbs);
+
+      List<String> delDbIds = Lists.newArrayList();
+      for (DatasourcePO db : delDbs) {
+        delDbIds.add(db.getId());
+      }
+      if (!delDbIds.isEmpty()) {
+        // 删除表和实体
+        // 获取应该删除的表的id
+        List<String> delTableIds = tableService.findIdByDatasourceIdIn(delDbIds);
+        // 获取应该删除的dto的id
+        List<String> delDtoIds = transObjService.findIdByGenBasedTableIdIn(delTableIds);
+        // 删除dto的field
+        transferObjFieldService.deleteByTransferObjIdIn(delDtoIds);
+        // 删除dto
+        transObjService.deleteByGenBasedTableIdIn(delTableIds);
+        // 删除表
+        tableService.deleteByDatasourceIdIn(delDbIds);
+        // 删除数据源
+        datasourceService.deleteDatasources(delDbs);
+      }
     }
     // 添加新增的数据源
     project.setDatasources(newDbs);
@@ -234,7 +269,7 @@ public class ProjectServiceImpl implements IProjectService {
     for (ComponentCategory co : list) {
       List<String> codes = co.getComponents().stream()
           .filter(cop -> project.getComponents() != null
-              && project.getComponents().indexOf(cop.getCode()) > -1)
+              && compareStr(project.getComponents(), cop.getCode()))
           .map(Component::getCode).collect(Collectors.toList());
       if (co.getIsMultiSelect().equals(Constants.DATA_IS_INVALID)) {
         componentMap.put(co.getCategory(), codes);
@@ -306,7 +341,7 @@ public class ProjectServiceImpl implements IProjectService {
     for (TransferObjPO transferObj : transferObjs) {
       // 查询DTO下对应DTO属性
       List<TransferObjFieldPO> transferObjFileds =
-          transferObjFieldService.findAllTransferObjField(transferObj.getId());
+          transferObjFieldService.findAllTransferObjFieldBySort(transferObj.getId());
       // 生成DTO文件代码
       generateService.generateDTOFiles(project.getName(), project.getPackages().toLowerCase(),
           transferObj, transferObjFileds);
@@ -321,17 +356,23 @@ public class ProjectServiceImpl implements IProjectService {
       List<TablePO> tables = tableService.findByDatasourceId(datasource.getId());
       Map<String, TablePO> tableMaps = Maps.newHashMap();
       for (TablePO table : tables) {
-        // 该数据库所有表
-        tableMaps.put(table.getId(), table);
         // 所有数据库所有表
         alltablemap.put(table.getId(), table);
         List<ColumnPO> columns = tableService.findMergedColumns(table.getId());
         Map<String, ColumnPO> columnMaps = Maps.newHashMap();
         for (ColumnPO column : columns) {
           // 该表所有字段
+          if (Constants.IS_ACTIVE.equals(column.getIsPk())) {
+            column.setSortWeight(Integer.MIN_VALUE);
+          }
           columnMaps.put(column.getName(), column);
         }
         table.setColumnMaps(columnMaps);
+        // 该数据库所有表
+        tableMaps.put(table.getId(), table);
+      }
+      // 添加关系
+      for (TablePO table : tableMaps.values()) {
         // 获取主表关系表
         List<TableRelationPO> tableRelations =
             tableService.findSlaveTableRelationList(table.getId());
@@ -340,14 +381,16 @@ public class ProjectServiceImpl implements IProjectService {
         }
         // 注入从表数据库类型
         for (TableRelationPO tableRelation : tableRelations) {
-          tableRelation.setMasterColumnJavaType(
-              datasource.getTableMaps().get(tableRelation.getMasterTableId()).getColumnMaps()
-                  .get(tableRelation.getMasterColumnName()).getJavaType());
           tableNeedServiceCreated.add(tableRelation.getMasterTableId());
           tableNeedServiceCreated.add(tableRelation.getSlaveTableId());
         }
         table.setMasterTableRelations(tableRelations);
+        // 获取从表关系表
+        List<TableRelationPO> tableRelationsForMaster =
+            tableService.findTableRelationList(table.getId());
+        table.setSlaveTableRelations(tableRelationsForMaster);
       }
+      // 放入数据源
       datasource.setTableMaps(tableMaps);
     }
 
@@ -362,8 +405,8 @@ public class ProjectServiceImpl implements IProjectService {
           table.setPackageName(datasource.getPackageName());
           // 生成servcie和serviceImpl
           generateService.generateIServiceAndServiceImpl(datasource.getPackageName(),
-              project.getName(), project.getPackages(), table, table.getMasterTableRelations(),
-              transferObjs.get(0).getPackageName());
+              project.getName(), project.getPackages(), table.getName(),
+              table.getMasterTableRelations(), null, false);
           // TODO 判断mybatis和jpa 生成JPAService和JPAServiceImpl
           // generateService.generateJPAServiceAndJPAServiceImpl(datasource.getPackageName(),
           // project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
@@ -375,8 +418,8 @@ public class ProjectServiceImpl implements IProjectService {
             project.getPackages().toLowerCase(), datasource, tables);
         isAutoGen = true;
       }
-
     }
+
     // 生成mybatis代码
     if (isAutoGen) {
       generateService.generateMybatisFiles(project.getName());
@@ -390,6 +433,8 @@ public class ProjectServiceImpl implements IProjectService {
         generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
             project.getPackages().toLowerCase(), table,
             Lists.newArrayList(table.getColumnMaps().values()));
+        // 生成高级查询代码
+        this.generateSeniorSearchCode(project, alltablemap, datasource, table);
         // TODO 判断mybatis和jpa 生成Jpa Repository
         // generateService.generateRepository(datasource.getPackageName(), project.getName(),
         // project.getPackages().toLowerCase(), table.getName());
@@ -410,14 +455,16 @@ public class ProjectServiceImpl implements IProjectService {
         if (Constants.IS_ACTIVE.equals(apiobj.getIsAutoGen())) {
           // 判断是否为从表
           String tableName;
-          if (apiobj.getUri().contains("}/")) {
+          if (StringUtils.isNotBlank(apiobj.getGenRelatedTableId()) && !apiobj.getIsSenior()) {
             apiobj.setSlaveUri(true);
-            List<String> substrs = PatternUtils.getMatchedSubString(apiobj.getUri().concat("/"),
-                "(?<=\\}/)(.+?)(?=\\/)");
-            String tableNameSuf = substrs.get(substrs.size() - 1);
             // 去掉添加的"s"结尾
-            tableName = tableNameSuf.substring(0, tableNameSuf.length() - 1);
+            tableName = alltablemap.get(apiobj.getGenRelatedTableId()).getName().toLowerCase();
+          } else if (apiobj.getIsSenior()) {
+            apiobj.setSlaveUri(false);
+            // 高级查询映射的实体驼峰名
+            tableName = alltablemap.get(apiobj.getGenBasedTableId()).getName().concat("_senior");
           } else {
+            apiobj.setSlaveUri(false);
             // 如果是主表则取直接取表名
             tableName = alltablemap.get(apiobj.getGenBasedTableId()).getName();
           }
@@ -430,11 +477,13 @@ public class ProjectServiceImpl implements IProjectService {
           // 获取表主键名
           List<String> substrs =
               PatternUtils.getMatchedSubString(apiobj.getUri(), "(?<=\\{)(.+?)(?=\\})");
-          if (apiobj.isSlaveUri()) {
+          if (apiobj.getIsSlaveUri()) {
             if (substrs.size() > 1) {
               // uri的结构为"/a/{aid}/b/{bid}";
               apiobj.setFirstPathVar(substrs.get(substrs.size() - 2));
               apiobj.setLastPathVar(substrs.get(substrs.size() - 1));
+            } else {
+              apiobj.setFirstPathVar(substrs.get(0));
             }
           } else {
             if (substrs.size() == 1) {
@@ -442,7 +491,14 @@ public class ProjectServiceImpl implements IProjectService {
               apiobj.setLastPathVar(substrs.get(0));
             }
           }
-
+          // 如果是高级关联查询
+          if (apiobj.getIsSenior()) {
+            List<String> subRelStrs = PatternUtils.getMatchedSubString(apiobj.getUri(),
+                "(?<=" + tableName + "s\\/)(.+?)(?=\\/pages)");
+            if (!subRelStrs.isEmpty()) {
+              apiobj.setSeniorRelationVar(subRelStrs.get(0));
+            }
+          }
         }
         // controller分类
         List<ApiObjPO> apilist = controllerMap.get(apiobj.getControllerName());
@@ -465,6 +521,97 @@ public class ProjectServiceImpl implements IProjectService {
     this.zipcode(project.getName());
 
     return "/codegen/api/v1/projects/" + project.getName() + "/download";
+  }
+
+  /**
+   * TODO 生成高级查询的Mapper, Mapper.xml, Service
+   * 
+   * @param project
+   * @param alltablemap
+   * @param datasources
+   */
+  private void generateSeniorSearchCode(ProjectPO project, Map<String, TablePO> alltablemap,
+      DatasourcePO datasource, TablePO table) {
+    // 获取表的高级关联关系
+    List<TableSeniorRelationPO> relations =
+        seniorRelationRepository.findByMasterTableIdOrderByCreatedAtAsc(table.getId());
+    String seniorTableName = table.getName().concat("_senior");
+    // dto包含的表
+    List<SeniorDtoAttribute> attrs = Lists.newArrayList();
+    // 用于去重
+    List<String> tableNames = Lists.newArrayList();
+    // dto包含的关系
+    List<SeniorDtoRelation> relationMethods = Lists.newArrayList();
+    // 如果不为空
+    if (!relations.isEmpty()) {
+      List<ColumnPO> columns = Lists.newArrayList(table.getColumnMaps().values());
+      // 排序
+      columns.sort((ColumnPO a, ColumnPO b) -> Integer.valueOf(a.getSortWeight())
+          .compareTo(Integer.valueOf(b.getSortWeight())));
+      // 放入主表
+      SeniorDtoAttribute masterAttr = new SeniorDtoAttribute(
+          CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, table.getName().toLowerCase()),
+          table.getName(), table.getClassName(), columns);
+      attrs.add(masterAttr);
+      tableNames.add(table.getId());
+      // 创建service
+      generateService.generateIServiceAndServiceImpl(datasource.getPackageName(), project.getName(),
+          project.getPackages(), seniorTableName, null, relations, true);
+      // TODO 创建mapper文件
+      int i = 1;
+      for (TableSeniorRelationPO relation : relations) {
+        // 关系包含的表
+        List<SeniorDtoAttribute> relationAttrs = Lists.newArrayList();
+        relationAttrs.add(masterAttr);
+        // 用于去重
+        List<String> relationTableNames = Lists.newArrayList();
+        relationTableNames.add(table.getId());
+        // 关联从表
+        List<TableSeniorSlavePO> slaves =
+            tableSeniorSlaveRepository.findBySeniorIdOrderByCreatedAtAsc(relation.getId());
+        for (TableSeniorSlavePO slave : slaves) {
+          if (!tableNames.contains(slave.getSlaveTableId())) {
+            List<ColumnPO> slavecolumns = Lists.newArrayList(table.getColumnMaps().values());
+            // 排序
+            slavecolumns.sort((ColumnPO a, ColumnPO b) -> Integer.valueOf(a.getSortWeight())
+                .compareTo(Integer.valueOf(b.getSortWeight())));
+            // 获取从表用于dto
+            TablePO slaveTable = alltablemap.get(slave.getSlaveTableId());
+            SeniorDtoAttribute slaveAttr = new SeniorDtoAttribute(
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,
+                    slaveTable.getName().toLowerCase()),
+                slaveTable.getName(), slaveTable.getClassName(), slavecolumns);
+            attrs.add(slaveAttr);
+            tableNames.add(slave.getSlaveTableId());
+          }
+          if (!relationTableNames.contains(slave.getSlaveTableId())) {
+            List<ColumnPO> slavecolumns = Lists.newArrayList(table.getColumnMaps().values());
+            // 排序
+            slavecolumns.sort((ColumnPO a, ColumnPO b) -> Integer.valueOf(a.getSortWeight())
+                .compareTo(Integer.valueOf(b.getSortWeight())));
+            // 获取从表用于关联关系sql
+            TablePO slaveTable = alltablemap.get(slave.getSlaveTableId());
+            SeniorDtoAttribute slaveAttr = new SeniorDtoAttribute(
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,
+                    slaveTable.getName().toLowerCase()),
+                slaveTable.getName(), slaveTable.getClassName(), slavecolumns);
+            relationAttrs.add(slaveAttr);
+            relationTableNames.add(slave.getSlaveTableId());
+          }
+          // 关联从表字段
+          slave.setRelationColumns(
+              tableSeniorColumnRepository.findBySeniorSlaveIdOrderByCreatedAtAsc(slave.getId()));
+        }
+        relation.setRelationTables(slaves);
+        // 添加关系
+        SeniorDtoRelation relationMethod =
+            new SeniorDtoRelation("Relation" + i, relationAttrs, slaves);
+        relationMethods.add(relationMethod);
+        i++;
+      }
+      generateService.generateDAOFiles(datasource.getPackageName(), project.getName(),
+          project.getPackages(), seniorTableName, relations, attrs, relationMethods);
+    }
   }
 
   /**
@@ -510,7 +657,58 @@ public class ProjectServiceImpl implements IProjectService {
             components.add(new Component(consul.name(), consul.getCname()));
           }
         }));
+    // dictionary组件
+    categories.add(this.getComponentCategory(() -> Dictionary.isMultiSelect(),
+        () -> Dictionary.getTypeCname(), (List<Component> components) -> {
+          for (Dictionary dictionary : Dictionary.values()) {
+            components.add(new Component(dictionary.name(), dictionary.getCname()));
+          }
+        }));
     return categories;
   }
 
+  /**
+   * 打包前台项目代码
+   * 
+   * @param projectName
+   * @return 压缩地址
+   */
+  private String zipUicode(String projectName) {
+    // 压缩生成的项目
+    String projectZipPath =
+        GeneratorUtils.getProjectZipPath(genProperties.getProjectZipPath(), projectName);
+    // 删除旧压缩文件及文件夹
+    FileUtil.delete(new File(projectZipPath));
+    File f = new File(genProperties.getProjectUiPath());
+    String srcPath = f.getParent() + File.separator + projectName;
+    FileUtils.zipFiles(srcPath, "*", projectZipPath);
+    FileUtil.delete(new File(srcPath));
+    return projectZipPath;
+  }
+
+  /**
+   * 下载前台代码
+   */
+  @Override
+  public File downloadZipUIFiles(String projectName) {
+    generateService.generateUIFiles(projectName);
+    String projectZipPath = zipUicode(projectName);
+    return new File(projectZipPath);
+  }
+
+  /**
+   * 比较字符串
+   * 
+   * @param compoents
+   * @param emun
+   * @return
+   */
+  public Boolean compareStr(String compoents, String emun) {
+    for (String str : compoents.split(",")) {
+      if (emun.equals(str)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

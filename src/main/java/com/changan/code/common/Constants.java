@@ -46,6 +46,10 @@ public class Constants {
   public final static String TRANS_OBJ_DEFAULT_PACKAGE = "other";
   // Api默认包名
   public final static String API_DEFAULT_PREFIX = "";
+  // 高级查询默认关联id标识
+  public final static String API_SENIOR_TAG = "senior_crud_api";
+  // 高级关联crud默认infix命名前缀
+  public final static String API_SENIOR_RELATION_INFIX = "relation_";
   // api默认生成类型
   public final static String API_PRODUCES = "application/json";
   // api默认消费类型

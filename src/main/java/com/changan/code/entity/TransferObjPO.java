@@ -46,6 +46,10 @@ public class TransferObjPO extends BaseEntity {
   @Column(name = "comments")
   @JsonProperty("comments")
   private String comments; // 注释
+  
+  @Column(name = "is_senior")
+  @JsonProperty("isSenior")
+  private String isSenior; // 是否高级关联查询实体
 
   @Column(name = "is_generic")
   @JsonProperty("isGeneric")

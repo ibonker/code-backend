@@ -46,13 +46,13 @@ public class BaseEntity implements Serializable {
   @Column(name = "created_at", nullable = false)
   @JsonPropertyDescription("创建时间")
   @JsonProperty(value = "createdAt", access = Access.READ_ONLY)
-  @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+  @JsonFormat(pattern = Constants.DATETIME_FORMAT, timezone="GMT+8")
   protected Date createdAt;
 
   @Column(name = "updated_at", nullable = false)
   @JsonPropertyDescription("更新时间")
   @JsonProperty(value = "updatedAt", access = Access.READ_ONLY)
-  @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+  @JsonFormat(pattern = Constants.DATETIME_FORMAT, timezone="GMT+8")
   protected Date updatedAt;
 
   /**

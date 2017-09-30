@@ -8,7 +8,8 @@ package ${packageName}.service.${moduleName};
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
-import ${packageName}.entity.${moduleName}.${className}PO;
+import ${packageName}.<#if isSenior>dto<#else>entity</#if>.${moduleName}.${className}<#if isSenior>DTO<#else>PO</#if>;
+import com.changan.jsonmeta.JsonSchema;
 
 /** 
  * I${className}Service
@@ -22,6 +23,17 @@ public interface I${className}Service {
    */
   public JsonSchema get${className}JsonSchema(String url);
 
+  <#if isSenior>
+  <#list seniorRelations as relation> 
+  /**
+   * 通过参数获取数据
+   * 
+   * @param _parameter
+   * @return
+   */
+  public ResultPageDTO<${className}DTO> get${className}ListByRelation${relation_index + 1}(PageDTO page);
+  </#list>
+  <#else>	
   /**
    * @Description datatable 分页查询
    * 
@@ -62,21 +74,31 @@ public interface I${className}Service {
   public int delete${className}(String id);
   
   <#list tableRelations as tableRelation>
+  <#if 'One to One' == tableRelation.relation>
+  /**
+   * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}查询详情
+   * 
+   * @param ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}
+   * @return
+   */
+  public ${className}PO findBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+  <#else>
   /**
    * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}分页查询
    * 
    * @param page
    * @return
    */
-  public ResultPageDTO<${className}PO> get${className}ListBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, PageDTO page);
-    
+  public ResultPageDTO<${className}PO> get${className}ListBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, PageDTO page);
+  </#if> 
+   
   /**
    * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}新增
    * 
    * @param ${lowerName}
    * @return
    */
-  public int insert${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName});
+  public int insert${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName});
     
   /**
    * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}修改
@@ -84,9 +106,9 @@ public interface I${className}Service {
    * @param ${lowerName}
    * @return
    */
-  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName});
+  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName});
   </#list>
-
+  </#if>
 }
 ]]>
   </content>

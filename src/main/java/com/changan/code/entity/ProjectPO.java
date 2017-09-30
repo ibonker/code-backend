@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.code.annotation.JsonSchemaLink;
+import com.changan.code.common.Constants;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
@@ -72,6 +73,11 @@ public class ProjectPO extends BaseEntity {
   @JsonPropertyDescription("项目组件选中")
   private Map<String, Object> componentsMap; // 项目组件选中
   
+  @Column(name = "isdictionary")
+  @JsonProperty("isdictionary")
+  @JsonPropertyDescription("是否启用字典表")
+  private String isdictionary = Constants.DATA_IS_NORMAL; //是否启用字典表
+  
   /**
    * 可以更新的属性
    * @param newProject
@@ -83,6 +89,7 @@ public class ProjectPO extends BaseEntity {
     this.packages = newProject.getPackages();
     this.name = newProject.getName();
     this.datasources = newProject.getDatasources();
+    this.isdictionary = newProject.getIsdictionary();
     
     return this;
   }

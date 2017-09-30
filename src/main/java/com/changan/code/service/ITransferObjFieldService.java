@@ -46,6 +46,13 @@ public interface ITransferObjFieldService {
    * @return
    */
   public List<TransferObjFieldPO> findAllTransferObjField(String transferObjId);
+  
+  /**
+   * 根据排序查询所有的DTO属性对象
+   * 
+   * @return
+   */
+  public List<TransferObjFieldPO> findAllTransferObjFieldBySort(String transferObjId);
 
   /**
    * 批量保存DTO属性
@@ -61,4 +68,12 @@ public interface ITransferObjFieldService {
    * @return
    */
   public void deleteByTransferObjId(String transferObjId);
+  
+  /**
+   * 根据transferObjId列表删除数据
+   * 
+   * @param apiObjId
+   * @return
+   */
+  public Long deleteByTransferObjIdIn(List<String> transferObjIds);
 }

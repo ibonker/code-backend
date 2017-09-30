@@ -35,9 +35,13 @@ import com.changan.code.common.template.JPAFile;
 import com.changan.code.common.template.MvcFile;
 import com.changan.code.common.template.ServiceFile;
 import com.changan.code.common.template.ServiceImplFile;
+import com.changan.code.common.template.UiCode;
 import com.changan.code.common.template.UiFile;
 import com.changan.code.config.property.GenerateProperties;
 import com.changan.code.dto.ApiServiceName;
+import com.changan.code.dto.RelationAnnotation;
+import com.changan.code.dto.SeniorDtoAttribute;
+import com.changan.code.dto.SeniorDtoRelation;
 import com.changan.code.dto.Template;
 import com.changan.code.entity.ApiBasePO;
 import com.changan.code.entity.ApiObjPO;
@@ -47,11 +51,13 @@ import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.entity.TableRelationPO;
+import com.changan.code.entity.TableSeniorRelationPO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 import com.changan.code.service.IGenerateService;
 import com.changan.code.utils.GeneratorUtils;
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -85,6 +91,38 @@ public class GenerateServiceImpl implements IGenerateService {
             (null == basePath ? (String) model.get(ParamerConstant.CPNS_PROJECT_NAME)
                 : Constants.MYBATIS_GEN_CONFIG_ROOT))
             + File.separator
+            + StringUtils.replaceEach(FreeMarkerUtils.renderString(tpl.getFilePath() + "/", model),
+                new String[] {"//", "/", "."},
+                new String[] {File.separator, File.separator, File.separator})
+            + FreeMarkerUtils.renderString(tpl.getFileName(), model);
+    log.debug(" fileName === " + fileName);
+
+    // 获取生成文件内容
+    String content = FreeMarkerUtils.renderString(StringUtils.trimToEmpty(tpl.getContent()), model);
+    log.debug(" content === \r\n" + content);
+
+    // 如果选择替换文件，则删除原文件
+    if (isReplaceFile) {
+      FileUtils.deleteFile(fileName);
+    }
+
+    // 创建并写入文件
+    if (FileUtils.createFile(fileName)) {
+      FileUtils.writeToFile(fileName, content, true);
+      log.debug(" file create === " + fileName);
+      return "生成成功：" + fileName + "<br/>";
+    } else {
+      log.debug(" file extents === " + fileName);
+      return "文件已存在：" + fileName + "<br/>";
+    }
+  }
+
+  @Override
+  public String generateToUIFile(String basePath, Template tpl, Map<String, Object> model,
+      boolean isReplaceFile) {
+    String fileName;
+    fileName = basePath == null ? genProperties.getProjectUiPath()
+        : basePath + File.separator
             + StringUtils.replaceEach(FreeMarkerUtils.renderString(tpl.getFilePath() + "/", model),
                 new String[] {"//", "/", "."},
                 new String[] {File.separator, File.separator, File.separator})
@@ -179,7 +217,7 @@ public class GenerateServiceImpl implements IGenerateService {
       if ("1".equals(column.getReadOnly())) {
         imports.add("readOnly");
       }
-      if ("1".equals(column.getIsNullable())) {
+      if (!"1".equals(column.getIsNullable())) {
         imports.add("isNullable");
       }
       if (!"".equals(column.getPattern()) && column.getPattern() != null) {
@@ -207,6 +245,45 @@ public class GenerateServiceImpl implements IGenerateService {
         imports.add("BigDecimal");
       }
     }
+    List<RelationAnnotation> relAnns = Lists.newArrayList();
+    // 添加主从关系
+    for (TableRelationPO tableRelation : table.getSlaveTableRelations()) {
+      RelationAnnotation ann = new RelationAnnotation();
+      boolean isCollection = true;
+      if ("One to One".equals(tableRelation.getRelation())) {
+        ann.setRelationType("@OneToOne");
+        imports.add("OneToOne");
+        isCollection = false;
+      } else {
+        ann.setRelationType("@OneToMany");
+        imports.add("OneToMany");
+      }
+      imports.add("masterRel");
+      ann.setCollection(isCollection);
+      ann.setMappedBy(table.getTableAttrNameLower());
+      ann.setAttrName(tableRelation.getSlaveTableNameLower().concat(isCollection ? "s" : ""));
+      ann.setAttrPOName(tableRelation.getSlaveTableNameCap().concat("PO"));
+      relAnns.add(ann);
+    }
+    // 添加从主关系
+    for (TableRelationPO tableRelation : table.getMasterTableRelations()) {
+      RelationAnnotation ann = new RelationAnnotation();
+      boolean isCollection = false;
+      if ("One to One".equals(tableRelation.getRelation())) {
+        ann.setRelationType("@OneToOne");
+        imports.add("OneToOne");
+      } else {
+        ann.setRelationType("@ManyToOne");
+        imports.add("ManyToOne");
+      }
+      imports.add("slaveRel");
+      ann.setCollection(isCollection);
+      ann.setAttrName(tableRelation.getMasterTableNameLower().concat(isCollection ? "s" : ""));
+      ann.setAttrPOName(tableRelation.getMasterTableNameCap().concat("PO"));
+      ann.setColumnName(tableRelation.getSlaveColumnName());
+      ann.setRefColumnName(tableRelation.getMasterColumnName());
+      relAnns.add(ann);
+    }
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     model.put("packageName", packageName);
@@ -215,6 +292,10 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("projectName", projectName);
     model.put("moduleName", moduleName);
     model.put("imports", imports);
+    model.put("relAnns", relAnns);
+    model.put("tableName", table.getName());
+    model.put("tableComments", table.getComments() == null ? table.getClassName().concat("实体")
+        : table.getComments().concat("实体"));
     // 生成实体文件
     this.generateToFile(null,
         GeneratorUtils.fileToObject(EntityFile.entity.getPath(), Template.class), model, true);
@@ -294,23 +375,30 @@ public class GenerateServiceImpl implements IGenerateService {
    * 自动生成DAO
    */
   @Override
-  public void generateDAOFiles(String projectName, String packageName, TablePO table) {
+  public void generateDAOFiles(String moduleName, String projectName, String packageName,
+      String tableName, List<TableSeniorRelationPO> relations, List<SeniorDtoAttribute> attrs,
+      List<SeniorDtoRelation> relationMethods) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
-    String str = table.getName();
-    // 按下划线拆分
-    String[] strs = str.split("_");
-    // 首字母大写
-    String className = strs[0].substring(0, 1).toUpperCase() + strs[0].substring(1)
-        + strs[1].substring(0, 1).toUpperCase() + strs[1].substring(1);
+    String className =
+        CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName.toLowerCase());
     model.put("className", className);
     // 首字母小写驼峰
-    String lowerName = strs[0] + strs[1].substring(0, 1).toUpperCase() + strs[1].substring(1);
-    model.put("lowerName", lowerName);
+    model.put("lowerName", StringUtils.uncapitalize(className));
     model.put("packageName", packageName);
+    model.put("moduleName", moduleName);
     model.put("projectName", projectName);
+    model.put("relations", relations);
+    model.put("masterTableName", relations.get(0).getMasterTableName());
+    model.put("masterTableAttrName", CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL,
+        relations.get(0).getMasterTableName().toLowerCase()));
+    model.put("attrList", attrs);
+    model.put("relationMethods", relationMethods);
     // 生成DAO文件
     this.generateToFile(null, GeneratorUtils.fileToObject(DAOFile.dao.getPath(), Template.class),
+        model, true);
+    // 生成mapper文件
+    this.generateToFile(null, GeneratorUtils.fileToObject(DAOFile.mapper.getPath(), Template.class),
         model, true);
   }
 
@@ -319,21 +407,23 @@ public class GenerateServiceImpl implements IGenerateService {
    */
   @Override
   public void generateIServiceAndServiceImpl(String moduleName, String projectName,
-      String packageName, TablePO table, List<TableRelationPO> tableRelation,
-      String DTOPackageName) {
+      String packageName, String tableName, List<TableRelationPO> tableRelation,
+      List<TableSeniorRelationPO> relations, boolean isSenior) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
-    String str = table.getName().toLowerCase();
     // 首字母大写
-    String className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str);
+    String className =
+        CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName.toLowerCase());
     model.put("className", className);
-    String lowerName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, str);
+    String lowerName =
+        CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, tableName.toLowerCase());
     model.put("lowerName", lowerName);
     model.put("packageName", packageName);
     model.put("projectName", projectName);
-    model.put("DTOPackageName", DTOPackageName);
     model.put("moduleName", moduleName);
     model.put("tableRelations", tableRelation);
+    model.put("seniorRelations", relations);
+    model.put("isSenior", isSenior);
     // 生成service文件
     this.generateToFile(null,
         GeneratorUtils.fileToObject(ServiceFile.Service.getPath(), Template.class), model, true);
@@ -589,6 +679,26 @@ public class GenerateServiceImpl implements IGenerateService {
     // 生成advice文件
     this.generateToFile(null,
         GeneratorUtils.fileToObject(AdviceFile.advice.getPath(), Template.class), model, true);
+  }
+
+  /**
+   * 生成前台util
+   */
+  @Override
+  public void generateUIFiles(String projectTitle) {
+    Map<String, Object> model = Maps.newHashMap();
+    model.put("projectTitle", projectTitle);
+    File f = new File(genProperties.getProjectUiPath());
+    String srcPath = f.getParent() + File.separator + projectTitle + File.separator;
+    // 复制模板文件
+    try {
+      org.apache.commons.io.FileUtils.copyDirectory(new File(genProperties.getProjectUiPath()),
+          new File(srcPath), true);
+      this.generateToUIFile(f.getParent() + File.separator + projectTitle,
+          GeneratorUtils.fileToObject(UiCode.uiUitl.getPath(), Template.class), model, true);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
 }

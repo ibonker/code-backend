@@ -7,6 +7,7 @@
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,10 +25,13 @@ public class ResourceMetadataConfiguration {
 
   @Autowired
   private ObjectMapper objectMapper;
+    
+  @Autowired
+  private ApplicationContext context;
   
   @Bean
   public ResourceMetaManager resourceMetaManager() {
-    return new ResourceMetaManager(objectMapper);
+    return new ResourceMetaManager(objectMapper, context);
   }
   
 }

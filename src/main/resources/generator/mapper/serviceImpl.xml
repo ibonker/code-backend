@@ -9,19 +9,26 @@ package ${packageName}.service.impl.${moduleName};
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ${packageName}.entity.${moduleName}.${className}PO;
+import ${packageName}.<#if isSenior>dto<#else>entity</#if>.${moduleName}.${className}<#if isSenior>DTO<#else>PO</#if>;
+<#if !isSenior>
 import ${packageName}.entity.${moduleName}.${className}POExample;
+</#if>
 import ${packageName}.service.${moduleName}.I${className}Service;
-import ${packageName}.dao.${moduleName}.${className}POMapper;
+import ${packageName}.dao.${moduleName}.${className}<#if !isSenior>PO</#if>Mapper;
 
 import com.changan.anywhere.common.utils.MybatisFilterUtils;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import com.changan.anywhere.common.mvc.page.rest.request.Collection;
 import com.changan.anywhere.common.mvc.page.rest.request.Filter;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.changan.jsonmeta.JsonSchema;
 import com.changan.jsonmeta.ResourceMetaManager;
+import com.changan.jsonmeta.JsonSchema;
+import java.util.List;
+import com.changan.demo.common.RestStatus;
+import com.changan.demo.exception.CodeCommonException;
 
 /**
  * ${className}ServiceImpl
@@ -30,7 +37,11 @@ import com.changan.jsonmeta.ResourceMetaManager;
 public class ${className}ServiceImpl implements I${className}Service {
   
   @Autowired
+  <#if isSenior>
+  private ${className}Mapper ${lowerName}Mapper;
+  <#else>
   private ${className}POMapper ${lowerName}POMapper;
+  </#if>
   
   @Autowired
   private ResourceMetaManager metaManager;
@@ -38,9 +49,37 @@ public class ${className}ServiceImpl implements I${className}Service {
   // 获取json schema
   @Override
   public JsonSchema get${className}JsonSchema(String url) {
-    return metaManager.fetchJsonSchema(${className}PO.class, url);
+    return metaManager.fetchJsonSchema(${className}<#if isSenior>DTO<#else>PO</#if>.class, url);
   }
   
+  <#if isSenior>
+  <#list seniorRelations as relation> 
+  /**
+   * 通过参数获取数据
+   * 
+   * @param _parameter
+   * @return
+   */
+  @Override
+  public ResultPageDTO<${className}DTO> get${className}ListByRelation${relation_index + 1}(PageDTO page) {
+  	ResultPageDTO<${className}DTO> result = new ResultPageDTO<>();
+    
+    // 参数
+    String _parameter = MybatisFilterUtils.transSearchForMybatisSenoir(page);
+    
+    // 分页
+    PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
+    PageInfo<${className}DTO> list = new PageInfo<>(${lowerName}Mapper.find${className}ByRelation${relation_index + 1}(_parameter));
+    
+    result.setData(list.getList());
+    result.setPageNumber(list.getPageNum());
+    result.setPageSize(list.getPageSize());
+    result.setTotalElements(list.getTotal());
+    
+    return result;
+  }
+  </#list>
+  <#else>
   //新增
   @Override
   public int insert${className}(${className}PO ${lowerName}) {
@@ -48,7 +87,7 @@ public class ${className}ServiceImpl implements I${className}Service {
     ${lowerName}.preInsert();
     return ${lowerName}POMapper.insertSelective(${lowerName});
   }
-
+  	
   //修改
   @Override
   public int update${className}(String id, ${className}PO ${lowerName}) {
@@ -77,7 +116,7 @@ public class ${className}ServiceImpl implements I${className}Service {
 
     ${className}POExample ce = new ${className}POExample();
     // 获取json schema
-    JsonSchema jsonschema = metaManager.fetchJsonSchema(${className}PO.class);
+    JsonSchema jsonschema = metaManager.fetchJsonSchema(${className}PO.class, null);
     // 查询
     MybatisFilterUtils.transformForMybatis(ce.createCriteria(), page.getCollection(), jsonschema);
     // 分页
@@ -94,22 +133,47 @@ public class ${className}ServiceImpl implements I${className}Service {
   }
   
   <#list tableRelations as tableRelation>
+  <#if 'One to One' == tableRelation.relation>
+  /**
+   * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}查询详情
+   * 
+   * @param ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}
+   * @return
+   */
+  public ${className}PO findBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}) {
+  	${className}POExample ce = new ${className}POExample();
+    // 添加查询条件
+    ce.createCriteria().and${tableRelation.masterColumnNameCap}EqualTo(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+    List<${className}PO> results = ${lowerName}POMapper.selectByExample(ce);
+    if (results.isEmpty()) {
+      throw new CodeCommonException(RestStatus.RESULT_NO_DATA.code(), RestStatus.RESULT_NO_DATA.message());
+    }
+    return results.get(0);
+  }
+  <#else>
   /**
    * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}分页查询
    * 
    * @param page
    * @return
    */
-  public ResultPageDTO<${className}PO> get${className}ListBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, PageDTO page){
+  public ResultPageDTO<${className}PO> get${className}ListBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, PageDTO page){
   	ResultPageDTO<${className}PO> result = new ResultPageDTO<${className}PO>();
 	
 	// 注入主表字段查询条件
 	Filter masterFilter = new Filter("${tableRelation.slaveColumnNameLower}", ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
-	page.getCollection().getFilters().add(masterFilter);
+	Collection collection = page.getCollection();
+	if (null == collection) {
+	  collection = new Collection();
+	  page.setCollection(collection);
+	}
+	List<Filter> filters = collection.getFilters();
+	filters.add(masterFilter);
+	page.getCollection().setFilters(filters);
 	
     ${className}POExample ce = new ${className}POExample();
     // 获取json schema
-    JsonSchema jsonschema = metaManager.fetchJsonSchema(${className}PO.class);
+    JsonSchema jsonschema = metaManager.fetchJsonSchema(${className}PO.class, null);
     // 查询
     MybatisFilterUtils.transformForMybatis(ce.createCriteria(), page.getCollection(), jsonschema);
     // 分页
@@ -124,6 +188,7 @@ public class ${className}ServiceImpl implements I${className}Service {
     result.setTotalElements(list.getTotal());
     return result;
   }
+  </#if>
     
   /**
    * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}新增
@@ -131,7 +196,7 @@ public class ${className}ServiceImpl implements I${className}Service {
    * @param ${lowerName}
    * @return
    */
-  public int insert${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName}){
+  public int insert${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName}){
   	// 设置值
   	${lowerName}.set${tableRelation.slaveColumnNameCap}(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
     ${lowerName}.preInsert();
@@ -144,7 +209,7 @@ public class ${className}ServiceImpl implements I${className}Service {
    * @param ${lowerName}
    * @return
    */
-  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnJavaType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName}){
+  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName}){
   	// 设置值
   	${lowerName}.set${tableRelation.slaveColumnNameCap}(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
   	${lowerName}.preUpdate();
@@ -152,7 +217,7 @@ public class ${className}ServiceImpl implements I${className}Service {
     return ${lowerName}POMapper.updateByPrimaryKeySelective(${lowerName});
   }
   </#list>
-  
+  </#if>
 }
 ]]>
   </content>

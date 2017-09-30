@@ -4,6 +4,7 @@
 package com.changan.code.service.impl;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,12 +24,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.druid.util.StringUtils;
 import com.changan.anywhere.common.datasource.annotation.ChangeDatasource;
 import com.changan.anywhere.common.mvc.page.rest.request.Filter;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.code.common.BaseType;
 import com.changan.code.common.Constants;
 import com.changan.code.common.PredictUtils;
+import com.changan.code.common.component.Dictionary;
 import com.changan.code.config.property.GenerateProperties;
 import com.changan.code.dao.DatabaseDao;
 import com.changan.code.dto.RequestOfTableIdsDTO;
@@ -39,12 +42,18 @@ import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.entity.TablePO;
 import com.changan.code.entity.TableRelationPO;
+import com.changan.code.entity.TableSeniorColumnPO;
+import com.changan.code.entity.TableSeniorRelationPO;
+import com.changan.code.entity.TableSeniorSlavePO;
 import com.changan.code.entity.TransferObjFieldPO;
 import com.changan.code.entity.TransferObjPO;
 import com.changan.code.exception.CodeCommonException;
 import com.changan.code.repository.ProjectRepository;
 import com.changan.code.repository.TableRelationRepository;
 import com.changan.code.repository.TableRepository;
+import com.changan.code.repository.TableSeniorColumnRepository;
+import com.changan.code.repository.TableSeniorRelationRepository;
+import com.changan.code.repository.TableSeniorSlaveRepository;
 import com.changan.code.service.IApiBaseService;
 import com.changan.code.service.IApiObjService;
 import com.changan.code.service.IColumnService;
@@ -64,6 +73,9 @@ import com.google.common.collect.Maps;
  */
 @Service
 public class TableServiceImpl implements ITableService {
+
+  // 字典表名
+  private final static List<String> DICT_TABLES = Arrays.<String>asList("dict_type", "dict_value");
 
   @Autowired
   private TableRepository tableRepository;
@@ -101,6 +113,15 @@ public class TableServiceImpl implements ITableService {
   @Autowired
   private TableRelationRepository tableRelationRepository;
 
+  @Autowired
+  private TableSeniorSlaveRepository tableSeniorSlaveRepository;
+
+  @Autowired
+  private TableSeniorRelationRepository seniorRelationRepository;
+
+  @Autowired
+  private TableSeniorColumnRepository tableSeniorColumnRepository;
+
   /**
    * 更新数据库表
    * 
@@ -110,14 +131,18 @@ public class TableServiceImpl implements ITableService {
   @Override
   @Transactional("jpaTransactionManager")
   public void saveAndDelMasterTables(List<TablePO> originTables, List<TablePO> masterTables,
-      String datasourceId) {
+      DatasourcePO datasource, ProjectPO project) {
     // 列出新的表
     List<TablePO> newTables = Lists.newArrayList();
     // 列出删除的表
     List<TablePO> notExistTables = Lists.newArrayList();
     if (null == masterTables || masterTables.isEmpty()) {
       for (TablePO originTable : originTables) {
-        newTables.add(originTable.setDefaultValue(datasourceId));
+        if ((Constants.IS_ACTIVE.equals(project.getIsdictionary())
+            && !DICT_TABLES.contains(originTable.getName()))
+            || !Constants.IS_ACTIVE.equals(project.getIsdictionary())) {
+          newTables.add(originTable.setDefaultValue(datasource.getId()));
+        }
       }
     } else {
       // master的table放入map中
@@ -127,10 +152,14 @@ public class TableServiceImpl implements ITableService {
       }
       // 识别新增表
       for (TablePO originTable : originTables) {
-        if (!masterTableMap.containsKey(originTable.getName())) {
-          newTables.add(originTable.setDefaultValue(datasourceId));
-        } else {
-          masterTableMap.remove(originTable.getName());
+        if ((Constants.IS_ACTIVE.equals(project.getIsdictionary())
+            && !DICT_TABLES.contains(originTable.getName()))
+            || !Constants.IS_ACTIVE.equals(project.getIsdictionary())) {
+          if (!masterTableMap.containsKey(originTable.getName())) {
+            newTables.add(originTable.setDefaultValue(datasource.getId()));
+          } else {
+            masterTableMap.remove(originTable.getName());
+          }
         }
       }
       // 得到删除表
@@ -141,8 +170,19 @@ public class TableServiceImpl implements ITableService {
 
     // 新建表
     this.saveNewTables(newTables);
-    // 删除表
+    // 新建实体
+    for (TablePO table : newTables) {
+      transobjService.createAutoCrudDTO(datasource.getProjectId(), table.getId(), table.getName(),
+          datasource.getName(),
+          datasource.getPackageName().concat(".").concat(table.getClassName()));
+    }
+    // 删除 表
     this.deleteNotExistTables(notExistTables);
+    // 删除实体
+    for (TablePO table : notExistTables) {
+      transobjService.deleteAutoCrudDTO(table.getId());
+    }
+    // TODO 删除自动生成的字典表api
   }
 
   @Override
@@ -268,14 +308,22 @@ public class TableServiceImpl implements ITableService {
       }
       table.setIsAutoCrud(Constants.IS_ACTIVE);
       String className = datasource.getPackageName().concat(".").concat(table.getClassName());
-      // 保存transfer obj
-      TransferObjPO showdto = transobjService.createAutoCrudDTO(project.getId(), table.getId(),
-          table.getName(), datasource.getPackageName(), className);
+      // 获取transfer obj
+      TransferObjPO showdto = transobjService.findTransferObjByTableId(table.getId());
       // 保存api obj
       apiobjService.createAutoCrudApi(firstApibase.getId(), table.getId(),
           table.getName().toLowerCase(), table.getComments(),
           showdto.getPackageName().concat(".").concat(showdto.getName()), className,
-          datasource.getName().toLowerCase(), dbcount);
+          datasource.getName().toLowerCase(), dbcount, null);
+      // 找到关联关系
+      List<TableRelationPO> relations =
+          tableRelationRepository.findByMasterTableIdOrderByCreatedAtAsc(table.getId());
+      for (TableRelationPO relation : relations) {
+        // 创建主从关系crud api
+        apiobjService.createAutoCruApiForRelation(firstApibase.getId(), relation,
+            showdto.getPackageName().concat(".").concat(showdto.getName()),
+            datasource.getName().toLowerCase(), dbcount);
+      }
     }
     // 保存tables
     this.saveNewTables(tables);
@@ -295,8 +343,6 @@ public class TableServiceImpl implements ITableService {
       table.setIsAutoCrud(Constants.IS_INACTIVE);
       // 删除api
       apiobjService.deleteAutoCrudApi(table.getId());
-      // 删除transobj
-      transobjService.deleteAutoCrudDTO(table.getId());
     }
     // 保存tables
     this.saveNewTables(tables);
@@ -304,9 +350,6 @@ public class TableServiceImpl implements ITableService {
 
   @Override
   public TransferObjPO transColumnPOToTransPO(String tableId) {
-    if (transobjService.checkIfIsDefaultDto(tableId)) {
-      return transobjService.getDefaultDtoByName(tableId);
-    }
     // 获取表信息
     TablePO table = tableRepository.findOne(tableId);
     // 获取字段信息
@@ -341,7 +384,6 @@ public class TableServiceImpl implements ITableService {
       throw new CodeCommonException("数据库查无此数据");
     }
   }
-
 
   /**
    * 生成实体代码
@@ -402,10 +444,32 @@ public class TableServiceImpl implements ITableService {
    * @param tableRelation
    */
   @Override
+  @Transactional("jpaTransactionManager")
   public TableRelationPO saveTableRelation(TableRelationPO tableRelation) {
     TableRelationPO trp = tableRelationRepository.save(tableRelation);
-    TablePO tp = tableRepository.findOne(trp.getSlaveTableId());
-    trp.setSlaveTableName(tp.getName());
+    TablePO stp = tableRepository.findOne(trp.getSlaveTableId());
+    DatasourcePO datasource = datasourceService.findById(stp.getDatasourceId());
+    TablePO mtp = tableRepository.findOne(trp.getMasterTableId());
+    trp.setMasterTableName(mtp.getName());
+    trp.setSlaveTableName(stp.getName());
+    trp.setMasterClassName(datasource.getPackageName().concat(".").concat(mtp.getClassName()));
+    trp.setSlaveClassName(datasource.getPackageName().concat(".").concat(stp.getClassName()));
+    // 获取从表dto
+    TransferObjPO dto = transobjService.findTransferObjByTableId(stp.getId());
+    // 创建主从表crud
+    // 获得该项目datasource的数目
+    Long dbcount = datasourceService.countByProjectId(datasource.getProjectId());
+    // 获取最早版本的api base
+    ApiBasePO firstApibase =
+        apibaseService.findEarlestApiBaseByProjectId(datasource.getProjectId());
+    // 如果为空则创建默认
+    if (null == firstApibase) {
+      throw new CodeCommonException("没有找到API版本, 请先创建Api版本");
+    }
+    // 创建主从关系crud api
+    apiobjService.createAutoCruApiForRelation(firstApibase.getId(), tableRelation,
+        dto.getPackageName().concat(".").concat(dto.getName()), datasource.getName().toLowerCase(),
+        dbcount);
     return trp;
   }
 
@@ -416,7 +480,13 @@ public class TableServiceImpl implements ITableService {
    * @param slaveTableId
    */
   @Override
+  @Transactional("jpaTransactionManager")
   public void deletTableRelation(String id) {
+    TableRelationPO relation = tableRelationRepository.findOne(id);
+    if (null != relation) {
+      // 删除主从关系api
+      apiobjService.deleteRelationCrudApi(relation.getMasterTableId(), relation.getSlaveTableId());
+    }
     tableRelationRepository.delete(id);
   }
 
@@ -454,5 +524,206 @@ public class TableServiceImpl implements ITableService {
       tableRelationPO.setMasterTableName(tp.getName());
     }
     return result;
+  }
+
+  /**
+   * 高级关联保存
+   */
+  @Override
+  @Transactional("jpaTransactionManager")
+  public TableSeniorRelationPO saveTableSeniorRelation(TableSeniorRelationPO tableSeniorRelation) {
+    if (StringUtils.isEmpty(tableSeniorRelation.getId())) {
+      TableSeniorRelationPO tsr = seniorRelationRepository.save(tableSeniorRelation);
+      tableSeniorRelation.setId(tsr.getId());
+    } else {
+      // 获取该关系所有从表
+      List<TableSeniorSlavePO> sspList =
+          tableSeniorSlaveRepository.findBySeniorIdOrderByCreatedAtAsc(tableSeniorRelation.getId());
+      for (TableSeniorSlavePO ssp : sspList) {
+        // 获取从表下 所有关联字段
+        List<TableSeniorColumnPO> cpList =
+            tableSeniorColumnRepository.findBySeniorSlaveIdOrderByCreatedAtAsc(ssp.getId());
+        for (TableSeniorColumnPO po : cpList) {
+          tableSeniorColumnRepository.delete(po.getId());
+        }
+        tableSeniorSlaveRepository.delete(ssp.getId());
+      }
+    }
+    for (TableSeniorSlavePO ssp : tableSeniorRelation.getRelationTables()) {
+      ssp.setSeniorId(tableSeniorRelation.getId());
+      TableSeniorSlavePO po = tableSeniorSlaveRepository.save(ssp);
+      for (TableSeniorColumnPO cp : ssp.getRelationColumns()) {
+        cp.setSeniorSlaveId(po.getId());
+        tableSeniorColumnRepository.save(cp);
+      }
+    }
+
+    // 更新dto和crud api
+    this.updateSeniorDTOAndCrudApi(tableSeniorRelation.getMasterTableId());
+
+    return null;
+  }
+
+  /**
+   * 更新高级查询dto和crud api
+   * 
+   * @param tableId
+   */
+  private void updateSeniorDTOAndCrudApi(String tableId) {
+    // 通过id获取datasource
+    TablePO stp = tableRepository.findOne(tableId);
+    DatasourcePO datasource = datasourceService.findById(stp.getDatasourceId());
+    // 获得该项目datasource的数目
+    Long dbcount = datasourceService.countByProjectId(datasource.getProjectId());
+    // 获取最早版本的api base
+    ApiBasePO firstApibase =
+        apibaseService.findEarlestApiBaseByProjectId(datasource.getProjectId());
+    // 获取所有的关联关系
+    List<TableSeniorRelationPO> ssrList =
+        seniorRelationRepository.findByMasterTableIdOrderByCreatedAtAsc(tableId);
+    // 删除dto
+    transobjService.deleteSeniorTransferObj(tableId);
+    // 删除api
+    apiobjService.deleteRelationCrudApi(tableId, Constants.API_SENIOR_TAG);
+    if (!ssrList.isEmpty()) {
+      // 获取关联关系id
+      List<String> seniorIds = Lists.newArrayList();
+      List<String> relationCounts = Lists.newArrayList();
+      int i = 1;
+      for (TableSeniorRelationPO relation : ssrList) {
+        seniorIds.add(relation.getId());
+        relationCounts.add(Constants.API_SENIOR_RELATION_INFIX + i);
+        i++;
+      }
+      // 获取所有从表
+      TableSeniorRelationPO tsr = ssrList.get(0);
+      tsr.setRelationTables(
+          tableSeniorSlaveRepository.findBySeniorIdInOrderByCreatedAtAsc(seniorIds));
+      // 更新实体
+      List<TransferObjPO> dtos = transobjService.updateAutoCrudSeniorDTO(datasource.getProjectId(),
+          datasource.getPackageName(), tsr);
+      // 关联实体
+      String dtoName = dtos.get(0).getPackageName().concat(".").concat(dtos.get(0).getName());
+      // 返回关联实体
+      String rdtoName = dtos.get(1).getPackageName().concat(".").concat(dtos.get(1).getName());
+      // 创建api
+      apiobjService.createAutoCrudApi(firstApibase.getId(), tableId,
+          stp.getName().concat("_senior"), stp.getComments(), rdtoName, dtoName,
+          datasource.getName(), dbcount, relationCounts);
+    }
+  }
+
+  /**
+   * 获取高级关联所有sql
+   */
+  @Override
+  public List<TableSeniorRelationPO> findTableSeniorRelationSqlList(String masterTableId) {
+
+    // 获取该表所有高级关系
+    List<TableSeniorRelationPO> tsrList =
+        seniorRelationRepository.findByMasterTableIdOrderByCreatedAtAsc(masterTableId);
+    for (TableSeniorRelationPO tsr : tsrList) {
+      String sql = "select * from <b>" + tsr.getMasterTableName() + "</b>";
+      // 获取该关系所有从表
+      List<TableSeniorSlavePO> sspList =
+          tableSeniorSlaveRepository.findBySeniorIdOrderByCreatedAtAsc(tsr.getId());
+      for (TableSeniorSlavePO ssp : sspList) {
+        sql += " <br>" + ssp.getRelation() + " <b>" + ssp.getSlaveTableName() + "</b>";
+        sql += " on" + "<br>";
+        // 获取从表下 所有关联字段
+        List<TableSeniorColumnPO> cpList =
+            tableSeniorColumnRepository.findBySeniorSlaveIdOrderByCreatedAtAsc(ssp.getId());
+        for (TableSeniorColumnPO po : cpList) {
+          sql += " <b>&nbsp;&nbsp;" + tsr.getMasterTableName() + "." + po.getMasterColumnName()
+              + "</b>" + po.getOperate() + "<b>" + ssp.getSlaveTableName() + "."
+              + po.getSlaveColumnName() + "</b>";
+        }
+      }
+      tsr.setSql(sql);
+    }
+    return tsrList;
+  }
+
+  /**
+   * 删除高级关联关系
+   */
+  @Override
+  @Transactional("jpaTransactionManager")
+  public void deletTableSeniorRelation(String id) {
+    // 获取该表所有高级关系
+    TableSeniorRelationPO tsr = seniorRelationRepository.findOne(id);
+    // 获取该关系所有从表
+    List<TableSeniorSlavePO> sspList =
+        tableSeniorSlaveRepository.findBySeniorIdOrderByCreatedAtAsc(tsr.getId());
+    for (TableSeniorSlavePO ssp : sspList) {
+      // 获取从表下 所有关联字段
+      List<TableSeniorColumnPO> cpList =
+          tableSeniorColumnRepository.findBySeniorSlaveIdOrderByCreatedAtAsc(ssp.getId());
+      for (TableSeniorColumnPO po : cpList) {
+        tableSeniorColumnRepository.delete(po.getId());
+      }
+      tableSeniorSlaveRepository.delete(ssp.getId());
+    }
+    seniorRelationRepository.delete(id);
+
+    // 更新dto和crud api
+    this.updateSeniorDTOAndCrudApi(tsr.getMasterTableId());
+  }
+
+  /**
+   * 根据id获取指定高级关联关系表
+   * 
+   * @param id
+   * @return
+   */
+  @Override
+  public TableSeniorRelationPO findOnetableSeniorRelation(String id) {
+    // 获取该表所有高级关系
+    TableSeniorRelationPO tsr = seniorRelationRepository.findOne(id);
+    // 获取该关系所有从表
+    List<TableSeniorSlavePO> sspList =
+        tableSeniorSlaveRepository.findBySeniorIdOrderByCreatedAtAsc(tsr.getId());
+    for (TableSeniorSlavePO ssp : sspList) {
+      // 获取从表下 所有关联字段
+      List<TableSeniorColumnPO> cpList =
+          tableSeniorColumnRepository.findBySeniorSlaveIdOrderByCreatedAtAsc(ssp.getId());
+      ssp.setRelationColumns(cpList);
+    }
+    tsr.setRelationTables(sspList);
+    return tsr;
+  }
+
+  @Override
+  public List<String> findIdByDatasourceIdIn(List<String> datasourceIds) {
+    return tableRepository.findIdByDatasourceIdIn(datasourceIds);
+  }
+
+  @Override
+  public Long deleteByDatasourceIdIn(List<String> datasourceIds) {
+    return tableRepository.deleteByDatasourceIdIn(datasourceIds);
+  }
+
+  /**
+   * 是否启用表
+   */
+  @Override
+  public Boolean isDictionary(String tableId) {
+    //是否启用字典表
+    Boolean dictFlag = false;
+    // 获取表信息
+    TablePO table = tableRepository.findOne(tableId);
+    // 获取对应的数据源
+    DatasourcePO datasource = datasourceService.findById(table.getDatasourceId());
+    // 获取项目的信息
+    ProjectPO project = projectRepo.findOne(datasource.getProjectId());
+    //判断是否启用字符串
+    for (String str : project.getComponents().split(",")){
+      if(Dictionary.dictionary.toString().equals(str)){
+        dictFlag = true;
+      }else{
+        dictFlag = false;
+      }
+    }
+    return dictFlag;
   }
 }
