@@ -19,7 +19,7 @@ import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import ${packageName}.dto.other.UiConfigDTO;
 import ${packageName}.dto.other.RequestUiConfigDTO;
 import ${packageName}.service.IUiConfigService;
-import com.changan.demo.common.RestStatus;
+import ${packageName}.common.RestStatus;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -180,10 +180,10 @@ public class DictApiController implements DictApi {
    * 查询所有DictType
    */
   @Override
-  public ResponseEntity<ResultDTO> dictTypeAllGet() {
+  public ResponseEntity<ResultDTO> dictTypeAllGet(@PathVariable String tableId) {
     // 查询所有DictType
     return new ResponseEntity<ResultDTO>(new ResultDictDTO()
-        .DictTypes(dictService.findAllDictType()).message(RestStatus.RESULT_SUCCESS.message())
+        .DictTypes(columnService.findDictTypes(tableId)).message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
 

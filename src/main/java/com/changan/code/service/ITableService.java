@@ -207,4 +207,15 @@ public interface ITableService {
    */
   public Boolean isDictionary(String tableId);
 
+  /**
+   * 创建dictType
+   * @param datasource
+   */
+  public void creatDictType(DatasourcePO datasource);
+  
+  /**
+   * 创建dictValue
+   * @param datasource
+   */
+  public void creatDictValue(DatasourcePO datasource);
 }

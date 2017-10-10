@@ -28,11 +28,11 @@ lombok_version = 1.16.16
 
 hibernate_java8_version = 5.0.11.Final
 
-rescenter_rest_version = 3.5.2-SNAPSHOT
+rescenter_rest_version = 3.5.5-SNAPSHOT
 
 titan_jsonmeta_version = 0.0.10-SNAPSHOT
 
-titan_dict_version = 0.0.4-SNAPSHOT
+titan_dict_version = 0.0.5-SNAPSHOT
 
 mybatis_typehandlers_jsr310_version = 1.0.2
 

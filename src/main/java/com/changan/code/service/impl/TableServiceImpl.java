@@ -726,4 +726,24 @@ public class TableServiceImpl implements ITableService {
     }
     return dictFlag;
   }
+  
+  /**
+   * 创建dictType表
+   * @param datasource
+   */
+  @Override
+  @ChangeDatasource
+  public void creatDictType(DatasourcePO datasource){
+    databaseDao.creatDictType();
+  }
+  
+  /**
+   * 创建dictValue表
+   * @param datasource
+   */
+  @Override
+  @ChangeDatasource
+  public void creatDictValue(DatasourcePO datasource){
+    databaseDao.creatDictValue();
+  }
 }

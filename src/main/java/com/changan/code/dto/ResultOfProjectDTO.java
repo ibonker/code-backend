@@ -31,9 +31,18 @@ public class ResultOfProjectDTO extends ResultDTO {
   @ApiModelProperty(value = "项目")
   private ProjectPO project;
   
+  @JsonProperty("isDictionary")
+  @JsonPropertyDescription("字典表信息")
+  @ApiModelProperty(value = "字典表信息")
+  private String isDictionary;
+  
   public ResultOfProjectDTO project(ProjectPO project) {
     this.project = project;
     return this;
   }
   
+  public ResultOfProjectDTO isDictionary(String isDictionary){
+    this.isDictionary = isDictionary;
+    return this;
+  }
 }

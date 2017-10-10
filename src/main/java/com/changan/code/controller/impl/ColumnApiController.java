@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
@@ -68,9 +69,9 @@ public class ColumnApiController extends BaseController implements ColumnApi {
    * 保存表字段和字典表配置
    */
   @Override
-  public ResponseEntity<ResultDTO> columnAndDictSavePost(@RequestBody ResultOfColumnDTO column) {
+  public ResponseEntity<ResultDTO> columnAndDictSavePost(@RequestBody ResultOfColumnDTO column,@PathVariable String id) {
     //保存表字段和字典表配置
-    columnService.saveColumnAndDict(column);
+    columnService.saveColumnAndDict(id,column);
     return new ResponseEntity<>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }

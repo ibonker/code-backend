@@ -28,7 +28,7 @@ spring:
   security:
     rest:
       ignorePath: /login
-      matchPath: /${mainpath}/**,/logout
+      matchPath: <#if (basePaths)?? ><#list basePaths as b>${b}/**,</#list></#if>/dict/api/v1/**,/logout
   </#if>
 <#if dbcount == 1>
 mybatis:

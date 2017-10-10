@@ -119,7 +119,7 @@ public class ColumnServiceImpl implements IColumnService {
         origincolumn.javaFieldName().setColumnJavaType();
       }
     }
-
+    
     return originColumns;
   }
 
@@ -128,7 +128,7 @@ public class ColumnServiceImpl implements IColumnService {
    */
   @Override
   @Transactional("jpaTransactionManager")
-  public ResultOfColumnDTO saveColumnAndDict(ResultOfColumnDTO column) {
+  public String saveColumnAndDict(String tableId,ResultOfColumnDTO column) {
     if (column.getColumn().getDictTypeCode().indexOf(" ") != -1
         || "".equals(column.getColumn().getDictTypeCode())) {
       // 设置dictTypeCode为空
@@ -137,20 +137,15 @@ public class ColumnServiceImpl implements IColumnService {
       column.getDictType().setCode(null);
       // 保存字段
       column.setColumn(columnRepo.save(column.getColumn()));
-      // 返回保存信息
-      return column;
+      return "保存成功！";
     }
     // 保存字段
     column.setColumn(columnRepo.save(column.getColumn()));
-    if ("".equals(column.getDictType().getId()) || column.getDictType().getId() == null) {
-      column.setDictType(dictService.insertDictType(column.getDictType()));
-    } else {
-      // 保存字典表类型
-      column.setDictType(
-          dictService.updateDictType(column.getDictType().getId(), column.getDictType()));
+    // 保存字典表配置
+    if(column.getDictType().getId() == null || "".equals(column.getDictType().getId())){
+      dictService.insertDictType(this.changeDatasource(tableId), column.getDictType());
     }
-    // 返回保存信息
-    return column;
+    return "保存成功！";
   }
 
   /**
@@ -158,12 +153,8 @@ public class ColumnServiceImpl implements IColumnService {
    */
   @Override
   public void getDataSource(String tableId, DictTypePO dictType, List<DictValuePO> dictValues) {
-    // 获取dataSourceId
-    String dataSourceId = tableRepo.findOne(tableId).getDatasourceId();
-    // 获取数据源
-    DatasourcePO datasource = dataSourceRepo.findOne(dataSourceId);
     // 执行数据库操作
-    dictService.saveDictValues(datasource, dictType, dictValues);
+    dictService.saveDictValues(this.changeDatasource(tableId), dictType, dictValues);
   }
 
   /**
@@ -174,11 +165,31 @@ public class ColumnServiceImpl implements IColumnService {
    */
   @Override
   public List<DictValuePO> findTypeAndValue(String tableId, String code) {
+    // 执行查询操作
+    return dictService.findTypeAndValue(this.changeDatasource(tableId), code);
+  }
+  
+  /**
+   * 获得数据源并执行查询操作
+   * 
+   * @param tableId
+   * @param code
+   */
+  @Override
+  public List<DictTypePO> findDictTypes(String tableId) {
+    // 执行查询操作
+    return dictService.findDictTypes(this.changeDatasource(tableId));
+  }
+  
+  /**
+   * 获取数据源
+   * @param tableId
+   * @return
+   */
+  public DatasourcePO changeDatasource(String tableId){
     // 获取dataSourceId
     String dataSourceId = tableRepo.findOne(tableId).getDatasourceId();
     // 获取数据源
-    DatasourcePO datasource = dataSourceRepo.findOne(dataSourceId);
-    // 执行查询操作
-    return dictService.findTypeAndValue(datasource, code);
+    return dataSourceRepo.findOne(dataSourceId);
   }
 }

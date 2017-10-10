@@ -83,5 +83,10 @@ public interface IProjectService extends IComponentService {
    * @return
    */
   public File downloadZipUIFiles(String projectName);
-
+  
+  /**
+   * 判断是否生成dictType和dictValue表
+   * @param projectId
+   */
+  public String creatDictTable(String projectId);
 }

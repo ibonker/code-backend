@@ -59,6 +59,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 </#if>
 </#list>
+import com.changan.annotation.DictionaryType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
@@ -101,6 +102,9 @@ public class ${className} extends BaseEntity {
   @JsonPropertyDescription("${c.comments}")
   <#if c.javaType == "Date" || c.javaType == "Timestamp">
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+8")
+  </#if>
+  <#if (c.dictTypeCode)?? >
+  @DictionaryType(dictName = "${c.dictTypeCode}")
   </#if>
   private ${c.javaType} ${c.javaField};
   </#if>

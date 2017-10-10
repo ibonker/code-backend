@@ -1,6 +1,8 @@
 package com.changan.code.datasource.aspect;
 
 import java.sql.SQLException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -33,7 +35,8 @@ import com.changan.code.entity.DatasourcePO;
 public class DatasourceChangeAspect {
 
   private Logger log = LoggerFactory.getLogger(DatasourceChangeAspect.class);
-
+  
+  private Lock lock = new ReentrantLock();
   /**
    * @Description 定义切点,扫描@ChangeDatasource的方法织入切面
    */
@@ -54,6 +57,7 @@ public class DatasourceChangeAspect {
     // 通过切点获取切点方法中的DatasourceDto参数
     DatasourcePO datasource = (DatasourcePO) joinPoint.getArgs()[0];
     // 动态配置加载数据源
+    lock.lock();
     connectDB(datasource);
   }
 
@@ -64,6 +68,7 @@ public class DatasourceChangeAspect {
   public void afterChangeDb() {
     // 切换回默认数据源
     DBContextHolder.clear();
+    lock.unlock();
   }
 
   /**
@@ -73,7 +78,7 @@ public class DatasourceChangeAspect {
   private void connectDB(DatasourcePO datasource) throws SQLException {
 
     DynamicLoadDatasource loadDatasource = SpringContextHolder.getBean(DynamicLoadDatasource.class);
-
+      
     loadDatasource.addDatasource(datasource);
   }
 }

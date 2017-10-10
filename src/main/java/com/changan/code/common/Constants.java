@@ -56,4 +56,16 @@ public class Constants {
   public final static String API_CONSUMES = "application/json";
   // mybatis配置文件根路径
   public final static String MYBATIS_GEN_CONFIG_ROOT = "configfiles";
+  // dictType和dictValue都存在
+  public final static String Type_Value_Exit = "0";
+  // dictType存在dictValue不存在
+  public final static String Type_Exit = "1";
+  // dictType不存在dictValue存在
+  public final static String Value_Exit = "2";
+  // dictType,dictValue都不存在
+  public final static String Type_Value_Unexit = "3";
+  // dictType表名
+  public final static String Table_Dict_Type = "dict_type";
+  //dictValue表名
+  public final static String Table_Dict_Value = "dict_value";
 }

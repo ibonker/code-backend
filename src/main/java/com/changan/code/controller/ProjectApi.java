@@ -132,4 +132,13 @@ public interface ProjectApi {
       @ApiParam(value = "projectName", required = true) @PathVariable String projectName)
       throws FileNotFoundException;
 
+  @ApiOperation(value = "启用或关闭字典表", notes = "启用或关闭字典表", response = ResultOfProjectDTO.class,
+      tags = {"Project"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfProjectDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfProjectDTO.class)})
+  @RequestMapping(value = "/project/{id}", produces = {"application/json"},
+      method = RequestMethod.POST)
+  ResponseEntity<ResultDTO> isDictionaryPost(
+      @ApiParam(value = "id", required = true) @PathVariable String id);
 }

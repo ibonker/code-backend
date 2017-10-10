@@ -70,7 +70,7 @@ public interface IColumnService {
    * @param column
    * @return
    */
-  public ResultOfColumnDTO saveColumnAndDict(ResultOfColumnDTO column);
+  public String saveColumnAndDict(String tableId, ResultOfColumnDTO column);
   
   
   /**
@@ -89,4 +89,11 @@ public interface IColumnService {
    * @return
    */
   public List<DictValuePO>  findTypeAndValue(String tableId, String code);
+  
+  /**
+   * 获得数据源并查询
+   * @param tableId
+   * @return
+   */
+  public List<DictTypePO> findDictTypes(String tableId);
 }

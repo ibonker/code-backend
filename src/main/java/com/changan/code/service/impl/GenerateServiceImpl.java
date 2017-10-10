@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -151,11 +152,18 @@ public class GenerateServiceImpl implements IGenerateService {
 
   @Override
   public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources,
-      String basePath) {
+      List<ApiBasePO> apiBases, ApiBasePO firstApiBase) {
+    // 构建basePath数组
+    List<String> basePaths = new ArrayList<>();
+    for (ApiBasePO apiBase : apiBases) {
+      basePaths.add(apiBase.getBasePath().toLowerCase());
+    }
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     model.put("packageName", project.getPackages().toLowerCase());
-    model.put("mainpath", basePath.toLowerCase().split("/")[1]);
+    model.put("basePaths", basePaths);
+    model.put("mainpath",
+        firstApiBase == null ? "" : firstApiBase.getBasePath().toLowerCase().split("/")[1]);
     model.put("projectDesc", StringUtils.trimToEmpty(project.getDescription()));
     model.put("datasourcelist", datasources);
     model.put("moduleName", "");
@@ -247,42 +255,47 @@ public class GenerateServiceImpl implements IGenerateService {
     }
     List<RelationAnnotation> relAnns = Lists.newArrayList();
     // 添加主从关系
-    for (TableRelationPO tableRelation : table.getSlaveTableRelations()) {
-      RelationAnnotation ann = new RelationAnnotation();
-      boolean isCollection = true;
-      if ("One to One".equals(tableRelation.getRelation())) {
-        ann.setRelationType("@OneToOne");
-        imports.add("OneToOne");
-        isCollection = false;
-      } else {
-        ann.setRelationType("@OneToMany");
-        imports.add("OneToMany");
+    if (null != table.getSlaveTableRelations()) {
+      for (TableRelationPO tableRelation : table.getSlaveTableRelations()) {
+        RelationAnnotation ann = new RelationAnnotation();
+        boolean isCollection = true;
+        if ("One to One".equals(tableRelation.getRelation())) {
+          ann.setRelationType("@OneToOne");
+          imports.add("OneToOne");
+          isCollection = false;
+        } else {
+          ann.setRelationType("@OneToMany");
+          imports.add("OneToMany");
+        }
+        imports.add("masterRel");
+        ann.setCollection(isCollection);
+        ann.setMappedBy(table.getTableAttrNameLower());
+        ann.setAttrName(tableRelation.getSlaveTableNameLower().concat(isCollection ? "s" : ""));
+        ann.setAttrPOName(tableRelation.getSlaveTableNameCap().concat("PO"));
+        relAnns.add(ann);
       }
-      imports.add("masterRel");
-      ann.setCollection(isCollection);
-      ann.setMappedBy(table.getTableAttrNameLower());
-      ann.setAttrName(tableRelation.getSlaveTableNameLower().concat(isCollection ? "s" : ""));
-      ann.setAttrPOName(tableRelation.getSlaveTableNameCap().concat("PO"));
-      relAnns.add(ann);
     }
+    
     // 添加从主关系
-    for (TableRelationPO tableRelation : table.getMasterTableRelations()) {
-      RelationAnnotation ann = new RelationAnnotation();
-      boolean isCollection = false;
-      if ("One to One".equals(tableRelation.getRelation())) {
-        ann.setRelationType("@OneToOne");
-        imports.add("OneToOne");
-      } else {
-        ann.setRelationType("@ManyToOne");
-        imports.add("ManyToOne");
+    if (null != table.getMasterTableRelations()) {
+      for (TableRelationPO tableRelation : table.getMasterTableRelations()) {
+        RelationAnnotation ann = new RelationAnnotation();
+        boolean isCollection = false;
+        if ("One to One".equals(tableRelation.getRelation())) {
+          ann.setRelationType("@OneToOne");
+          imports.add("OneToOne");
+        } else {
+          ann.setRelationType("@ManyToOne");
+          imports.add("ManyToOne");
+        }
+        imports.add("slaveRel");
+        ann.setCollection(isCollection);
+        ann.setAttrName(tableRelation.getMasterTableNameLower().concat(isCollection ? "s" : ""));
+        ann.setAttrPOName(tableRelation.getMasterTableNameCap().concat("PO"));
+        ann.setColumnName(tableRelation.getSlaveColumnName());
+        ann.setRefColumnName(tableRelation.getMasterColumnName());
+        relAnns.add(ann);
       }
-      imports.add("slaveRel");
-      ann.setCollection(isCollection);
-      ann.setAttrName(tableRelation.getMasterTableNameLower().concat(isCollection ? "s" : ""));
-      ann.setAttrPOName(tableRelation.getMasterTableNameCap().concat("PO"));
-      ann.setColumnName(tableRelation.getSlaveColumnName());
-      ann.setRefColumnName(tableRelation.getMasterColumnName());
-      relAnns.add(ann);
     }
     // 添加model
     Map<String, Object> model = Maps.newHashMap();

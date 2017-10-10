@@ -6,6 +6,7 @@ package com.changan.code.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,7 +74,9 @@ public interface ColumnApi {
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
           @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
-  @RequestMapping(value = "/column/dict/save", produces = {"application/json"},
+  @RequestMapping(value = "table/{id}/column/dict/save", produces = {"application/json"},
       method = RequestMethod.POST)
-  public ResponseEntity<ResultDTO> columnAndDictSavePost(@RequestBody ResultOfColumnDTO columnDTO);  
+  public ResponseEntity<ResultDTO> columnAndDictSavePost(
+      @RequestBody ResultOfColumnDTO columnDTO,
+      @PathVariable String id);  
 }

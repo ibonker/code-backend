@@ -499,16 +499,19 @@ public class ApiObjServiceImpl implements IApiObjService {
   /**
    * 生成api
    * 
-   * @param apiBaseId
-   * @param tableId
-   * @param uri
-   * @param name
-   * @param dtoName
-   * @param desc
-   * @param genericName
-   * @param produces
-   * @param description
+   * @param apiBaseId api版本id
+   * @param tableId 对应的表id
+   * @param tableName 对应的表名
+   * @param prefixName 数据库名
+   * @param uri 
+   * @param name 对应controller方法名
+   * @param dtoName 返回实体名
+   * @param desc 描述
+   * @param genericType 泛型类型
+   * @param genericName 泛型实体名称
+   * @param produces 
    * @param requestMethod
+   * @param relateTableId 关联的表名
    * @return
    */
   private ApiObjPO genApiObjPO(String apiBaseId, String tableId, String tableName,

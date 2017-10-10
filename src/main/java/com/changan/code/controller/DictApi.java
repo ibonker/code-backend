@@ -133,8 +133,8 @@ public interface DictApi {
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultPageDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
-  @RequestMapping(value = "/dict_type", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,method = RequestMethod.GET)
-  ResponseEntity<ResultDTO> dictTypeAllGet();
+  @RequestMapping(value = "/table/{tableId}/dict_type", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> dictTypeAllGet(@PathVariable String tableId);
   
   @ApiOperation(value = "DictValue批量保存", notes = "DictValue批量保存", response = ResultPageDTO.class,
       tags = {"Dict"})

@@ -90,11 +90,18 @@ public interface IDictService {
    * 查询所有dictType
    * @return
    */
-  public List<DictTypePO> findAllDictType();
+  public List<DictTypePO> findDictTypes(DatasourcePO datasource);
   
   /**
    * 查询指定Type下的value
    * @return
    */
   public List<DictValuePO> findTypeAndValue(DatasourcePO datasource, String code);
+  
+  /**
+   * 新增DictType
+   * @param datasource
+   * @param dictType
+   */
+  public void insertDictType(DatasourcePO datasource, DictTypePO dictType);
 }

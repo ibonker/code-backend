@@ -156,8 +156,10 @@
 		</if>
 	</select>
 
-	<select id="findDictValueByCode" parameterType = "String" resultType="com.changan.code.entity.DictValuePO">
-		SELECT * FROM dict_value WHERE dict_code = #{dictCode} AND del_flag = #{delFlag}
+	<select id="findDictValueByCode" parameterType="String"
+		resultType="com.changan.code.entity.DictValuePO">
+		SELECT * FROM dict_value WHERE dict_code = #{dictCode} AND
+		del_flag = #{delFlag}
 	</select>
 
 	<insert id="saveDictValue" parameterType="com.changan.code.entity.DictValuePO">
@@ -175,18 +177,23 @@
 	<update id="updateDictValue" parameterType="com.changan.code.entity.DictValuePO">
 		UPDATE dict_value
 		SET
-		name = #{dictValue.name}, value = #{dictValue.value}, dict_code = #{dictValue.dictCode}, sort = #{dictValue.sort},
-		created_by = #{dictValue.createdBy}, created_at = #{dictValue.createdAt},updated_by = #{dictValue.updatedBy}, 
+		name = #{dictValue.name}, value = #{dictValue.value}, dict_code =
+		#{dictValue.dictCode}, sort = #{dictValue.sort},
+		created_by =
+		#{dictValue.createdBy}, created_at = #{dictValue.createdAt},updated_by
+		= #{dictValue.updatedBy},
 		updated_at = #{dictValue.updatedAt}
 		WHERE id = #{dictValue.id}
 	</update>
 
 	<update id="deleteDictValue" parameterType="String">
-		UPDATE dict_value SET del_flag = #{delFlag} WHERE id = #{id}
+		UPDATE dict_value SET
+		del_flag = #{delFlag} WHERE id = #{id}
 	</update>
 
 	<update id="deleteDictValues" parameterType="String">
-		UPDATE dict_value SET del_flag = #{delFlag}
+		UPDATE dict_value
+		SET del_flag = #{delFlag}
 		WHERE
 		dict_code
 		= #{dictCode}
@@ -194,7 +201,8 @@
 
 	<select id="findDictTypeByCode" parameterType="String"
 		resultType="Integer">
-		SELECT count(1) FROM dict_type WHERE code = #{code} AND del_flag = #{delFlag}
+		SELECT count(1) FROM dict_type WHERE code = #{code} AND
+		del_flag = #{delFlag}
 	</select>
 
 	<insert id="insertDictType" parameterType="com.changan.code.entity.DictTypePO">
@@ -206,4 +214,37 @@
 		#{dictType.name}, #{dictType.createdBy}, #{dictType.createdAt},
 		#{dictType.updatedBy}, #{dictType.updatedAt}, #{dictType.delFlag})
 	</insert>
+
+	<select id="findDictTypes" parameterType="String"
+		resultType="com.changan.code.entity.DictTypePO">
+		SELECT * FROM dict_type WHERE del_flag = #{delFlag}
+	</select>
+
+	<update id="creatDictType">
+		create table dict_type (
+		id varchar(64) not null primary key,
+		code varchar(64) not null,
+		name varchar(255) not null,
+		created_by varchar(64),
+		created_at datetime not null,
+		updated_by varchar(64),
+		updated_at datetime not null,
+		del_flag char(1) not null
+		);
+	</update>
+
+	<update id="creatDictValue">
+		create table dict_value (
+		id varchar(64) not null primary key,
+		name varchar(64) not null,
+		value varchar(255) not null,
+		dict_code varchar(64) not null,
+		sort int(11) not null,
+		created_by varchar(64),
+		created_at datetime not null,
+		updated_by varchar(64),
+		updated_at datetime not null,
+		del_flag char(1) not null
+		);
+	</update>
 </mapper>

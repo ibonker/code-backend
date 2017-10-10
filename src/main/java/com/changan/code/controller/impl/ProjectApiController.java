@@ -174,4 +174,13 @@ public class ProjectApiController extends BaseController implements ProjectApi {
         .body(new InputStreamResource(new FileInputStream(file)));
   }
 
+  /**
+   * 创建字典表
+   */
+  @Override
+  public ResponseEntity<ResultDTO> isDictionaryPost(@PathVariable String id) {
+    return new ResponseEntity<>(new ResultOfProjectDTO().isDictionary(projectService.creatDictTable(id)).message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+
 }

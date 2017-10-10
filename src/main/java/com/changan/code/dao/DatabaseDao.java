@@ -107,4 +107,20 @@ public interface DatabaseDao extends CrudDao<ColumnPO> {
    * 新增dictType
    */
   void insertDictType(@Param("dictType")DictTypePO dictType);
+  
+  /**
+   * 查询所有dictType
+   * @return
+   */
+  List<DictTypePO> findDictTypes(@Param("delFlag") String delFlag);
+  
+  /**
+   * 创建dictType表
+   */
+  void creatDictType();
+  
+  /**
+   * 创建dictValue表
+   */
+  void creatDictValue();
 }

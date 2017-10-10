@@ -268,7 +268,7 @@ to   { -webkit-transform: rotate(360deg); transform: rotate(360deg);
 
 
 
-.tab-content {
+.tab-content[data-v-5af306dc] {
     background-color: #fff;
     border: 1px solid #dddee1;
     border-top: none;
@@ -276,12 +276,12 @@ to   { -webkit-transform: rotate(360deg); transform: rotate(360deg);
     width: 100%;
     padding: 16px;
 }
-.add-positon {
+.add-positon[data-v-5af306dc] {
     width: 100%;
     text-align: right;
     margin-bottom: 8px;
 }
-.tab-conf-content-block {
+.tab-conf-content-block[data-v-5af306dc] {
     background: #f5f7f9;
     width: 100%;
     height: 100%;
@@ -290,13 +290,16 @@ to   { -webkit-transform: rotate(360deg); transform: rotate(360deg);
     border-radius: 4px;
     overflow: auto;
 }
-.tab-conf-content-block .ivu-table-wrapper {
+.tab-conf-content-block .ivu-table-wrapper[data-v-5af306dc] {
     height:100%;
 }
-.regix-show-out {
+.regix-show-out[data-v-5af306dc] {
     display: none;
 }
 
+.test .ivu-modal-wrap{
+    z-index: 1001;
+}
 
 .tab-content {
     background-color: #fff;

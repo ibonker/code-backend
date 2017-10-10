@@ -45,7 +45,7 @@ public interface IGenerateService {
    * @return
    */
   public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources,
-      String basepath);
+      List<ApiBasePO> apiBases, ApiBasePO firstApiBase);
 
   /**
    * 生成实体类

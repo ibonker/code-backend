@@ -210,12 +210,14 @@ public class ProjectServiceImpl implements IProjectService {
         // 删除表和实体
         // 获取应该删除的表的id
         List<String> delTableIds = tableService.findIdByDatasourceIdIn(delDbIds);
-        // 获取应该删除的dto的id
-        List<String> delDtoIds = transObjService.findIdByGenBasedTableIdIn(delTableIds);
-        // 删除dto的field
-        transferObjFieldService.deleteByTransferObjIdIn(delDtoIds);
-        // 删除dto
-        transObjService.deleteByGenBasedTableIdIn(delTableIds);
+        if (!delTableIds.isEmpty()) {
+          // 获取应该删除的dto的id
+          List<String> delDtoIds = transObjService.findIdByGenBasedTableIdIn(delTableIds);
+          // 删除dto的field
+          transferObjFieldService.deleteByTransferObjIdIn(delDtoIds);
+          // 删除dto
+          transObjService.deleteByGenBasedTableIdIn(delTableIds);
+        }
         // 删除表
         tableService.deleteByDatasourceIdIn(delDbIds);
         // 删除数据源
@@ -331,9 +333,11 @@ public class ProjectServiceImpl implements IProjectService {
     // 获取表map
     Map<String, TablePO> alltablemap = Maps.newHashMap();
     // 获取最新的apibase
-    ApiBasePO firstApibase = apiBaseService.findEarlestApiBaseByProjectId(id);
+    List<ApiBasePO> ApiBases = apiBaseService.findAllApiBase(id);
+    // 获取最新的apibase
+    ApiBasePO firstApiBase = apiBaseService.findEarlestApiBaseByProjectId(id);
     // 生成配置文件代码
-    generateService.generateConfigFiles(project, datasources, firstApibase.getBasePath());
+    generateService.generateConfigFiles(project, datasources, ApiBases, firstApiBase);
     // 查询对应项目下的DTO信息
     List<TransferObjPO> transferObjs = transObjService.findAllTransferObj(id);
     // 需要创建service的表
@@ -524,7 +528,7 @@ public class ProjectServiceImpl implements IProjectService {
   }
 
   /**
-   * TODO 生成高级查询的Mapper, Mapper.xml, Service
+   * 生成高级查询的Mapper, Mapper.xml, Service
    * 
    * @param project
    * @param alltablemap
@@ -557,7 +561,7 @@ public class ProjectServiceImpl implements IProjectService {
       // 创建service
       generateService.generateIServiceAndServiceImpl(datasource.getPackageName(), project.getName(),
           project.getPackages(), seniorTableName, null, relations, true);
-      // TODO 创建mapper文件
+      // 创建mapper文件
       int i = 1;
       for (TableSeniorRelationPO relation : relations) {
         // 关系包含的表
@@ -710,5 +714,73 @@ public class ProjectServiceImpl implements IProjectService {
       }
     }
     return false;
+  }
+
+  /**
+   * 判断是否生成dictType和dictValue表
+   */
+  @Override
+  public String creatDictTable(String projectId) {
+    // 获取compoent
+    String compoents = projectRepo.findOne(projectId).getComponents();
+    // 创建判断表示
+    Boolean dictFlag = false;
+    // 判断是否启用字典表
+    for (String compoent : compoents.split(",")) {
+      if (Dictionary.dictionary.toString().equals(compoent)) {
+        dictFlag = true;
+      }
+    }
+    if (dictFlag) {
+      // 获取数据源列表
+      List<DatasourcePO> datasources = datasourceService.findByProjectId(projectId);
+      for (DatasourcePO datasource : datasources) {
+        // 判断数据源中是否存在表
+        switch (this.isExist(datasource)) {
+          case Constants.Type_Value_Exit:
+            break;
+          case Constants.Type_Value_Unexit:
+            tableService.creatDictType(datasource);
+            tableService.creatDictValue(datasource);
+            break;
+          case Constants.Value_Exit:
+            tableService.creatDictType(datasource);
+            break;
+          case Constants.Type_Exit:
+            tableService.creatDictValue(datasource);
+            break;
+        }
+      }
+      return "字典表已启用";
+    } else {
+      return "字典表已关闭";
+    }
+  }
+
+  /**
+   * 判断表是否存在
+   */
+  public String isExist(DatasourcePO datasource) {
+    // 创建判断条件
+    String check = Constants.Type_Value_Unexit;
+    // 创建判断标识
+    int exitNum = 0;
+    // 查询副数据库
+    List<TablePO> originalTables = tableService.findTableListFromOriginalDatasource(datasource);
+    // 返回判断结果
+    for (TablePO table : originalTables) {
+      if (Constants.Table_Dict_Type.equals(table.getName())) {
+        check = Constants.Type_Exit;
+        exitNum++;
+      }
+      if (Constants.Table_Dict_Value.equals(table.getName())) {
+        check = Constants.Value_Exit;
+        exitNum++;
+      }
+    }
+    if (exitNum == 2) {
+      check = Constants.Type_Value_Exit;
+    }
+    return check;
   }
 }

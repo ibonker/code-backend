@@ -421,17 +421,35 @@ public class DictServiceImpl implements IDictService {
    * 查询所有DictType
    */
   @Override
-  public List<DictTypePO> findAllDictType() {
-    return dictTypeRepo.findByDelFlag(Constants.DATA_IS_NORMAL);
+  @ChangeDatasource
+  public List<DictTypePO> findDictTypes(DatasourcePO datasource) {
+    return databaseDao.findDictTypes(Constants.DATA_IS_NORMAL);
   }
 
   /**
-   * 查询指定Type下的value
+   * 查询指定DictType下的value
    */
   @Override
   @ChangeDatasource
   public List<DictValuePO> findTypeAndValue(DatasourcePO datasource, String code) {
     //查询指定type下所有的value
     return databaseDao.findDictValueByCode(code, Constants.DATA_IS_NORMAL);
+  }
+  
+  /**
+   * 新增DictType
+   * @param datasource
+   * @param dictType
+   */
+  @Override
+  @ChangeDatasource
+  public void insertDictType(DatasourcePO datasource, DictTypePO dictType){
+    //查询DictTyp是否存在
+    int isExist = databaseDao.findDictTypeByCode(dictType.getCode(), Constants.DATA_IS_NORMAL);
+    //如果不存在DictType则新增
+    if(isExist == 0){
+      dictType.preInsert();
+      databaseDao.insertDictType(dictType);
+    }
   }
 }
