@@ -17,7 +17,7 @@ public enum ConfigFile {
   metaConfiguration("config/metaConfiguration.xml"),
   buildGradle("gradle/build.xml"), 
   propertiesGradle("gradle/property.xml"), 
-  mvcConfig("config/mvcConfiguration.xml"),
+//  mvcConfig("config/mvcConfiguration.xml"),
   swaggerConfig("config/swaggerConfiguration.xml"),
   basecontroller("controller/controllerBase.xml"),
   commonException("exception/commonException.xml"),

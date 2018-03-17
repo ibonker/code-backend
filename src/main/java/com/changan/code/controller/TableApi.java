@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.dto.RequestOfTableIdsDTO;
@@ -108,57 +107,62 @@ public interface TableApi {
   @RequestMapping(value = "/tables/{tableId}/generate/code", produces = {"application/json"},
       method = RequestMethod.GET)
   ResponseEntity<ResultDTO> columnsGenerateCodeGet(
-      @ApiParam(value = "tableId", required = true) @PathVariable String tableId);
+      @ApiParam(value = "tableId", required = true) @PathVariable String tableId)
+      throws FileNotFoundException;
 
-  @ApiOperation(value = "下载项目代码", notes = "下载项目代码", response = InputStreamResource.class,
-      tags = {"Table"})
+  @ApiOperation(value = "下载实体及Mapper代码", notes = "下载实体代码及Mapper代码",
+      response = InputStreamResource.class, tags = {"Table"})
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = InputStreamResource.class),
           @ApiResponse(code = 200, message = "返回错误信息", response = InputStreamResource.class)})
-  @RequestMapping(value = "/tables/download",
-      produces = {"application/octet-stream"}, method = RequestMethod.GET)
-  ResponseEntity<InputStreamResource> projectsDownloadGet(
-      @ApiParam(value = "tableId", required = true) @RequestParam String tableId)
+  @RequestMapping(value = "/tables/{tableName}/download", produces = {"application/octet-stream"},
+      method = RequestMethod.GET)
+  ResponseEntity<InputStreamResource> tableDownloadGet(
+      @ApiParam(value = "tableName", required = true) @PathVariable String tableName)
       throws FileNotFoundException;
-  
+
   /**
    * 新增restFul关联表
    */
-  @ApiOperation(value = "新增restFul关联表", notes = "新增restFul关联表", response = ResultDTO.class, tags = {"Table"})
+  @ApiOperation(value = "新增restFul关联表", notes = "新增restFul关联表", response = ResultDTO.class,
+      tags = {"Table"})
   @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/tables/relations/save", produces = {"application/json"},
       method = RequestMethod.PUT)
   ResponseEntity<ResultDTO> tablesRelationSavePut(
       @ApiParam(value = "表关联关系对象", required = false) @RequestBody TableRelationPO tableRelation);
-  
+
   /**
    * 根据id删除tableRelation
+   * 
    * @param id
    * @return
    */
-  @ApiOperation(value = "根据id删除tableRelation", notes = "根据id删除tableRelation", response = ResultDTO.class,
-      tags = {"Table"})
-  @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @ApiOperation(value = "根据id删除tableRelation", notes = "根据id删除tableRelation",
+      response = ResultDTO.class, tags = {"Table"})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/tables/relations/{id}/delete", produces = {"application/json"},
       method = RequestMethod.DELETE)
   ResponseEntity<ResultDTO> deletTableRelation(
       @ApiParam(value = "id") @PathVariable(value = "id", required = true) String id);
-  
+
   /**
    * 根据id获取所有关联关系表
+   * 
    * @param id
    * @return
    */
-  @ApiOperation(value = "根据id获取tableRelations", notes = "根据id获取tableRelations", response = ResultDTO.class,tags = {"Table"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
-  @RequestMapping(value = "/tables/{id}/relations", produces = {"application/json"},method = RequestMethod.GET)
-  ResponseEntity<ResultDTO> tableRelationList(@ApiParam(value = "id", required = true) @PathVariable(name="id") String id);
-  
+  @ApiOperation(value = "根据id获取tableRelations", notes = "根据id获取tableRelations",
+      response = ResultDTO.class, tags = {"Table"})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/{id}/relations", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> tableRelationList(
+      @ApiParam(value = "id", required = true) @PathVariable(name = "id") String id);
+
   /**
    * 新增高级关联表
    */
@@ -167,45 +171,51 @@ public interface TableApi {
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/tables/seniorRelations/save", produces = {"application/json"},
       method = RequestMethod.PUT)
-  ResponseEntity<ResultDTO> tablesSeniorRelationSavePut(
-      @ApiParam(value = "表高级关联关系对象", required = false) @RequestBody TableSeniorRelationPO tableSeniorRelation);
-  
+  ResponseEntity<ResultDTO> tablesSeniorRelationSavePut(@ApiParam(value = "表高级关联关系对象",
+      required = false) @RequestBody TableSeniorRelationPO tableSeniorRelation);
+
   /**
    * 根据id获取所有高级关联关系表
+   * 
    * @param id
    * @return
    */
-  @ApiOperation(value = "根据id获取所有高级关联关系", notes = "根据id获取所有高级关联关系", response = ResultDTO.class,tags = {"Table"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
-  @RequestMapping(value = "/tables/{id}/seniorRelations", produces = {"application/json"},method = RequestMethod.GET)
-  ResponseEntity<ResultDTO> tableSeniorRelationList(@ApiParam(value = "id", required = true) @PathVariable(name="id") String id);
-  
+  @ApiOperation(value = "根据id获取所有高级关联关系", notes = "根据id获取所有高级关联关系", response = ResultDTO.class,
+      tags = {"Table"})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/{id}/seniorRelations", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> tableSeniorRelationList(
+      @ApiParam(value = "id", required = true) @PathVariable(name = "id") String id);
+
   /**
    * 根据id删除高级关联关系
+   * 
    * @param id
    * @return
    */
   @ApiOperation(value = "根据id删除高级关联关系", notes = "根据id删除高级关联关系", response = ResultDTO.class,
       tags = {"Table"})
-  @ApiResponses(
-      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/tables/seniorRelations/{id}/delete", produces = {"application/json"},
       method = RequestMethod.DELETE)
   ResponseEntity<ResultDTO> deletTableSeniorRelation(
       @ApiParam(value = "id") @PathVariable(value = "id", required = true) String id);
-  
+
   /**
    * 根据id获取指定高级关联关系表
+   * 
    * @param id
    * @return
    */
-  @ApiOperation(value = "根据id获取指定高级关联关系表", notes = "根据id获取指定高级关联关系表", response = ResultDTO.class,tags = {"Table"})
-  @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
-          @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
-  @RequestMapping(value = "/tables/seniorRelations/{id}", produces = {"application/json"},method = RequestMethod.GET)
-  ResponseEntity<ResultDTO> tableSeniorRelation(@ApiParam(value = "id", required = true) @PathVariable(name="id") String id);
+  @ApiOperation(value = "根据id获取指定高级关联关系表", notes = "根据id获取指定高级关联关系表", response = ResultDTO.class,
+      tags = {"Table"})
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultDTO.class),
+      @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
+  @RequestMapping(value = "/tables/seniorRelations/{id}", produces = {"application/json"},
+      method = RequestMethod.GET)
+  ResponseEntity<ResultDTO> tableSeniorRelation(
+      @ApiParam(value = "id", required = true) @PathVariable(name = "id") String id);
 }

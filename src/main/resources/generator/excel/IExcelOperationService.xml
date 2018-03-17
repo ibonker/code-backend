@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>IExcelOperationService</name>
+  <filePath>src/main/java/${packageName}/service/excel/</filePath>
+  <fileName>IExcelOperationService.java</fileName>
+  <content><![CDATA[
+package ${packageName}.service.excel;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import ${packageName}.dto.excel.ExcelExportTempDTO;
+import ${packageName}.dto.excel.ExcelDTO;
+import ${packageName}.dto.excel.ExcelImportDTO;
+
+/**
+ * 通用excel导入导出方法声明接口
+ * @author TitanCode2
+ */
+public interface IExcelOperationService {
+  
+  /**
+   * 导出模版
+   * 
+   * @param columns
+   * @param request
+   */
+  public byte[] exportTemplate(ExcelDTO excelDTO);
+
+  /**
+   * 导出数据到excel
+   */
+  public byte[] exportExcel(ExcelDTO excelDTO) throws IOException;
+
+  /**
+   * 复制excel的sheet
+   */
+  public void copySheets(XSSFWorkbook wbCreat, XSSFWorkbook wbOld) throws IOException;
+
+  /**
+   * 从excel导入数据
+   */
+  public List<Map<String, Object>> importExcel(ExcelImportDTO excelDTO);
+
+  /**
+   * 构建sql并导入数据
+   * 
+   * @param excelDTO
+   * @param Msg
+   */
+  public void createSQL(ExcelImportDTO excelDTO, Map<String, Object> Msg);
+
+  /**
+   * 保存数据到excel的sheet
+   * 
+   * @param Msg
+   * @param sheet
+   * @param excelDTO
+   * @param intcellStyle
+   * @param floatcellStyle
+   * @param datecellStyle
+   * @param datetimecellStyle
+   * @param cellBasicStyle
+   */
+  public void putValueToCell(ExcelExportTempDTO data, XSSFSheet sheet, XSSFCellStyle intcellStyle,
+      XSSFCellStyle floatcellStyle, XSSFCellStyle datecellStyle, XSSFCellStyle datetimecellStyle,
+      XSSFCellStyle cellTitleStyle, XSSFCellStyle cellHeaderStyle);
+}
+]]>
+  </content>
+</template>

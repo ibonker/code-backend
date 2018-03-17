@@ -56,9 +56,6 @@ public class DictServiceImpl implements IDictService {
   DictValueRepository dictValueRepo;
 
   @Autowired
-  CacheService cacheService;
-
-  @Autowired
   DatabaseDao databaseDao;
 
   /**
@@ -67,12 +64,7 @@ public class DictServiceImpl implements IDictService {
   @Override
   public ResultDictDTO findAll(int version) {
     // 如果版本号相同则直接返回内存中的数据
-    if (Integer.valueOf(cacheService.getResultDictDTO().getVersion()) == version) {
-      return new ResultDictDTO().DictIsUpdate("0");
-    } else {
-      // 获取内存数据对象并返回
-      return cacheService.getResultDictDTO();
-    }
+    return new ResultDictDTO().DictIsUpdate("0");
   }
 
   /**
@@ -91,8 +83,6 @@ public class DictServiceImpl implements IDictService {
       dictType.updateAttrs(updateDictType);
       // 更新dictType下的dictValue
       dictValueRepo.updateByDictCode(dictType.getCode(), Constants.DATA_IS_NORMAL);;
-      // 获取内存数据,设置版本号
-      this.refreshVersion();
       // 更新数据库
       return dictTypeRepo.save(dictType);
     } else {
@@ -110,8 +100,6 @@ public class DictServiceImpl implements IDictService {
     if (dictValue != null) {
       // 更新属性
       dictValue.updateAttrs(updateDictValue);
-      // 获取内存数据，设置版本号
-      this.refreshVersion();
       // 更新数据库
       return dictValueRepo.save(dictValue);
     } else {
@@ -138,8 +126,6 @@ public class DictServiceImpl implements IDictService {
         // 根据DicteTypeId删除DictValue
         dictValueRepo.modifyByDictCode(dictType.getCode(), Constants.DATA_IS_INVALID);
       }
-      // 获取内存数据，设置版本号
-      this.refreshVersion();
     } else {
       throw new CodeCommonException("需要删除的数据不存在！");
     }
@@ -154,8 +140,6 @@ public class DictServiceImpl implements IDictService {
     DictTypePO selectDictType =
         dictTypeRepo.findByCodeAndDelFlag(dictType.getCode(), Constants.DATA_IS_NORMAL);
     if (selectDictType == null) {
-      // 获取内存数据，设置版本号
-      this.refreshVersion();
       // 新增DictType
       return dictTypeRepo.save(dictType);
     } else {
@@ -181,22 +165,6 @@ public class DictServiceImpl implements IDictService {
     return dictValueRepo.findByIdAndDelFlag(id, Constants.DATA_IS_NORMAL);
   }
 
-  /**
-   * 重置版本号
-   */
-  public void refreshVersion() {
-    // 取出版本号
-    int oldVersion = cacheService.getResultDictDTO().getVersion();
-    // 更新内存数据
-    cacheService.CacheDictTypeAndValue();
-    // 获取内存数据对象
-    ResultDictDTO resultDictDTO = cacheService.getResultDictDTO();
-    // 更新版本号
-    resultDictDTO.DictVersion(oldVersion + 1);
-    // 设置是否更新标识符
-    resultDictDTO.DictIsUpdate("1");
-  }
-
 
   /**
    * 根据id删除DictValue
@@ -210,8 +178,6 @@ public class DictServiceImpl implements IDictService {
       dictValue.setDelFlag(Constants.DATA_IS_INVALID);
       // 删除dictValue
       dictValueRepo.save(dictValue);
-      // 更新版本
-      this.refreshVersion();
     } else {
       throw new CodeCommonException("需要删除的数据不存在！");
     }
@@ -224,8 +190,6 @@ public class DictServiceImpl implements IDictService {
   public DictValuePO insertDictValue(String code, DictValuePO dictValue) {
     // 设置属性
     dictValue.setDictCode(code);
-    // 更新版本号
-    this.refreshVersion();
     // 新增DictValue
     return dictValueRepo.save(dictValue);
   }

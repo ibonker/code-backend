@@ -3,8 +3,8 @@
  */
 package com.changan.code.entity;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.changan.anywhere.common.utils.StringUtils;
 import com.changan.code.common.Constants;
+import com.changan.code.dto.SeniorDtoRelation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -85,7 +86,7 @@ public class TablePO extends BaseEntity {
    */
   @Transient
   @JsonIgnore
-  private Map<String, ColumnPO> columnMaps;
+  private LinkedHashMap<String, ColumnPO> columnMaps;
   
   /**
    * 与主表的table relation list
@@ -100,6 +101,13 @@ public class TablePO extends BaseEntity {
   @Transient
   @JsonIgnore
   private List<TableRelationPO> slaveTableRelations;
+  
+  /**
+   * 高级关联关系
+   */
+  @Transient
+  @JsonIgnore
+  private List<SeniorDtoRelation> relationMethods;
   
   /**
    * 初始化值

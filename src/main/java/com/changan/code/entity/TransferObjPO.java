@@ -49,11 +49,11 @@ public class TransferObjPO extends BaseEntity {
   
   @Column(name = "is_senior")
   @JsonProperty("isSenior")
-  private String isSenior; // 是否高级关联查询实体
+  private String isSenior = Constants.IS_INACTIVE; // 是否高级关联查询实体
 
   @Column(name = "is_generic")
   @JsonProperty("isGeneric")
-  private String isGeneric; // 是否泛型
+  private String isGeneric = Constants.IS_INACTIVE; // 是否泛型
 
   @Column(name = "inherit_obj_name")
   @JsonProperty("inheritObjName")

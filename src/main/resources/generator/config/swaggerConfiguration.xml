@@ -21,16 +21,15 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /** 
- * SwaggerConfiguration 
+ * Swagger-UI配置 SwaggerConfiguration 
  *
  * @author TitanCode2
- * @version  
- * @since JDK 1.8 
  */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfiguration {
-
+  
+  // 初始化信息	
   ApiInfo apiInfo() {
     return new ApiInfoBuilder().title("${projectName} API")
         .description(
@@ -39,6 +38,7 @@ public class SwaggerConfiguration {
         .contact(new Contact("", "", "")).build();
   }
 
+  // 配置需要在swagger中展现的接口
   @Bean
   public Docket customImplementation() {
     return new Docket(DocumentationType.SWAGGER_2).select()

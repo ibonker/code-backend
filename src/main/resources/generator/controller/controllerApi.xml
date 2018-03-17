@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 <#list importIFPackageList as package>
+<#if package?? && package != "">
 import ${package};
+</#if>
 </#list>
 
 import io.swagger.annotations.Api;
@@ -24,10 +26,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 /** 
+ * 控制器的声明接口，可以与FeignClient配合使用 
  * 
  * @author TitanCode2
- * @version  
- * @since JDK 1.8 
  */
 @Api(value = "${controllerName}")
 @RequestMapping(value = "${basePath}")
@@ -41,7 +42,7 @@ public interface ${controllerName}Api {
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ${apiObj.responseObjNameNoPack}.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
-  @RequestMapping(value = "${apiObj.uri}", produces = <#if apiObj.produces == "application/json">MediaType.APPLICATION_JSON_UTF8_VALUE<#else>{"${apiObj.produces}"}</#if>,
+  @RequestMapping(value = "${apiObj.uri}", produces = <#if apiObj.produces == "application/json">MediaType.APPLICATION_JSON_UTF8_VALUE<#else>{"${apiObj.produces}"}</#if>,<#if apiObj.consumes?? && apiObj.consumes != "">consumes = {"${apiObj.consumes}"},</#if>
       method = RequestMethod.${apiObj.requestMethod})
   ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam>@ApiParam(value = "${apiParam.name}", required = <#if apiParam.isRequired == "1">true<#else>false</#if>) ${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
   </#list>

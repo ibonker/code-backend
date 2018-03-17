@@ -19,11 +19,9 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 
 
 /** 
- * Application 
+ * 主类 
  *
  * @author TitanCode2
- * @version  
- * @since JDK 1.8 
  */
 <#if components?seq_contains("rescentersecurity")>@EnableFeignClients(basePackages = {"com.changan.rescenter.auth"})</#if>
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
@@ -37,8 +35,9 @@ public class Application {
    * @param args
    */
   public static void main(String[] args) {
+    // 初始化实例
     SpringApplication app = new SpringApplication(Application.class);
-
+	// 运行实例
     app.run(args);
   }
 

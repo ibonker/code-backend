@@ -14,6 +14,7 @@ public enum BaseFormat {
   Long(""),
   Float(""),
   Double(""),
+  Boolean(""),
   BigDecimal("java.math.BigDecimal"),
   Date("java.util.Date"),
   Timestamp("java.sql.Timestamp"),

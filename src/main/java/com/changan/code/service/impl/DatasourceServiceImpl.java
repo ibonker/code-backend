@@ -47,21 +47,34 @@ public class DatasourceServiceImpl implements IDatasourceService {
     try {
       // 新建数据源
       DruidDataSource dataSource = new DruidDataSource();
+      
+      dataSource.setPassword(datasource.getDbtype());
       // 设置数据源驱动名称
-      dataSource.setDriverClassName(datasource.getDbdriver());
+      String Dbtype = datasource.getDbtype();
+      if(Dbtype.equals(Constants.DATASOURCE_ORACLE))
+    	  dataSource.setDriverClassName(Constants.DATASOURCE_ORACLE_DRIVER);
+      else
+    	  dataSource.setDriverClassName(Constants.DATASOURCE_MYSQL_DRIVER);
+      
       // 设置数据源用户名
       dataSource.setUsername(datasource.getDbuser());
       // 设置数据源密码
       dataSource.setPassword(datasource.getDbpassword());
+      // 设置数据库
+      dataSource.setDbType(datasource.getDbtype());
       // 设置数据源连接字符串
-      dataSource.setUrl(datasource.getDburl());
+      if(Dbtype.equals(Constants.DATASOURCE_ORACLE))
+    	  dataSource.setUrl(Constants.JDBC_ORACLE_PREFIX + datasource.getDburl() + Constants.JDBC_ORACLE_POSTFIX + datasource.getName());
+      else
+    	  dataSource.setUrl(Constants.JDBC_MYSQL_PREFIX  + datasource.getDburl() + Constants.JDBC_MYSQL_POSTFIX + datasource.getName() + Constants.JDBC_MYSQL_POSTFIX_UTF8_ENCODING);
+      
       // 数据源连接的测试的其它设置
       dataSource.setInitialSize(5);
       dataSource.setMinIdle(1);
       // 新建JDBC对象
       JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
       // 执行SQL
-      jdbcTemplate.execute("select 1 from dual");
+      jdbcTemplate.execute("SELECT 1 FROM DUAL");
       // 关闭数据源
       dataSource.close();
       // 当数据源测试成功返回true
@@ -101,11 +114,11 @@ public class DatasourceServiceImpl implements IDatasourceService {
   }
 
   @Override
-  public void syncTableFromOriginalDatasource(String datasourceId) {
+  public void syncTableFromOriginalDatasource(String datasourceId, String usercode) {
     // 获取datasource
     DatasourcePO datasource = this.findById(datasourceId);
     // 获取项目
-    ProjectPO project = projectService.getProjectById(datasource.getProjectId());
+    ProjectPO project = projectService.getProjectById(datasource.getProjectId(), usercode);
     // 获取数据源的表
     List<TablePO> originTables = tableService.findTableListFromOriginalDatasource(datasource);
     // 获取保存的表

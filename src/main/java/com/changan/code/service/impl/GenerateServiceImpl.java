@@ -31,6 +31,7 @@ import com.changan.code.common.template.ConfigFile;
 import com.changan.code.common.template.DAOFile;
 import com.changan.code.common.template.DTOFile;
 import com.changan.code.common.template.EntityFile;
+import com.changan.code.common.template.ExcelFile;
 import com.changan.code.common.template.GeneratorConfigFile;
 import com.changan.code.common.template.JPAFile;
 import com.changan.code.common.template.MvcFile;
@@ -84,12 +85,14 @@ public class GenerateServiceImpl implements IGenerateService {
    * @return
    */
   @Override
-  public String generateToFile(String basePath, Template tpl, Map<String, Object> model,
-      boolean isReplaceFile) {
+  public String generateToFile(String pathPostfix, String basePath, Template tpl,
+      Map<String, Object> model, boolean isReplaceFile) {
     String fileName;
+    // 文件名
     fileName =
         GeneratorUtils.getProjectPath(null == basePath ? genProperties.getProjectPath() : basePath,
-            (null == basePath ? (String) model.get(ParamerConstant.CPNS_PROJECT_NAME)
+            (null == basePath
+                ? ((String) model.get(ParamerConstant.CPNS_PROJECT_NAME) + "_" + pathPostfix)
                 : Constants.MYBATIS_GEN_CONFIG_ROOT))
             + File.separator
             + StringUtils.replaceEach(FreeMarkerUtils.renderString(tpl.getFilePath() + "/", model),
@@ -151,8 +154,8 @@ public class GenerateServiceImpl implements IGenerateService {
   }
 
   @Override
-  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources,
-      List<ApiBasePO> apiBases, ApiBasePO firstApiBase) {
+  public void generateConfigFiles(String pathPostfix, ProjectPO project,
+      List<DatasourcePO> datasources, List<ApiBasePO> apiBases, ApiBasePO firstApiBase) {
     // 构建basePath数组
     List<String> basePaths = new ArrayList<>();
     for (ApiBasePO apiBase : apiBases) {
@@ -163,9 +166,10 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("packageName", project.getPackages().toLowerCase());
     model.put("basePaths", basePaths);
     model.put("mainpath",
-        firstApiBase == null ? "" : firstApiBase.getBasePath().toLowerCase().split("/")[1]);
+        firstApiBase == null ? "/" : ("/" + firstApiBase.getBasePath().toLowerCase().split("/")[1]));
     model.put("projectDesc", StringUtils.trimToEmpty(project.getDescription()));
     model.put("datasourcelist", datasources);
+    model.put("datasourceName", datasources.get(0).getPackageName());
     model.put("moduleName", "");
     model.put("projectName", project.getName());
     model.put("hasMysql", "0");
@@ -176,6 +180,7 @@ public class GenerateServiceImpl implements IGenerateService {
     if (null != datasources) {
       Template dbTpl =
           GeneratorUtils.fileToObject(ConfigFile.datasourceConfig.getPath(), Template.class);
+      int i = 0;
       for (DatasourcePO datasource : datasources) {
         if (Constants.DATASOURCE_MYSQL.equals(datasource.getDbtype())) {
           model.put("hasMysql", "1");
@@ -184,28 +189,38 @@ public class GenerateServiceImpl implements IGenerateService {
           model.put("hasOracle", "1");
         }
         model.put("datasource", datasource);
-        this.generateToFile(null, dbTpl, model, true);
+        this.generateToFile(pathPostfix, null, dbTpl, model, true);
+        // 只在第一个数据源添加
+        if (i == 0) {
+          model.put("servuceModuleName", datasource.getPackageName());
+        }
+        i++;
       }
     }
     // 生成普通配置文件
     for (ConfigFile configFile : ConfigFile.values()) {
       if (!ConfigFile.datasourceConfig.equals(configFile)
           && !ConfigFile.applicationYml.equals(configFile)) {
-        this.generateToFile(null, GeneratorUtils.fileToObject(configFile.getPath(), Template.class),
-            model, true);
+        this.generateToFile(pathPostfix, null,
+            GeneratorUtils.fileToObject(configFile.getPath(), Template.class), model, true);
       }
     }
     // 生成yml配置文件
     for (BaseProfile profile : BaseProfile.values()) {
       model.put("postfix", profile.equals(BaseProfile.main) ? "" : "-".concat(profile.name()));
-      this.generateToFile(null,
+      this.generateToFile(pathPostfix, null,
           GeneratorUtils.fileToObject(ConfigFile.applicationYml.getPath(), Template.class), model,
           true);
     }
-    // 生成ui配置文件
+    // 生成ui配置模块文件
     for (UiFile uiFile : UiFile.values()) {
-      this.generateToFile(null, GeneratorUtils.fileToObject(uiFile.getPath(), Template.class),
-          model, true);
+      this.generateToFile(pathPostfix, null,
+          GeneratorUtils.fileToObject(uiFile.getPath(), Template.class), model, true);
+    }
+    // 生成excel导出模块文件
+    for (ExcelFile excelFile : ExcelFile.values()) {
+      this.generateToFile(pathPostfix, null,
+          GeneratorUtils.fileToObject(excelFile.getPath(), Template.class), model, true);
     }
   }
 
@@ -213,8 +228,8 @@ public class GenerateServiceImpl implements IGenerateService {
    * 自动生成entity
    */
   @Override
-  public void generateEntityFiles(String moduleName, String projectName, String packageName,
-      TablePO table, List<ColumnPO> columns) {
+  public void generateEntityFiles(String pathPostfix, String moduleName, String projectName,
+      String packageName, TablePO table, List<ColumnPO> columns) {
     // 定义需要传入的包
     HashSet<String> imports = new HashSet<>();
     for (ColumnPO column : columns) {
@@ -225,11 +240,14 @@ public class GenerateServiceImpl implements IGenerateService {
       if ("1".equals(column.getReadOnly())) {
         imports.add("readOnly");
       }
-      if (!"1".equals(column.getIsNullable())) {
+      if ("0".equals(column.getIsNullable())) {
         imports.add("isNullable");
       }
       if (!"".equals(column.getPattern()) && column.getPattern() != null) {
         imports.add("pattern");
+      }
+      if (!"".equals(column.getDictTypeCode()) && column.getDictTypeCode() != null) {
+        imports.add("dict");
       }
       if ("String".equals(column.getJavaType())
           && (column.getMax() != null || column.getMin() != null)) {
@@ -275,7 +293,7 @@ public class GenerateServiceImpl implements IGenerateService {
         relAnns.add(ann);
       }
     }
-    
+
     // 添加从主关系
     if (null != table.getMasterTableRelations()) {
       for (TableRelationPO tableRelation : table.getMasterTableRelations()) {
@@ -310,7 +328,7 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("tableComments", table.getComments() == null ? table.getClassName().concat("实体")
         : table.getComments().concat("实体"));
     // 生成实体文件
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(EntityFile.entity.getPath(), Template.class), model, true);
 
   }
@@ -319,8 +337,9 @@ public class GenerateServiceImpl implements IGenerateService {
    * 自动生成DTO
    */
   @Override
-  public void generateDTOFiles(String projectName, String packageName, TransferObjPO transferObj,
-      List<TransferObjFieldPO> transferObjFileds) {
+  public void generateDTOFiles(String pathPostfix, String projectName, String packageName,
+      TransferObjPO transferObj, List<TransferObjFieldPO> transferObjFileds,
+      List<SeniorDtoRelation> relations, String seniorName) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     // 注解引入包
@@ -379,18 +398,21 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("BaseDTO", BaseDTO.values());
     model.put("imports", imports);
     model.put("typeImports", typeImports);
+    model.put("isSenior", Constants.IS_ACTIVE.equals(transferObj.getIsSenior()));
+    model.put("seniorRelations", relations);
+    model.put("seniorName", seniorName);
     // 生成DTO文件
-    this.generateToFile(null, GeneratorUtils.fileToObject(DTOFile.dto.getPath(), Template.class),
-        model, true);
+    this.generateToFile(pathPostfix, null,
+        GeneratorUtils.fileToObject(DTOFile.dto.getPath(), Template.class), model, true);
   }
 
   /**
    * 自动生成DAO
    */
   @Override
-  public void generateDAOFiles(String moduleName, String projectName, String packageName,
-      String tableName, List<TableSeniorRelationPO> relations, List<SeniorDtoAttribute> attrs,
-      List<SeniorDtoRelation> relationMethods) {
+  public void generateDAOFiles(String pathPostfix, String moduleName, String projectName,
+      String packageName, String tableName, List<TableSeniorRelationPO> relations,
+      List<SeniorDtoAttribute> attrs, List<SeniorDtoRelation> relationMethods) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     String className =
@@ -408,19 +430,19 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("attrList", attrs);
     model.put("relationMethods", relationMethods);
     // 生成DAO文件
-    this.generateToFile(null, GeneratorUtils.fileToObject(DAOFile.dao.getPath(), Template.class),
-        model, true);
+    this.generateToFile(pathPostfix, null,
+        GeneratorUtils.fileToObject(DAOFile.dao.getPath(), Template.class), model, true);
     // 生成mapper文件
-    this.generateToFile(null, GeneratorUtils.fileToObject(DAOFile.mapper.getPath(), Template.class),
-        model, true);
+    this.generateToFile(pathPostfix, null,
+        GeneratorUtils.fileToObject(DAOFile.mapper.getPath(), Template.class), model, true);
   }
 
   /**
    * 自定生成service
    */
   @Override
-  public void generateIServiceAndServiceImpl(String moduleName, String projectName,
-      String packageName, String tableName, List<TableRelationPO> tableRelation,
+  public void generateIServiceAndServiceImpl(String pathPostfix, String moduleName,
+      String projectName, String packageName, String tableName, List<TableRelationPO> tableRelation,
       List<TableSeniorRelationPO> relations, boolean isSenior) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
@@ -434,14 +456,35 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("packageName", packageName);
     model.put("projectName", projectName);
     model.put("moduleName", moduleName);
+    // 如果为null则置空
+    if (null == tableRelation) {
+      tableRelation = Lists.newArrayList();
+    }
+    // 如果为null则置空
+    if (null == relations) {
+      relations = Lists.newArrayList();
+    }
     model.put("tableRelations", tableRelation);
+    // 检查是否有一对多关联
+    boolean hasOneToMany = false;
+    // 检查是否有一对一关联
+    boolean hasOneToOne = false;
+    for (TableRelationPO relation : tableRelation) {
+      if (!"One to One".equals(relation.getRelation())) {
+        hasOneToMany = true;
+      } else {
+        hasOneToOne = true;
+      }
+    }
+    model.put("hasOneToMany", hasOneToMany);
+    model.put("hasOneToOne", hasOneToOne);
     model.put("seniorRelations", relations);
     model.put("isSenior", isSenior);
     // 生成service文件
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(ServiceFile.Service.getPath(), Template.class), model, true);
     // 生成serviceImpl文件
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(ServiceImplFile.ServiceImpl.getPath(), Template.class), model,
         true);
   }
@@ -450,8 +493,8 @@ public class GenerateServiceImpl implements IGenerateService {
    * 生成controller的api和Implement
    */
   @Override
-  public void generateControllerFiles(ProjectPO project, ApiBasePO apibase, String controllerName,
-      List<ApiObjPO> apiobjs) {
+  public void generateControllerFiles(String pathPostfix, ProjectPO project, ApiBasePO apibase,
+      String controllerName, List<ApiObjPO> apiobjs) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     // project名称
@@ -524,10 +567,10 @@ public class GenerateServiceImpl implements IGenerateService {
     importImplPackSet.addAll(importIFPackSet);
     model.put("importImplPackageList", importImplPackSet);
     // 生成api文件
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(MvcFile.controllerApi.getPath(), Template.class), model, true);
     // 生成impl文件
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(MvcFile.controllerImpl.getPath(), Template.class), model, true);
   }
 
@@ -570,21 +613,22 @@ public class GenerateServiceImpl implements IGenerateService {
    * @param datasource
    */
   @Override
-  public void generateGeneratorConfigFiles(String projectName, String packageName,
-      DatasourcePO datasource, Set<TablePO> tables) {
+  public void generateGeneratorConfigFiles(String pathPostfix, String projectName,
+      String packageName, DatasourcePO datasource, List<TablePO> tables) {
     // 修改数据库url
     String url = datasource.getDburl().replace("&", "&amp;");
     datasource.setDburl(url);
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
-    model.put("projectName", projectName);
+    model.put("projectName", projectName.concat("_").concat(pathPostfix));
     model.put("packageName", packageName);
     model.put("dataSource", datasource);
     model.put("tables", tables);
     model.put("projectPath", genProperties.getProjectPath());
     // 生成xml文件
-    this.generateToFile(genProperties.getMybatisGenlibsPath(), GeneratorUtils.fileToObject(
-        GeneratorConfigFile.generatorConfigFile.getPath(), Template.class), model, true);
+    this.generateToFile(pathPostfix, genProperties.getMybatisGenlibsPath(), GeneratorUtils
+        .fileToObject(GeneratorConfigFile.generatorConfigFile.getPath(), Template.class), model,
+        true);
   }
 
   /**
@@ -593,10 +637,11 @@ public class GenerateServiceImpl implements IGenerateService {
    * @param projectName
    */
   @Override
-  public void generateMybatisFiles(String projectName) {
+  public void generateMybatisFiles(String pathPostfix, String projectName) {
     // 项目配置文件目录
-    File projectConfigDir = new File(genProperties.getMybatisGenlibsPath()
-        + Constants.MYBATIS_GEN_CONFIG_ROOT + File.separator + projectName);
+    File projectConfigDir =
+        new File(genProperties.getMybatisGenlibsPath() + Constants.MYBATIS_GEN_CONFIG_ROOT
+            + File.separator + projectName.concat("_").concat(pathPostfix));
     List<String> configfiles = FileUtils.findChildrenList(projectConfigDir, false);
     // 循环执行mybatis generator
     String os = System.getProperty("os.name");
@@ -604,14 +649,17 @@ public class GenerateServiceImpl implements IGenerateService {
     String shFile = "";
     for (String filename : configfiles) {
       InputStream inputStream = null;
-      String filepath = Constants.MYBATIS_GEN_CONFIG_ROOT + File.separator + projectName
-          + File.separator + filename;
+      // 配置文件路径
+      String filepath = Constants.MYBATIS_GEN_CONFIG_ROOT + File.separator
+          + projectName.concat("_").concat(pathPostfix) + File.separator + filename;
       try {
         if (os.toLowerCase().startsWith("win")) {
+          // windows环境执行代码生成
           shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.bat").toAbsolutePath()
               .toString();
           cmd = "cmd /c start /b " + shFile + " " + filepath;
         } else {
+          // linux环境执行代码生成
           shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.sh").toAbsolutePath()
               .toString();
           cmd = "/bin/sh " + shFile + " " + filepath;
@@ -638,8 +686,8 @@ public class GenerateServiceImpl implements IGenerateService {
    * 生成JPA Repository
    */
   @Override
-  public void generateRepository(String module, String projectName, String packageName,
-      String name) {
+  public void generateRepository(String pathPostfix, String module, String projectName,
+      String packageName, String name) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     String str = name.toLowerCase();
@@ -650,7 +698,7 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("packageName", packageName);
     model.put("className", className);
     // 生成JPA Repository文件
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(JPAFile.repository.getPath(), Template.class), model, true);
   }
 
@@ -659,8 +707,8 @@ public class GenerateServiceImpl implements IGenerateService {
    * 
    */
   @Override
-  public void generateJPAServiceAndJPAServiceImpl(String moduleName, String projectName,
-      String packageName, TablePO table, String DTOPackageName) {
+  public void generateJPAServiceAndJPAServiceImpl(String pathPostfix, String moduleName,
+      String projectName, String packageName, TablePO table, String DTOPackageName) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     String str = table.getName().toLowerCase();
@@ -673,10 +721,10 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("projectName", projectName);
     model.put("moduleName", moduleName);
     // 生成JPAService
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(JPAFile.JPAservice.getPath(), Template.class), model, true);
     // 生成JPAServiceImpl
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(JPAFile.JPAserviceImpl.getPath(), Template.class), model, true);
   }
 
@@ -684,13 +732,13 @@ public class GenerateServiceImpl implements IGenerateService {
    * 生成advice代码
    */
   @Override
-  public void generateAdvice(String packageName, String projectName) {
+  public void generateAdvice(String pathPostfix, String packageName, String projectName) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     model.put("packageName", packageName);
     model.put("projectName", projectName);
     // 生成advice文件
-    this.generateToFile(null,
+    this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(AdviceFile.advice.getPath(), Template.class), model, true);
   }
 
@@ -698,20 +746,16 @@ public class GenerateServiceImpl implements IGenerateService {
    * 生成前台util
    */
   @Override
-  public void generateUIFiles(String projectTitle) {
+  public void generateUIFiles(String projectDescription, String projectName, String projectTitle,
+      String appId) {
+    String[] title = projectTitle.split("\\.");
     Map<String, Object> model = Maps.newHashMap();
-    model.put("projectTitle", projectTitle);
-    File f = new File(genProperties.getProjectUiPath());
-    String srcPath = f.getParent() + File.separator + projectTitle + File.separator;
-    // 复制模板文件
-    try {
-      org.apache.commons.io.FileUtils.copyDirectory(new File(genProperties.getProjectUiPath()),
-          new File(srcPath), true);
-      this.generateToUIFile(f.getParent() + File.separator + projectTitle,
-          GeneratorUtils.fileToObject(UiCode.uiUitl.getPath(), Template.class), model, true);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    model.put("projectDescription", projectDescription);
+    model.put("projectTitle", title[title.length - 1]);
+    model.put("appId", appId);
+    // 生成模板文件
+    this.generateToUIFile(genProperties.getProjectUiTempPath().concat(projectName),
+        GeneratorUtils.fileToObject(UiCode.uiUitl.getPath(), Template.class), model, true);
   }
 
 }

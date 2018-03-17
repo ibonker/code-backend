@@ -7,8 +7,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import com.changan.code.entity.ApiObjPO;
+
 /**
- * ApiObj  JPA数据库操作
+ * ApiObj JPA数据库操作
+ * 
  * @author xuyufeng
  *
  */
@@ -32,6 +34,23 @@ public interface ApiObjRepository
   public List<ApiObjPO> findByApiBaseIdAndDelFlagOrderByUri(String apiBaseId, String delFlag);
 
   /**
+   * 根据genBasedTableId查询 ApiObj
+   * 
+   * @return
+   */
+  public List<ApiObjPO> findByGenBasedTableIdAndDelFlag(String genBasedTableId, String delFlag);
+
+  /**
+   * 查询是否有高级关联
+   * @param apiBaseId
+   * @param genBasedTableId
+   * @param genRelatedTableId
+   * @return
+   */
+  public Long countByApiBaseIdAndGenBasedTableIdAndGenRelatedTableIdAndProduces(String apiBaseId,
+      String genBasedTableId, String genRelatedTableId, String produces);
+
+  /**
    * 根据id查询ApiObj
    * 
    * @param id
@@ -47,15 +66,17 @@ public interface ApiObjRepository
    */
   @Query("SELECT t.id as id FROM ApiObjPO t WHERE t.genBasedTableId = ?1")
   List<String> findIdByGenBasedTableId(String genBasedTableId);
-  
+
   /**
    * 根据genBasedTableId, genRelatedTableId获取数据id
+   * 
    * @param genBasedTableId
    * @param genRelatedTableId
    * @return
    */
   @Query("SELECT t.id as id FROM ApiObjPO t WHERE t.genBasedTableId = ?1 and t.genRelatedTableId = ?2")
-  List<String> findIdByGenBasedTableIdAndGenRelatedTableId(String genBasedTableId, String genRelatedTableId);
+  List<String> findIdByGenBasedTableIdAndGenRelatedTableId(String genBasedTableId,
+      String genRelatedTableId);
 
   /**
    * 根据genBasedTableId删除数据
@@ -64,14 +85,24 @@ public interface ApiObjRepository
    * @return
    */
   Long deleteByGenBasedTableId(String genBasedTableId);
-  
+
+  /**
+   * 根据genBasedTableId删除数据
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  Long deleteByGenBasedTableIdIn(List<String> genBasedTableIds);
+
   /**
    * 根据genBasedTableId和genRelatedTableId删除数据
+   * 
    * @param genBasedTableId
    * @param genRelatedTableId
    * @return
    */
-  Long deleteByGenBasedTableIdAndGenRelatedTableId(String genBasedTableId, String genRelatedTableId);
+  Long deleteByGenBasedTableIdAndGenRelatedTableId(String genBasedTableId,
+      String genRelatedTableId);
 
   /**
    * 通过apiId和uri查询ApiObj

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>excelFailedDTO</name>
+  <filePath>src/main/java/${packageName}/dto/excel/</filePath>
+  <fileName>ExcelFailedDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.dto.excel;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+/**
+ * excel导入错误说明
+ * @author TitanCode2
+ */
+@Data
+@AllArgsConstructor
+@JsonInclude(Include.NON_NULL)
+public class ExcelFailedDTO {
+  // 行数
+  private Integer index;
+  // 错误原因
+  private String failedReason;
+  
+}
+
+]]>
+  </content>
+</template>

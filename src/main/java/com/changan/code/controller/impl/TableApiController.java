@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
@@ -63,7 +62,8 @@ public class TableApiController extends BaseController implements TableApi {
     List<ColumnPO> columns = tableService.findMergedColumns(id);
     return new ResponseEntity<>(
         new ResultOfColumnsDTO().columns(columns).dictFlag(tableService.isDictionary(id))
-            .message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE),HttpStatus.OK);
+            .message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE),
+        HttpStatus.OK);
   }
 
   /**
@@ -73,7 +73,7 @@ public class TableApiController extends BaseController implements TableApi {
   public ResponseEntity<ResultDTO> tablesAutocrudChangeGet(@PathVariable String status,
       @RequestBody RequestOfTableIdsDTO tableIds) {
     if ("active".equals(status)) {
-      tableService.activeIsAutoCrud(tableIds);
+      tableService.activeIsAutoCrud(tableIds, getUser().getUsername());
     } else {
       tableService.inactiveIsAutoCrud(tableIds);
     }
@@ -105,22 +105,25 @@ public class TableApiController extends BaseController implements TableApi {
 
   /**
    * 生成实体文件
+   * 
+   * @throws FileNotFoundException
    */
   @Override
-  public ResponseEntity<ResultDTO> columnsGenerateCodeGet(@PathVariable String tableId) {
-    return new ResponseEntity<>(
-        new ResultOfMsgDataDTO().msgData(tableService.generateEntityCodeFiles(tableId))
-            .message(RestStatus.RESULT_SUCCESS.message()).statusCode(Constants.SUCCESS_API_CODE),
+  public ResponseEntity<ResultDTO> columnsGenerateCodeGet(@PathVariable String tableId)
+      throws FileNotFoundException {
+    return new ResponseEntity<>(new ResultOfMsgDataDTO()
+        .msgData(tableService.generateTableCodes(tableId))
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
         HttpStatus.OK);
   }
 
   /**
-   * 下载实体文件
+   * 下载单表相关文件
    */
   @Override
-  public ResponseEntity<InputStreamResource> projectsDownloadGet(@RequestParam String tableId)
+  public ResponseEntity<InputStreamResource> tableDownloadGet(@PathVariable String tableName)
       throws FileNotFoundException {
-    File file = tableService.downLoadFile(tableId);
+    File file = tableService.downloadZipFiles(tableName);
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
     headers.add("Content-Disposition",

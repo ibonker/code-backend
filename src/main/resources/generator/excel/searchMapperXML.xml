@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>searchMapper</name>
+  <filePath>src/main/resources/mappings/${datasourceName}/</filePath>
+  <fileName>searchMapper.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace = "${packageName}.dao.excel.SearchMapper">
+	<select id = "searchMsg" parameterType = "String" resultType = "Map">
+		${r'$'}{parameter}
+		<where>
+		${r'$'}{where}
+		</where>
+	</select>
+	
+	<insert id = "insertMsg" parameterType = "String">
+		${r'$'}{parameter}
+	</insert>
+</mapper>
+]]>
+  </content>
+</template>

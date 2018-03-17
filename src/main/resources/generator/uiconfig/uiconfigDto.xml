@@ -6,6 +6,8 @@
 	<content><![CDATA[
 package ${packageName}.dto.other;
 	
+import java.util.Map;
+	
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -19,7 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 	
 /**
- * 
+ * 前端配置文件DTO
  * @author TitanCode2
  */
 @Data
@@ -34,8 +36,19 @@ public class UiConfigDTO extends ResultDTO {
   @ApiModelProperty(value = "配置数据")
   private JsonNode data;
   
+  //配置数据集合
+  @JsonProperty("uimap")
+  @JsonPropertyDescription("配置数据集合")
+  @ApiModelProperty(value = "配置数据集合")
+  private Map<String, Object> uimap;
+  
   public UiConfigDTO data(JsonNode data) {
     this.data = data;
+    return this;
+  }
+  
+  public UiConfigDTO uimap(Map<String, Object> UIMap){
+    this.uimap = UIMap;
     return this;
   }
   

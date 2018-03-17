@@ -25,6 +25,7 @@ public class CorsConfig {
     CorsConfiguration corsConfiguration = new CorsConfiguration();
     corsConfiguration.addAllowedOrigin("*");
     corsConfiguration.addAllowedHeader("*");
+    corsConfiguration.addExposedHeader("AUTH_TOKEN");
     corsConfiguration.addAllowedMethod("*");
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", corsConfiguration); // 4

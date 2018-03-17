@@ -9,12 +9,13 @@ package ${packageName}.dto.other;
 import lombok.Data;
 
 /**
- * 
+ * 前端配置文件请求实体
  * @author TitanCode2
  */
 @Data
 public class RequestUiConfigDTO {
 
+  // 数据
   private String data;
   
 }

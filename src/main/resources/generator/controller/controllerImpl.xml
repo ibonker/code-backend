@@ -16,20 +16,21 @@ import org.springframework.stereotype.Controller;
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base.BaseController;
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.common.RestStatus;
 <#list importImplPackageList as package>
+<#if package?? && package != "">
 import ${package};
+</#if>
 </#list>
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.${versionName}.${controllerName}Api;
 
 /** 
- * 
+ * 控制器实现类
  * @author TitanCode2
- * @version  
- * @since JDK 1.8 
  */
 @Controller
 public class ${controllerName}ApiController extends BaseController implements ${controllerName}Api {
 
   <#list appServiceNameList as appServiceName>
+  // 注入业务bean - ${appServiceName.serviceName}
   @Autowired
   private ${appServiceName.serviceName} ${appServiceName.serviceNameAttr};
   </#list>
@@ -59,7 +60,7 @@ public class ${controllerName}ApiController extends BaseController implements ${
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "delete">
-    ${apiObj.attrServiceNameNoPack}.delete${apiObj.tableAttrNameCap}(${apiObj.lastPathVar});
+    ${apiObj.attrServiceNameNoPack}.delete<#if apiObj.lastPathVar?? && !apiObj.isSlaveUri>${apiObj.tableAttrNameCap}<#else>By${apiObj.firstPathVarCap}</#if>(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>);
     return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
@@ -71,9 +72,14 @@ public class ${controllerName}ApiController extends BaseController implements ${
     </#if>
     <#if apiObj.apiType == "show">
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}()
-        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findById(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>))
+        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findBy<#if apiObj.lastPathVar?? && !apiObj.isSlaveUri>Id<#else>${apiObj.firstPathVarCap}</#if>(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>))
         .message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+    </#if>
+    <#if apiObj.apiType == "import_excel">
+    return new ResponseEntity<ResultDTO>(new ResultOfExcelReportDTO().excelReport(${apiObj.attrServiceNameNoPack}.importExcel${apiObj.tableAttrNameCap}(excelDTO))
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
     </#if>
   }
   </#list>

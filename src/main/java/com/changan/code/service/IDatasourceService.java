@@ -52,7 +52,7 @@ public interface IDatasourceService {
    * 
    * @param datasourceId
    */
-  public void syncTableFromOriginalDatasource(String datasourceId);
+  public void syncTableFromOriginalDatasource(String datasourceId, String usercode);
   
   /**
    * 获取项目数据源个数

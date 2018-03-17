@@ -10,14 +10,20 @@ import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import ${packageName}.<#if isSenior>dto<#else>entity</#if>.${moduleName}.${className}<#if isSenior>DTO<#else>PO</#if>;
 import com.changan.jsonmeta.JsonSchema;
+import ${packageName}.dto.excel.ExcelReportDTO;
+import ${packageName}.dto.excel.ExcelImportDTO;
+<#if className == 'UiConfig'>
+import java.util.Map;
+</#if>
 
-/** 
- * I${className}Service
+/**
+ * @author TitanCode2 
+ * 业务接口声明 - I${className}Service
  */
 public interface I${className}Service {
 
   /**
-   * @Description 获取${className}的jsonschema
+   * 获取${className}的jsonschema
    * 
    * @return
    */
@@ -33,17 +39,38 @@ public interface I${className}Service {
    */
   public ResultPageDTO<${className}DTO> get${className}ListByRelation${relation_index + 1}(PageDTO page);
   </#list>
-  <#else>	
+  <#else>
   /**
-   * @Description datatable 分页查询
+   * datatable 分页查询
    * 
    * @param page
    * @return
    */
   public ResultPageDTO<${className}PO> get${className}List(PageDTO page);
+  
+  /**
+   * 导入
+   * 
+   * @param appInfo
+   * @return
+   */
+  public ExcelReportDTO importExcel${className}(ExcelImportDTO excelDTO);
+  <#if className == 'UiConfig'>	
+  /**
+   * 获取ui配置
+   * @return
+   */
+  public Map<String, Object> getUiConfig(String version);
+
+  /**
+   * 保存ui配置
+   * @param data
+   */
+  public void saveUiConfig(String data);
+  </#if>
     
   /**
-   * @Description 新增
+   * 新增
    * 
    * @param ${lowerName}
    * @return
@@ -51,7 +78,7 @@ public interface I${className}Service {
   public int insert${className}(${className}PO ${lowerName});
     
   /**
-   * @Description 修改
+   * 修改
    * 
    * @param ${lowerName}
    * @return
@@ -59,7 +86,7 @@ public interface I${className}Service {
   public int update${className}(String id, ${className}PO ${lowerName});
     
   /**
-   * @Description 根据ID查找
+   * 根据ID查找
    *  
    * @param id
    * @return
@@ -67,7 +94,7 @@ public interface I${className}Service {
   public ${className}PO findById(String id);
     
   /**
-   * @Description 删除
+   * 删除
    * 
    * @param ${lowerName}
    */
@@ -76,12 +103,20 @@ public interface I${className}Service {
   <#list tableRelations as tableRelation>
   <#if 'One to One' == tableRelation.relation>
   /**
-   * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}查询详情
+   * datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}查询详情
    * 
    * @param ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}
    * @return
    */
   public ${className}PO findBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+  
+  /**
+   * datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}删除
+   * 
+   * @param ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}
+   * @return
+   */
+  public int deleteBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
   <#else>
   /**
    * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}分页查询
@@ -93,7 +128,7 @@ public interface I${className}Service {
   </#if> 
    
   /**
-   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}新增
+   * 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}新增
    * 
    * @param ${lowerName}
    * @return
@@ -101,12 +136,12 @@ public interface I${className}Service {
   public int insert${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName});
     
   /**
-   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}修改
+   * 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}修改
    * 
    * @param ${lowerName}
    * @return
    */
-  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName});
+  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}<#if 'One to One' != tableRelation.relation>, String id</#if>, ${className}PO ${lowerName});
   </#list>
   </#if>
 }

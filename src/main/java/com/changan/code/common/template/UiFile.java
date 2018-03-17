@@ -13,7 +13,8 @@ public enum UiFile {
   uiconfigDto("uiconfig/uiconfigDto.xml"),
   uiconfigService("uiconfig/uiconfigService.xml"),
   uiconfigServiceImpl("uiconfig/uiconfigServiceImpl.xml"),
-  uiconfigRequestDto("uiconfig/uiconfigRequestDto.xml");
+  uiconfigRequestDto("uiconfig/uiconfigRequestDto.xml"),
+  uiconfig("uiconfig/uicache.xml");
   
   private String path;
   

@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
   <name>serviceImpl</name>
-  <filePath>src/main/java/${packageName}/service/impl/${moduleName}</filePath>
+  <filePath>src/main/java/${packageName}/service/${moduleName}/impl</filePath>
   <fileName>${className}ServiceImpl.java</fileName>
   <content><![CDATA[
-package ${packageName}.service.impl.${moduleName};
+package ${packageName}.service.${moduleName}.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConversionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,21 +25,39 @@ import ${packageName}.dao.${moduleName}.${className}<#if !isSenior>PO</#if>Mappe
 import com.changan.anywhere.common.utils.MybatisFilterUtils;
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+<#if hasOneToMany>
 import com.changan.anywhere.common.mvc.page.rest.request.Collection;
 import com.changan.anywhere.common.mvc.page.rest.request.Filter;
+</#if>
+import com.changan.anywhere.common.utils.StringUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.changan.jsonmeta.JsonSchema;
 import com.changan.jsonmeta.ResourceMetaManager;
-import com.changan.jsonmeta.JsonSchema;
-import java.util.List;
-import com.changan.demo.common.RestStatus;
-import com.changan.demo.exception.CodeCommonException;
+
+import ${packageName}.dto.excel.ExcelReportDTO;
+import ${packageName}.dto.excel.ExcelImportDTO;
+import ${packageName}.dto.excel.ExcelFailedDTO;
+import ${packageName}.service.excel.IExcelOperationService;
+<#if hasOneToOne>
+import ${packageName}.exception.CodeCommonException;
+import ${packageName}.common.RestStatus;
+</#if>
+import com.google.common.collect.Lists;
+<#if className == 'UiConfig'>
+import ${packageName}.cache.UICache;
+</#if>
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * ${className}ServiceImpl
+ * @author TitanCode2
+ * 业务接口声明实现类 - ${className}ServiceImpl
  */
 @Service
+<#if !isSenior>
+@Slf4j
+</#if>
 public class ${className}ServiceImpl implements I${className}Service {
   
   @Autowired
@@ -41,16 +65,57 @@ public class ${className}ServiceImpl implements I${className}Service {
   private ${className}Mapper ${lowerName}Mapper;
   <#else>
   private ${className}POMapper ${lowerName}POMapper;
+  
+  // 注入excelservice
+  @Autowired
+  private IExcelOperationService excelOperationService;
   </#if>
   
   @Autowired
   private ResourceMetaManager metaManager;
+  
+  <#if className == 'UiConfig'>
+  @Autowired
+  private UICache uiCache;
+  </#if>
   
   // 获取json schema
   @Override
   public JsonSchema get${className}JsonSchema(String url) {
     return metaManager.fetchJsonSchema(${className}<#if isSenior>DTO<#else>PO</#if>.class, url);
   }
+  
+  <#if className == 'UiConfig'>
+  @Override
+  public Map<String, Object> getUiConfig(String version) {
+    // 如果版本号相同返回空,否则返回内存数据
+    if (uiCache.getUIMap().get("version").toString().equals(version)) {
+      return null;
+    } else {
+      return uiCache.getUIMap();
+    }
+  }
+  
+  @Override
+  public void saveUiConfig(String data) {
+    // 获取内存版本号
+    int version = Integer.valueOf(uiCache.getUIMap().get("version").toString());
+    UiConfigPO configObj = this.findById("all");
+    if (null != configObj) {
+      configObj.setConfigJson(data.replace("'", "\""));
+      this.updateUiConfig(configObj.getId(), configObj);
+    } else {
+      configObj = new UiConfigPO();
+      configObj.setConfigJson(data.replace("'", "\""));
+      configObj.setId("all");
+      this.insertUiConfig(configObj);
+    }
+    // 更新内存数据
+    uiCache.saveUiMap(configObj);
+    // 更新内存版本号
+    uiCache.getUIMap().put("version", version + 1);
+  }
+  </#if>
   
   <#if isSenior>
   <#list seniorRelations as relation> 
@@ -87,6 +152,51 @@ public class ${className}ServiceImpl implements I${className}Service {
     ${lowerName}.preInsert();
     return ${lowerName}POMapper.insertSelective(${lowerName});
   }
+  
+  //导入excel
+  @Override
+  public ExcelReportDTO importExcel${className}(ExcelImportDTO excelDTO) {
+    // 创建导入结果
+    ExcelReportDTO excelReport = new ExcelReportDTO(); 
+    // 创建失败结果集
+    List<ExcelFailedDTO> failedList = Lists.newArrayList();
+    // 导入开始时间
+    Long startTime = System.currentTimeMillis();
+    List<Map<String, Object>> datas = excelOperationService.importExcel(excelDTO);
+    int i = 0;
+    int failedCount = 0;
+    int successCount = 0;
+    for (Map<String, Object> data : datas) {
+      ${className}PO ${lowerName} = new ${className}PO();
+      try {
+        // map转换为对象
+        BeanUtils.populate(${lowerName}, data);
+        // 导入数据库
+        this.insert${className}(${lowerName});
+        // 记录成功导入数
+        successCount++;
+      } catch (IllegalAccessException | InvocationTargetException | ConversionException e) {
+        // 记录失败导入数
+        failedCount++;
+        // 创建失败原因
+        ExcelFailedDTO failed = new ExcelFailedDTO(i + 1, e.getMessage());
+        // 添加结果集
+        failedList.add(failed);
+        log.error("导入数据失败：第" + i + "行", e);
+      }
+      i++; 
+    }
+    // 导入结束时间
+    Long endTime = System.currentTimeMillis();
+    
+    excelReport.setTotal(i);
+    excelReport.setFailedTotal(failedCount);
+    excelReport.setSuccessTotal(successCount);
+    excelReport.setFailedDetails(failedList);
+    excelReport.setTimeCost(endTime - startTime);
+    
+    return excelReport;
+  }
   	
   //修改
   @Override
@@ -107,7 +217,7 @@ public class ${className}ServiceImpl implements I${className}Service {
   public int delete${className}(String id) {
     return ${lowerName}POMapper.deleteByPrimaryKey(id);
   }
-
+  
   //分页查询
   @Override
   public ResultPageDTO<${className}PO> get${className}List(PageDTO page) {
@@ -122,7 +232,10 @@ public class ${className}ServiceImpl implements I${className}Service {
     // 分页
     PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
     // 排序
-    PageHelper.orderBy(MybatisFilterUtils.transformOrderBy(page, jsonschema));
+    String order = MybatisFilterUtils.transformOrderBy(page, jsonschema);
+    if (!StringUtils.isEmpty(order)) {
+      ce.setOrderByClause(order);
+    }
     PageInfo<${className}PO> list = new PageInfo<>(${lowerName}POMapper.selectByExample(ce));
 
     result.setData(list.getList());
@@ -135,7 +248,7 @@ public class ${className}ServiceImpl implements I${className}Service {
   <#list tableRelations as tableRelation>
   <#if 'One to One' == tableRelation.relation>
   /**
-   * @Description datatable 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}查询详情
+   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}查询详情
    * 
    * @param ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}
    * @return
@@ -143,12 +256,26 @@ public class ${className}ServiceImpl implements I${className}Service {
   public ${className}PO findBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}) {
   	${className}POExample ce = new ${className}POExample();
     // 添加查询条件
-    ce.createCriteria().and${tableRelation.masterColumnNameCap}EqualTo(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+    ce.createCriteria().and${tableRelation.slaveColumnNameCap}EqualTo(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
     List<${className}PO> results = ${lowerName}POMapper.selectByExample(ce);
     if (results.isEmpty()) {
       throw new CodeCommonException(RestStatus.RESULT_NO_DATA.code(), RestStatus.RESULT_NO_DATA.message());
     }
     return results.get(0);
+  }
+  
+  /**
+   * @Description 根据主表${tableRelation.masterTableNameCap}字段${tableRelation.masterColumnNameCap}删除
+   * 
+   * @param ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}
+   * @return
+   */
+  public int deleteBy${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}) {
+  	${className}POExample ce = new ${className}POExample();
+  	// 添加查询条件
+    ce.createCriteria().and${tableRelation.slaveColumnNameCap}EqualTo(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
+    
+    return ${lowerName}POMapper.deleteByExample(ce);
   }
   <#else>
   /**
@@ -209,11 +336,13 @@ public class ${className}ServiceImpl implements I${className}Service {
    * @param ${lowerName}
    * @return
    */
-  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, String id, ${className}PO ${lowerName}){
+  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName}){
   	// 设置值
   	${lowerName}.set${tableRelation.slaveColumnNameCap}(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
   	${lowerName}.preUpdate();
-    ${lowerName}.setId(id);
+  	<#if 'One to One' != tableRelation.relation>
+  	${lowerName}.setId(id);
+  	</#if>
     return ${lowerName}POMapper.updateByPrimaryKeySelective(${lowerName});
   }
   </#list>

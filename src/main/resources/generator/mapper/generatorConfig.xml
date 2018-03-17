@@ -42,7 +42,7 @@
 		<!-- 要生成哪些表-->
 		<#list tables as t>
 		<table schema="${dataSource.dbuser ?upper_case}" tableName="${t.name}" domainObjectName="${t.className}" 
-		enableDeleteByExample="false" enableCountByExample="false" 
+		enableDeleteByExample="true" enableCountByExample="false" 
 		enableUpdateByExample="false"></table>
 		</#list>
 	</context>

@@ -1,4 +1,4 @@
-import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,8 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.changan.code.Application;
-import com.changan.code.dto.SimpleDataObj;
+import com.changan.code.config.property.ApiProperties;
 import com.changan.code.service.ITableService;
+import com.google.common.collect.Maps;
 
 /**
  * 
@@ -26,10 +27,22 @@ public class TableServiceTest {
   @Autowired
   private ITableService tableService;
   
+  @Autowired
+  private ApiProperties apiProperties;
+  
   @Test
   public void crudTest() {
-    List<SimpleDataObj> result = tableService.findClassnameByDatasourceId("161e1581-9430-487e-b8d4-b8c277e9d377");
-    System.err.println(result.size());
+//    List<SimpleDataObj> result = tableService.findClassnameByDatasourceId("161e1581-9430-487e-b8d4-b8c277e9d377");
+//    System.err.println(result.size());
+    String a = apiProperties.getGeneratedModal().getNormalApiModels().get(0).getConsumes();
+    Map<String, String> map = Maps.newHashMap();
+    map.put("urlPrefix", "aaa");
+    map.put("tableName", "bbbb");
+    map.put("tableParamName", "ccccc");
+    for (String key : map.keySet()) {
+      a = a.replace("${".concat(key).concat("}"), map.get(key));
+    }
+    System.err.println(a);
   }
 
 }

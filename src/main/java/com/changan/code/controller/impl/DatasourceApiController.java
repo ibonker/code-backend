@@ -67,7 +67,7 @@ public class DatasourceApiController extends BaseController implements Datasourc
    */
   @Override
   public ResponseEntity<ResultDTO> datasourcesTablesSyncGet(@PathVariable String id) {
-    datasourceService.syncTableFromOriginalDatasource(id);
+    datasourceService.syncTableFromOriginalDatasource(id, getUser().getUsername());
     return new ResponseEntity<>(
         new ResultDTO().message("同步成功").statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
   }

@@ -54,6 +54,16 @@ public class Constants {
   public final static String API_PRODUCES = "application/json";
   // api默认消费类型
   public final static String API_CONSUMES = "application/json";
+  // Oracle链接串前缀
+  public final static String JDBC_ORACLE_PREFIX = "jdbc:oracle:thin:@";
+  // MySQL连接串前缀
+  public final static String JDBC_MYSQL_PREFIX = "jdbc:mysql://";
+  // Oracle链接串前缀
+  public final static String JDBC_ORACLE_POSTFIX = ":";
+  // MySQL连接串前缀
+  public final static String JDBC_MYSQL_POSTFIX = "/";
+  // MySQL连接串超后缀
+  public final static String JDBC_MYSQL_POSTFIX_UTF8_ENCODING = "?useUnicode=true&characterEncoding=utf-8";
   // mybatis配置文件根路径
   public final static String MYBATIS_GEN_CONFIG_ROOT = "configfiles";
   // dictType和dictValue都存在
@@ -64,8 +74,20 @@ public class Constants {
   public final static String Value_Exit = "2";
   // dictType,dictValue都不存在
   public final static String Type_Value_Unexit = "3";
+  // ui_config都存在
+  public final static String Ui_Config_Exist = "4";
   // dictType表名
   public final static String Table_Dict_Type = "dict_type";
   //dictValue表名
   public final static String Table_Dict_Value = "dict_value";
+  //uiconfig表名
+  public final static String Table_UICONFIG = "ui_config";
+  // Unknown
+  public final static String Unknown = "unknown";
+  // x-forwarded-for
+  public final static String X_Forwarded_For = "x-forwarded-for";
+  // Proxy-Client-IP
+  public final static String Proxy_Client_IP = "Proxy-Client-IP";
+  // WL-Proxy-Client-IP
+  public final static String WL_Proxy_Client_IP = "WL-Proxy-Client-IP";
 }

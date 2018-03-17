@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
@@ -32,8 +35,6 @@ import com.changan.code.dto.ResultOfProjectDTO;
 import com.changan.code.dto.ResultOfTypeDTO;
 import com.changan.code.entity.ProjectPO;
 import com.changan.code.service.IProjectService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
 /**
  * @author wenxing
@@ -53,8 +54,8 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectsSchemaGet() {
-    JsonSchema jsonSchema = this.getJsonSchemaByJavaType(new TypeReference<ProjectPO>() {});
-    return new ResponseEntity<>(new ResultJsonSchemaDTO().jsonSchema(jsonSchema)
+    /* JsonSchema jsonSchema = this.getJsonSchemaByJavaType(new TypeReference<ProjectPO>() {}); */
+    return new ResponseEntity<>(new ResultJsonSchemaDTO()/* .jsonSchema(jsonSchema) */
         .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
         HttpStatus.OK);
   }
@@ -64,7 +65,7 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectsGet(@RequestBody PageDTO searchParams) {
-    Page<ProjectPO> result = projectService.findProjecsPage(searchParams);
+    Page<ProjectPO> result = projectService.findProjecsPage(searchParams, getUser().getUsername());
     return new ResponseEntity<>(new ResultPageDTO<ProjectPO>()
         .totalElements(result.getTotalElements()).pageNumber(result.getNumber())
         .pageSize(result.getSize()).data(result.getContent())
@@ -77,7 +78,7 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> projectsShowGet(@PathVariable String id) {
-    ProjectPO project = projectService.getProjectById(id);
+    ProjectPO project = projectService.getProjectById(id, getUser().getUsername());
     return new ResponseEntity<>(new ResultOfProjectDTO().project(project)
         .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
         HttpStatus.OK);
@@ -87,11 +88,12 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    * 保存project
    */
   @Override
-  public ResponseEntity<ResultDTO> projectSavePost(@RequestBody ProjectPO project) {
+  public ResponseEntity<ResultDTO> projectSavePost(@RequestBody ProjectPO project,
+      @RequestParam(value = "token", required = false) String token, HttpServletRequest request) {
     if (project.isNew()) {
-      project = projectService.saveProject(project);
+      project = projectService.createProject(project, token, request, getUser().getUsername());
     } else {
-      project = projectService.updateProject(project);
+      project = projectService.updateProject(project, token, request, getUser().getUsername());
     }
     return new ResponseEntity<>(new ResultOfProjectDTO().project(project)
         .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
@@ -139,8 +141,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
   @Override
   public ResponseEntity<ResultDTO> projectsGenerateCodeGet(@PathVariable String id) {
     return new ResponseEntity<>(new ResultOfMsgDataDTO()
-        .msgData(projectService.generateCodeFiles(id)).message(RestStatus.RESULT_SUCCESS.message())
-        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+        .msgData(projectService.generateCodeFiles(id, getUser().getUsername()))
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
   }
 
   /**
@@ -161,9 +164,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
   }
 
   @Override
-  public ResponseEntity<InputStreamResource> projectsDownloadUIGet(@PathVariable String projectName)
+  public ResponseEntity<InputStreamResource> projectsDownloadUIGet(@PathVariable String projectId)
       throws FileNotFoundException {
-    File file = projectService.downloadZipUIFiles(projectName);
+    File file = projectService.downloadZipUIFiles(projectId, getUser().getUsername());
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
     headers.add("Content-Disposition",
@@ -179,8 +182,22 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> isDictionaryPost(@PathVariable String id) {
-    return new ResponseEntity<>(new ResultOfProjectDTO().isDictionary(projectService.creatDictTable(id)).message(RestStatus.RESULT_SUCCESS.message())
-        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+    return new ResponseEntity<>(new ResultOfProjectDTO()
+        .isDictionary(projectService.creatNeedTables(id))
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
+  }
+
+  /**
+   * 根据id删除项目
+   */
+  @Override
+  public ResponseEntity<ResultDTO> projectPost(@PathVariable String id) {
+    // 执行删除
+    projectService.deleteProject(id);
+    return new ResponseEntity<>(new ResultOfProjectDTO()
+        .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
+        HttpStatus.OK);
   }
 
 }

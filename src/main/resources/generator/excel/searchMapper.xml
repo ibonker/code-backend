@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>searchMapper</name>
+  <filePath>src/main/java/${packageName}/dao/excel/</filePath>
+  <fileName>SearchMapper.java</fileName>
+  <content><![CDATA[
+package ${packageName}.dao.excel;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * excel数据导出查询sql声明dao
+ * @author TitanCode2
+ */
+public interface SearchMapper {
+  
+  List<Map<String,String>> searchMsg (@Param("parameter") String parameter, @Param("where") String where);
+  
+  void insertMsg(@Param("parameter") String parameter);
+}
+]]>
+  </content>
+</template>

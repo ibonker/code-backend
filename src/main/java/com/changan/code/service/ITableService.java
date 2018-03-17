@@ -4,6 +4,7 @@
 package com.changan.code.service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,13 @@ import com.changan.code.entity.TransferObjPO;
  *
  */
 public interface ITableService {
+  
+  /**
+   * 根据id查找
+   * @param id
+   * @return
+   */
+  public TablePO findById(String id);
   
   /**
    * 根据datasource id更新数据库表信息，并返回最新数据库表
@@ -98,7 +106,7 @@ public interface ITableService {
    * 更新自动创建crud状态-active
    * @param ids
    */
-  public void activeIsAutoCrud(RequestOfTableIdsDTO tableIds);
+  public void activeIsAutoCrud(RequestOfTableIdsDTO tableIds, String usercode);
   
   /**
    * 更新自动创建crud状态-inactive
@@ -111,20 +119,18 @@ public interface ITableService {
    * @return
    */
   public TransferObjPO transColumnPOToTransPO(String tableId);
-
-  /**
-   * 实体文件生成
-   * @param projectId
-   * @return
-   */
-  public String generateEntityCodeFiles(String tableId);
   
   /**
    * 下载实体文件
    * @param projectName
    * @return
    */
-  public File downLoadFile(String tableName);
+  public String generateTableCodes(String tableId) throws FileNotFoundException;
+  
+  /**
+   * 下载文件
+   */
+  public File downloadZipFiles(String tableName);
   
   /**
    * 获取表
@@ -206,6 +212,12 @@ public interface ITableService {
    * @return
    */
   public Boolean isDictionary(String tableId);
+  
+  /**
+   * 创建uiconfig
+   * @param datasource
+   */
+  public void createUiConfig(DatasourcePO datasource);
 
   /**
    * 创建dictType

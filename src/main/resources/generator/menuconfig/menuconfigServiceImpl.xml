@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>menuconfigServiceImpl</name>
+	<filePath>src/main/java/${packageName}/service/impl</filePath>
+	<fileName>MenuConfigServiceImpl.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service.impl;
+
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.changan.anywhere.common.utils.FileUtils;
+import ${packageName}.common.RestStatus;
+import ${packageName}.exception.CodeCommonException;
+import ${packageName}.service.IMenuConfigService;
+import ${packageName}.cache.MenuCache;
+	
+	
+/**
+ * 
+ * @author xuyufeng
+ *
+ */
+@Service
+public class MenuConfigServiceImpl implements IMenuConfigService {
+
+  @Value("${r'$'}{uiconfig.menuPath}")
+  private String menuPath;
+
+  @Autowired
+  private MenuCache menuCache;
+  
+  @Override
+  public Map<String, Object> getMenuConfig(String version) {
+    // 如果版本号相同返回空,否则返回内存数据
+    if (menuCache.getMenuMap().get("version").toString().equals(version)) {
+      return null;
+    } else {
+      return menuCache.getMenuMap();
+    }
+  }
+
+  @Override
+  public void saveMenuConfig(String data) {
+    // 配置文件
+    FileUtils.createFile(menuPath);
+    // 获取内存版本号
+    int version = Integer.valueOf(menuCache.getMenuMap().get("version").toString());
+    // 将配置写入文件
+    try {
+      Writer writer =
+          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(menuPath), "UTF-8"));
+      writer.write(data.replace("'", "\""));
+      writer.close();
+    } catch (Exception e) {
+      // 抛出异常
+      throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
+          RestStatus.RESULT_SYSTEM_ERROR.message(), e);
+    }
+    // 更新内存数据
+    menuCache.getMenuConfig();
+    // 更新内存版本号
+    menuCache.getMenuMap().put("version", version+1);
+  }
+
+}
+	]]>
+	</content>
+</template>

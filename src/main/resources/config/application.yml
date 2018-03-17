@@ -12,21 +12,12 @@ spring:
   application:
     name: titan-code2
   profiles:
-    active: ${PRO_ENV:local}
+    active: ${PRO_ENV:test}
+    include: api
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
-apis:
-  baseType: 
-    - String
-    - Integer
-    - Long
-    - Float
-    - Double
-    - BigDecimal
-    - Date
-    - Timestamp
-  arrayType:
-    - base
-    - po
-    - dto
+  security:
+    rest:
+      ignorePath: /login
+      matchPath: /logout

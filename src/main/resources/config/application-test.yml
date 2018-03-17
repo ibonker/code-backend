@@ -1,5 +1,18 @@
 spring:
   profiles: test
+  redis:
+    database: 0
+    host: 10.64.13.80
+    port: 6379
+    
+#  datasource:
+#    druid:
+#      driverClassName: oracle.jdbc.driver.OracleDriver
+#      url: jdbc:oracle:thin:@10.64.26.45:1521:xe
+#      username: root
+#      password: root
+#      filters: stat
+#      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000   
   datasource:
     druid:
       driverClassName: com.mysql.jdbc.Driver
@@ -18,4 +31,14 @@ generate:
   projectPath: /home/titan-code2/codedir/
   projectZipPath: /home/titan-code2/codedir/zip/
   projectUiPath: /home/titan-code2/ui-code/
+  projectUiTempPath: /home/titan-code2/ui-code-temp/
   mybatisGenlibsPath: /home/titan-code2/mybatis-genlibs/
+  entityZipPath: /home/titan-code2/codeir/entity/zip/
+  entityPath: /home/titan-code2/codeir/entity/
+appId:
+  url: http://10.64.11.157:8080/rescenter/rest/codeGenerator/api/v1/app/save
+token:
+  url: http://10.64.19.104:8085/rescenter-rest/ResCenterApi/getUserByToken
+res:
+  center:
+    server: 10.64.19.104:8085

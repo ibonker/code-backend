@@ -1,2 +1,4 @@
 spring:
   profiles: prod
+appId:
+  url: http://cmp.changan.com/rescenter/rest/codeGenerator/api/v1/app/save

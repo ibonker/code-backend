@@ -33,6 +33,13 @@ public interface IApiObjService {
    * @return
    */
   public List<ApiObjPO> findAllApiObj(String apiBaseId);
+  
+  /**
+   * 查询所有ApiObj
+   * 
+   * @return
+   */
+  public List<ApiObjPO> findAllApiObjByTableId(String tableId);
 
   /**
    * 根据id查询ApiObj
@@ -70,6 +77,14 @@ public interface IApiObjService {
    * @param tableId
    */
   public void deleteAutoCrudApi(String tableId);
+  
+  /**
+   * 根据genBasedTableId列表删除数据
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  public Long deleteByGenBasedTableIdIn(List<String> genBasedTableIds);
   
   /**
    * 根据tableId删除关联关系crud api

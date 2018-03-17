@@ -13,7 +13,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 /**
- * CorsConfig
+ * 跨域请求配置
  *
  * @author TitanCode2
  *
@@ -28,13 +28,19 @@ public class CorsConfig {
    */
   @Bean
   public CorsFilter corsFilter() {
+    // 初始化配置实例
     CorsConfiguration corsConfiguration = new CorsConfiguration();
+    // 允许任意来源的请求
     corsConfiguration.addAllowedOrigin("*");
+    // 允许任意的请求头
     corsConfiguration.addAllowedHeader("*");
+    // 允许暴露给前端的响应头
     corsConfiguration.addExposedHeader("AUTH_TOKEN");
+    // 允许任意请求方法
     corsConfiguration.addAllowedMethod("*");
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", corsConfiguration); // 4
+    // 所有的接口都适用相同跨域配置
+    source.registerCorsConfiguration("/**", corsConfiguration);
     return new CorsFilter(source);
   }
   

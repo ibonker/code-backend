@@ -85,6 +85,14 @@ public interface TransferObjRespository
    * @return
    */
   List<TransferObjPO> findByGenBasedTableId(String genBasedTableId);
+  
+  /**
+   * 根据genBasedTableId获取普通实体数据
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  List<TransferObjPO> findByGenBasedTableIdAndIsSeniorNot(String genBasedTableId, String isSenior);
 
   /**
    * 根据genBasedTableId删除数据

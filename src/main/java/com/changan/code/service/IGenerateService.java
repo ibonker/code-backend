@@ -5,7 +5,6 @@ package com.changan.code.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.changan.code.dto.SeniorDtoAttribute;
 import com.changan.code.dto.SeniorDtoRelation;
@@ -35,8 +34,8 @@ public interface IGenerateService {
    * @param subProjectName
    * @return
    */
-  public String generateToFile(String basePath, Template tpl, Map<String, Object> model,
-      boolean isReplaceFile);
+  public String generateToFile(String bathpath, String pathPostfix, Template tpl,
+      Map<String, Object> model, boolean isReplaceFile);
 
   /**
    * 生成配置文件
@@ -44,8 +43,8 @@ public interface IGenerateService {
    * @param datasources
    * @return
    */
-  public void generateConfigFiles(ProjectPO project, List<DatasourcePO> datasources,
-      List<ApiBasePO> apiBases, ApiBasePO firstApiBase);
+  public void generateConfigFiles(String pathPostfix, ProjectPO project,
+      List<DatasourcePO> datasources, List<ApiBasePO> apiBases, ApiBasePO firstApiBase);
 
   /**
    * 生成实体类
@@ -53,8 +52,8 @@ public interface IGenerateService {
    * @param table
    * @param columns
    */
-  public void generateEntityFiles(String moduleName, String projectName, String packageName,
-      TablePO table, List<ColumnPO> columns);
+  public void generateEntityFiles(String pathPostfix, String moduleName, String projectName,
+      String packageName, TablePO table, List<ColumnPO> columns);
 
 
   /**
@@ -63,8 +62,9 @@ public interface IGenerateService {
    * @param transferObj
    * @param tansferObjFileds
    */
-  public void generateDTOFiles(String projectName, String packageName, TransferObjPO transferObj,
-      List<TransferObjFieldPO> transferObjFileds);
+  public void generateDTOFiles(String pathPostfix, String projectName, String packageName,
+      TransferObjPO transferObj, List<TransferObjFieldPO> transferObjFileds,
+      List<SeniorDtoRelation> relations, String seniorName);
 
   /**
    * 生成DAO文件
@@ -72,9 +72,9 @@ public interface IGenerateService {
    * @param table
    * @param columns
    */
-  public void generateDAOFiles(String moduleName, String projectName, String packageName,
-      String tableName, List<TableSeniorRelationPO> relations, List<SeniorDtoAttribute> attrs,
-      List<SeniorDtoRelation> relationMethods);
+  public void generateDAOFiles(String pathPostfix, String moduleName, String projectName,
+      String packageName, String tableName, List<TableSeniorRelationPO> relations,
+      List<SeniorDtoAttribute> attrs, List<SeniorDtoRelation> relationMethods);
 
   /**
    * 生成Iservice文件
@@ -83,8 +83,8 @@ public interface IGenerateService {
    * @param packageName
    * @param ClassName
    */
-  public void generateIServiceAndServiceImpl(String moduleName, String projectName,
-      String packageName, String tableName, List<TableRelationPO> tableRelation,
+  public void generateIServiceAndServiceImpl(String pathPostfix, String moduleName,
+      String projectName, String packageName, String tableName, List<TableRelationPO> tableRelation,
       List<TableSeniorRelationPO> relations, boolean isSenior);
 
   /**
@@ -94,8 +94,8 @@ public interface IGenerateService {
    * @param apibase
    * @param apiobjs
    */
-  public void generateControllerFiles(ProjectPO project, ApiBasePO apibase, String controllerName,
-      List<ApiObjPO> apiobjs);
+  public void generateControllerFiles(String pathPostfix, ProjectPO project, ApiBasePO apibase,
+      String controllerName, List<ApiObjPO> apiobjs);
 
   /**
    * 数据库代码生成xml
@@ -104,21 +104,21 @@ public interface IGenerateService {
    * @param packageName
    * @param datasource
    */
-  public void generateGeneratorConfigFiles(String projectName, String packageName,
-      DatasourcePO datasource, Set<TablePO> tables);
+  public void generateGeneratorConfigFiles(String pathPostfix, String projectName,
+      String packageName, DatasourcePO datasource, List<TablePO> tables);
 
   /**
    * 通过mybatis generator生成mybatis相关文件
    * 
    * @param projectName
    */
-  public void generateMybatisFiles(String projectName);
+  public void generateMybatisFiles(String pathPostfix, String projectName);
 
   /**
    * 生成JPA Repository
    */
-  public void generateRepository(String moduleName, String projectName, String packageName,
-      String name);
+  public void generateRepository(String pathPostfix, String moduleName, String projectName,
+      String packageName, String name);
 
   /**
    * 生成JPAService 和 JPAServiceImpl
@@ -129,8 +129,8 @@ public interface IGenerateService {
    * @param table
    * @param DTOPackageName
    */
-  public void generateJPAServiceAndJPAServiceImpl(String module, String projectName,
-      String packageName, TablePO table, String dtoPackageName);
+  public void generateJPAServiceAndJPAServiceImpl(String pathPostfix, String module,
+      String projectName, String packageName, TablePO table, String dtoPackageName);
 
   /**
    * 生成advice文件
@@ -138,14 +138,15 @@ public interface IGenerateService {
    * @param packageName
    * @param module
    */
-  public void generateAdvice(String packageName, String projectName);
+  public void generateAdvice(String pathPostfix, String packageName, String projectName);
 
   /**
    * 生成前台文件util、index
    * 
    * @param projectName
    */
-  public void generateUIFiles(String projecTitle);
+  public void generateUIFiles(String projectDescription, String projectName,
+      String projecTitle, String appId);
 
   /**
    * 生成前台文件
@@ -156,6 +157,6 @@ public interface IGenerateService {
    * @param isReplaceFile
    * @return
    */
-  public String generateToUIFile(String basePath, Template tpl, Map<String, Object> model,
-      boolean isReplaceFile);
+  public String generateToUIFile(String basePath, Template tpl,
+      Map<String, Object> model, boolean isReplaceFile);
 }

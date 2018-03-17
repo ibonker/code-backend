@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>menuconfigService</name>
+	<filePath>src/main/java/${packageName}/service</filePath>
+	<fileName>IMenuConfigService.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service;
+	
+import java.util.Map;
+
+/**
+ * @author TitanCode2
+ *
+ */
+public interface IMenuConfigService {
+  
+  /**
+   * 获取Menu配置
+   * @return
+   */
+  public Map<String, Object> getMenuConfig(String version);
+
+  /**
+   * 保存Menu配置
+   * @param data
+   */
+  public void saveMenuConfig(String data);
+}
+	]]>
+	</content>
+</template>

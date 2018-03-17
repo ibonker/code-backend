@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>excelOperationServiceImpl</name>
+  <filePath>src/main/java/${packageName}/service/excel/impl</filePath>
+  <fileName>ExcelOperationServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.service.excel.impl;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFDataFormat;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.changan.anywhere.common.utils.FileUtils;
+import com.changan.anywhere.common.utils.IdGen;
+import com.changan.anywhere.common.utils.MybatisFilterUtils;
+import ${packageName}.common.Constants;
+import ${packageName}.common.RestStatus;
+import ${packageName}.dao.excel.SearchMapper;
+import ${packageName}.dto.excel.ExcelDTO;
+import ${packageName}.dto.excel.ExcelExportTempDTO;
+import ${packageName}.dto.excel.ExcelImportDTO;
+import ${packageName}.dto.excel.TitleDTO;
+import ${packageName}.exception.CodeCommonException;
+import ${packageName}.service.excel.IExcelOperationService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
+
+/**
+ * 通用excel导入导出方法实现
+ * @author TitanCode2
+ */
+@Service
+public class ExcelOperationServiceImpl implements IExcelOperationService {
+	
+  // 导入数据文件保存路径	
+  @Value("${r'$'}{excel.importPath}")
+  private String importPath;
+  // 查询参数	
+  @Autowired
+  private SearchMapper searchMapper;
+
+  /**
+   * 导出excel模版
+   */
+  @Override
+  public byte[] exportTemplate(ExcelDTO excelDTO) {
+    // 声明导出模版工作簿
+    XSSFWorkbook template = new XSSFWorkbook();
+    // 生成一个表格
+    XSSFSheet sheet = template.createSheet();
+    // 设置标题样式
+    XSSFCellStyle cellTitleStyle = template.createCellStyle();
+    cellTitleStyle.setAlignment(HorizontalAlignment.CENTER);
+    cellTitleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+    // 设置标题字体
+    XSSFFont font = template.createFont();
+    font.setFontHeightInPoints((short) 18); // 字体大小
+    font.setFontName("微软雅黑"); // 字体类型
+    cellTitleStyle.setFont(font);
+    // 合并单元格，从0-1行，0-size列
+    sheet.addMergedRegion(new CellRangeAddress(0, 1, 0, excelDTO.getExcelTitle().size() - 1));
+    XSSFCell nowCell = sheet.createRow(0).createCell(0);
+    nowCell.setCellValue(excelDTO.getExcelHeader());
+    nowCell.setCellStyle(cellTitleStyle);
+    // 设置表头样式
+    XSSFCellStyle cellHeaderStyle = template.createCellStyle();
+    // 设置表头字体
+    XSSFFont headerfont = template.createFont();
+    headerfont.setFontHeightInPoints((short) 12); // 字体大小
+    headerfont.setBold(true);
+    headerfont.setFontName("微软雅黑"); // 字体类型
+    cellHeaderStyle.setFont(headerfont);
+    // 产生表格标题行
+    XSSFRow row = sheet.createRow(2);
+    // 若filedDESC不为空，表头为filedDESC，否则为filedName
+    for (int i = 0; i < excelDTO.getExcelTitle().size(); i++) {
+      XSSFCell cell = row.createCell(excelDTO.getExcelTitle().get(i).getOrder());
+      String title = "";
+      if (excelDTO.getExcelTitle().get(i).getFieldDESC() == null
+          || "".equals(excelDTO.getExcelTitle().get(i).getFieldDESC())) {
+        cell.setCellValue(excelDTO.getExcelTitle().get(i).getFieldName());
+        title = excelDTO.getExcelTitle().get(i).getFieldName();
+      } else {
+        cell.setCellValue(excelDTO.getExcelTitle().get(i).getFieldDESC());
+        title = excelDTO.getExcelTitle().get(i).getFieldDESC();
+      }
+      // 设置表头格式
+      cell.setCellStyle(cellHeaderStyle);
+      // 表头宽度
+      sheet.setColumnWidth(i, title.getBytes().length * 256);
+    }
+    ByteArrayOutputStream out = null;
+    try {
+      // 生成临时文件
+      out = new ByteArrayOutputStream();
+      template.write(out);
+      out.close();
+      template.close();
+    } catch (IOException e) {
+      throw new CodeCommonException(RestStatus.RESULT_NO_DATA.code(), RestStatus.RESULT_NO_DATA.message());
+    }
+    return out.toByteArray();
+  }
+
+
+  /**
+   * 导出数据到excel
+   */
+  @Override
+  public byte[] exportExcel(ExcelDTO excelDTO) throws IOException {
+    ByteArrayOutputStream out = null;
+    try {
+      // 创建模版
+      InputStream is = new ByteArrayInputStream(this.exportTemplate(excelDTO));
+      XSSFWorkbook exportWorkbook = new XSSFWorkbook(is);
+      XSSFSheet sheet = exportWorkbook.getSheetAt(0);
+      List<Map<String, String>> Msg = this.selectMsg(excelDTO);
+      // 整数
+      XSSFCellStyle intcellStyle = exportWorkbook.createCellStyle();
+      intcellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(Constants.INTEGER_FORMAT));
+      // 小数
+      XSSFCellStyle floatcellStyle = exportWorkbook.createCellStyle();
+      floatcellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(Constants.FLOAT_FORMAT));
+      // 日期
+      XSSFCellStyle datecellStyle = exportWorkbook.createCellStyle();
+      XSSFDataFormat dateformat = exportWorkbook.createDataFormat();
+      datecellStyle.setDataFormat(dateformat.getFormat(Constants.DATE_FORMAT));
+      // 日期时间
+      XSSFCellStyle datetimecellStyle = exportWorkbook.createCellStyle();
+      XSSFDataFormat datetimeformat = exportWorkbook.createDataFormat();
+      datetimecellStyle.setDataFormat(datetimeformat.getFormat(Constants.DATETIME_FORMAT));
+      // 宽度
+      List<Integer> maxColumnWidths = Lists.newArrayList();
+      for (int i = 0; i < excelDTO.getExcelTitle().size(); i++) {
+        maxColumnWidths.add(sheet.getColumnWidth(i));
+      }
+      // excel赋值
+      for (int i = 0; i < Msg.size(); i++) {
+        XSSFRow row = sheet.createRow(i + 3);
+        for (int j = 0; j < excelDTO.getExcelTitle().size(); j++) {
+          int width = 0;
+          XSSFCell cell = row.createCell(excelDTO.getExcelTitle().get(j).getOrder());
+          Object value = Msg.get(i).get(excelDTO.getExcelTitle().get(j).getFieldName());
+          if (value instanceof java.lang.Integer) {
+            // 整数类型数据
+            cell.setCellStyle(intcellStyle);
+            cell.setCellValue((Integer) value);
+          } else if (value instanceof java.lang.Float) {
+            // 小数类型数据
+            cell.setCellStyle(floatcellStyle);
+            cell.setCellValue((Float) value);
+          } else if (value instanceof java.lang.String) {
+            // 字符串类型数据
+            cell.setCellValue((String) value);
+          } else if (value instanceof java.sql.Date || value instanceof java.util.Date
+              || value instanceof java.sql.Timestamp) {
+            // 日期类型数据
+            String pattern = excelDTO.getExcelTitle().get(j).getPattern();
+            if (StringUtils.isBlank(pattern)
+                || (StringUtils.isNotBlank(pattern) && !pattern.equals(Constants.DATE_FORMAT))) {
+              cell.setCellStyle(datetimecellStyle);
+            } else {
+              cell.setCellStyle(datecellStyle);
+            }
+            cell.setCellValue((Date) value);
+          }
+
+          width = null != value ? value.toString().getBytes().length * 256 : 0;
+
+          // 重置宽度
+          if (maxColumnWidths.get(j) < width) {
+            maxColumnWidths.set(j, width);
+          }
+        }
+      }
+
+      // 调整宽度
+      for (int ic = 0; ic < maxColumnWidths.size(); ic++) {
+        sheet.setColumnWidth(ic, maxColumnWidths.get(ic));
+      }
+      // 输出
+      out = new ByteArrayOutputStream();
+      exportWorkbook.write(out);
+      out.close();
+      exportWorkbook.close();
+    } catch (FileNotFoundException e) {
+      throw new CodeCommonException(RestStatus.RESULT_NO_DATA.code(),
+          RestStatus.RESULT_NO_DATA.message());
+    }
+    return out.toByteArray();
+  }
+
+  /**
+   * 从excel导入数据
+   */
+  @Override
+  public List<Map<String, Object>> importExcel(ExcelImportDTO excelDTO) {
+    try {
+      InputStream is = excelDTO.getFile().getInputStream();
+      XSSFWorkbook importMsg = new XSSFWorkbook(is);
+      Date date = new Date();
+      // 将上传的文件保存至指定目录
+      String savePath = this.createImportPath(excelDTO, date);
+      // 创建父级文件夹
+      File fatherFile = new File(savePath);
+      if (!fatherFile.exists()) {
+        FileUtils.createFile(savePath);
+      }
+      // 解析excel
+      FileOutputStream out = new FileOutputStream(savePath);
+      importMsg.write(out);
+      XSSFSheet sheet = importMsg.getSheetAt(0);
+      // 获取excel数据
+      List<Map<String, Object>> Msgs = this.checkContent(sheet, excelDTO.getExcelTitle());
+      if (excelDTO.getVersion()) {
+        SimpleDateFormat fileNameFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        // 新增version字段
+        TitleDTO addVersion = new TitleDTO();
+        addVersion.setFieldName("version");
+        excelDTO.getExcelTitle().add(addVersion);
+        for (Map<String, Object> Msg : Msgs) {
+          Msg.put("version", fileNameFormat.format(date));
+        }
+      }
+      importMsg.close();
+      return Msgs;
+    } catch (Exception e) {
+      throw new CodeCommonException("文件格式错误!", e.toString());
+    }
+  }
+
+  /**
+   * 获取需要导出的数据
+   * 
+   * @return
+   */
+  public List<Map<String, String>> selectMsg(ExcelDTO excelDTO) {
+    StringBuffer parameter = new StringBuffer("select * from " + excelDTO.getTableName());
+    String where = MybatisFilterUtils.transSearchForMybatisSenoir(excelDTO.getPageDTO());
+    // 分页
+    PageHelper.startPage(excelDTO.getPageDTO().getPageParms().getPageIndex(),
+        excelDTO.getPageDTO().getPageParms().getPageSize());
+    // 获取数据    
+    PageInfo<Map<String, String>> result =
+        new PageInfo<>(searchMapper.searchMsg(parameter.toString(), where));
+    return result.getList();
+  }
+
+  /**
+   * 检查内容格式是否正确,并取值
+   * 
+   * @return
+   */
+  public List<Map<String, Object>> checkContent(XSSFSheet sheet, List<TitleDTO> excelTitle) {
+    List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+    for (int i = 3; i < sheet.getPhysicalNumberOfRows(); i++) {
+      Map<String, Object> Msg = new HashMap<String, Object>();
+      for (int j = 0; j < excelTitle.size(); j++) {
+      	// 将excel中的值转换到Map中
+        Object value =
+            this.transformatContent(sheet.getRow(i).getCell(excelTitle.get(j).getOrder()));
+        Msg.put(StringUtils.isNotEmpty(excelTitle.get(j).getAttrName())
+            ? excelTitle.get(j).getAttrName() : excelTitle.get(j).getFieldName(), value);
+      }
+      list.add(Msg);
+    }
+    return list;
+  }
+
+  /**
+   * 格式转换
+   * 
+   * @param cell
+   * @param type
+   * @return
+   */
+  public Object transformatContent(XSSFCell cell) {
+    try {
+      Object value = null;
+      if (null == cell) {
+        return value;
+      }
+      switch (cell.getCellType()) {
+        // 数值型
+        case Cell.CELL_TYPE_NUMERIC:
+          if (DateUtil.isCellDateFormatted(cell)) {
+            // 如果是date类型则 ，获取该cell的date值
+            value = HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
+            // Date date = HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
+            // SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            // value = format.format(date);
+          } else {// 纯数字
+            value = new BigDecimal(cell.getNumericCellValue());
+            // value = String.valueOf(cell.getNumericCellValue());
+            // // 解决1234.0 去掉后面的.0
+            // if (null != value && !"".equals(value.trim())) {
+            // String[] item = value.split("[.]");
+            // if (1 < item.length && "0".equals(item[1])) {
+            // value = item[0];
+            // }
+            // }
+          }
+          break;
+        // 字符串类型
+        case Cell.CELL_TYPE_STRING:
+          value = cell.getStringCellValue().toString();
+          break;
+        // 公式类型
+        case Cell.CELL_TYPE_FORMULA:
+          // 读公式计算值
+          value = String.valueOf(cell.getNumericCellValue());
+          if (value.equals("NaN")) {// 如果获取的数据值为非法值,则转换为获取字符串
+            value = cell.getStringCellValue().toString();
+          }
+          break;
+        // 布尔类型
+        case Cell.CELL_TYPE_BOOLEAN:
+          value = " " + cell.getBooleanCellValue();
+          break;
+        // 空值
+        case Cell.CELL_TYPE_BLANK:
+          value = "";
+          break;
+        // 故障
+        case Cell.CELL_TYPE_ERROR:
+          value = "";
+          break;
+        default:
+          value = cell.getStringCellValue().toString();
+      }
+      return value;
+    } catch (Exception e) {
+      throw new CodeCommonException("文件格式错误!", e.toString());
+    }
+  }
+
+  /**
+   * 构建sql并导入数据
+   * 
+   * @param excelDTO
+   * @param Msg
+   */
+  @Override
+  public void createSQL(ExcelImportDTO excelDTO, Map<String, Object> Msg) {
+    // 构建导入数据库SQL
+    StringBuffer parameter = new StringBuffer("insert into " + excelDTO.getTableName() + " ");
+    // 构建column字段
+    if (excelDTO.getExcelTitle().size() == 1) {
+      parameter.append("(id," + excelDTO.getExcelTitle().get(0).getFieldName() + ")");
+    } else {
+      StringBuffer column =
+          new StringBuffer("(id," + excelDTO.getExcelTitle().get(0).getFieldName());
+      for (int i = 1; i < excelDTO.getExcelTitle().size(); i++) {
+        column.append("," + excelDTO.getExcelTitle().get(i).getFieldName());
+      }
+      parameter.append(column + ")");
+    }
+    // 构建value字段
+    if (Msg.size() == 1) {
+      if (Msg.get("id") == null) {
+        Msg.put("id", IdGen.uuid());
+      }
+      parameter.append("values ('" + Msg.get("id") + "','"
+          + Msg.get(excelDTO.getExcelTitle().get(0).getFieldName().toString()) + "')");
+    } else {
+      StringBuffer value = new StringBuffer(
+          " values ('" + Msg.get(excelDTO.getExcelTitle().get(0).getFieldName()).toString());
+      for (int i = 1; i < Msg.size(); i++) {
+        value.append("','" + Msg.get(excelDTO.getExcelTitle().get(i).getFieldName()).toString());
+      }
+      parameter.append(value + "')");
+    }
+    searchMapper.insertMsg(parameter.toString());
+  }
+
+  /**
+   * 构建excel保存路径
+   * 
+   * @param file
+   * @return
+   */
+  public String createImportPath(ExcelImportDTO excelImportDTO, Date date) throws IOException {
+    SimpleDateFormat floderNameFormat = new SimpleDateFormat("yyyy_MM_dd");
+    SimpleDateFormat fileNameFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    // 获得当前日期为文件夹名
+    String floderName = floderNameFormat.format(date);
+    String[] file = excelImportDTO.getFile().getOriginalFilename().split("\\.");
+    String fileName = file[0] + "_" + fileNameFormat.format(date);
+    String savePath = importPath + floderName + "/" + fileName + ".xls";
+    return savePath;
+  }
+
+  /**
+   * 判断是否有id
+   * 
+   * @param excelTitle
+   * @return
+   */
+  public boolean isHaveId(List<TitleDTO> excelTitle) {
+    for (TitleDTO title : excelTitle) {
+      if ("id".equals(title.getFieldName())) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public void copySheets(XSSFWorkbook wbCreat, XSSFWorkbook wbOld) throws IOException {
+    int maxColumnCounts = 0;
+    for (int i = 0; i < wbOld.getNumberOfSheets(); i++) {
+      XSSFSheet sheet = wbOld.getSheetAt(i);
+      // sheet名称
+      XSSFSheet sheetCreat = wbCreat.createSheet(sheet.getSheetName());
+      // sheet合并单元格
+      int sheetMergerCount = sheet.getNumMergedRegions();
+      for (int mi = 0; mi < sheetMergerCount; mi++) {
+        CellRangeAddress mergedRegionAt = sheet.getMergedRegion(mi);
+        sheetCreat.addMergedRegion(mergedRegionAt);
+      }
+      // 原sheet可操作的行
+      int firstRow = sheet.getFirstRowNum();
+      int lastRow = sheet.getLastRowNum();
+      for (int ri = firstRow; ri <= lastRow; ri++) {
+        // 创建新建excel Sheet的行
+        XSSFRow rowCreat = sheetCreat.createRow(ri);
+        // 取得源有excel Sheet的行
+        XSSFRow row = sheet.getRow(ri);
+        // 单元格式样
+        int firstCell = row.getFirstCellNum();
+        int lastCell = row.getLastCellNum();
+        for (int ci = firstCell; ci < lastCell; ci++) {
+          // 老的
+          XSSFCell oldcell = row.getCell(ci);
+          if (maxColumnCounts < lastCell) {
+            maxColumnCounts = lastCell;
+          }
+          if (null != oldcell) {
+            // 新的样式
+            XSSFCellStyle newStyle = wbCreat.createCellStyle();
+            // 新的单元格
+            XSSFCell newcell = rowCreat.createCell(ci);
+            // 复制样式
+            newStyle.cloneStyleFrom(oldcell.getCellStyle());
+            // 设置样式
+            newcell.setCellStyle(newStyle);
+            // 设置类型
+            newcell.setCellType(oldcell.getCellType());
+            switch (oldcell.getCellType()) {
+              case XSSFCell.CELL_TYPE_BOOLEAN:
+                newcell.setCellValue(oldcell.getBooleanCellValue());
+                break;
+              case XSSFCell.CELL_TYPE_ERROR:
+                newcell.setCellErrorValue(oldcell.getErrorCellValue());
+                break;
+              case XSSFCell.CELL_TYPE_FORMULA:
+                newcell.setCellFormula(oldcell.getCellFormula());
+                break;
+              case XSSFCell.CELL_TYPE_NUMERIC:
+                if (DateUtil.isCellDateFormatted(oldcell)) {
+                  // 如果是date类型则 ，获取该cell的date值
+                  newcell.setCellValue(DateUtil.getJavaDate(oldcell.getNumericCellValue()));
+                } else {// 纯数字
+                  newcell.setCellValue(oldcell.getNumericCellValue());
+                }
+                break;
+              case XSSFCell.CELL_TYPE_STRING:
+                newcell.setCellValue(oldcell.getRichStringCellValue());
+                break;
+            }
+          }
+        }
+      }
+      // 调整宽度
+      for (int ic = 0; ic < maxColumnCounts; ic++) {
+        sheetCreat.autoSizeColumn((short) ic);
+      }
+    }
+  }
+
+  public void putValueToCell(ExcelExportTempDTO data, XSSFSheet sheet, XSSFCellStyle intcellStyle,
+      XSSFCellStyle floatcellStyle, XSSFCellStyle datecellStyle, XSSFCellStyle datetimecellStyle,
+      XSSFCellStyle cellTitleStyle, XSSFCellStyle cellHeaderStyle) {
+    // 合并单元格创建标题
+    sheet.addMergedRegion(new CellRangeAddress(0, 1, 0, data.getTableHeader().size() - 1));
+    XSSFCell nowCell = sheet.createRow(0).createCell(0);
+    // 设置表头格式
+    nowCell.setCellStyle(cellTitleStyle);
+    nowCell.setCellValue(data.getExcelHeader());
+    // 产生表格表头
+    XSSFRow thRow = sheet.createRow(2);
+    // 宽度
+    List<Integer> maxColumnWidths = Lists.newArrayList();
+    // 填充表头
+    for (int i = 0; i < data.getTableHeader().size(); i++) {
+      XSSFCell cell = thRow.createCell(i);
+      cell.setCellValue(data.getTableHeader().get(i));
+      cell.setCellStyle(cellHeaderStyle);
+      maxColumnWidths.add(data.getTableHeader().get(i).getBytes().length * 256);
+    }
+    // excel赋值
+    for (int i = 0; i < data.getValue().size(); i++) {
+      XSSFRow row = sheet.createRow(i + 3);
+      for (int j = 0; j < data.getValue().get(i).size(); j++) {
+        XSSFCell cell = row.createCell(j);
+        Object value = data.getValue().get(i).get(j);
+        // 初始化宽度
+        int width = null != value ? value.toString().getBytes().length * 256 : 0;
+        // 设置值和样式
+        if (value instanceof java.lang.Integer) {
+          // 整数类型数据
+          cell.setCellStyle(intcellStyle);
+          cell.setCellValue((Integer) value);
+        } else if (value instanceof java.lang.Float) {
+          // 小数类型数据
+          cell.setCellStyle(floatcellStyle);
+          cell.setCellValue((Float) value);
+        } else if (value instanceof java.lang.Double) {
+          // double类型数据
+          cell.setCellStyle(floatcellStyle);
+          cell.setCellValue((Double) value);
+        } else if (value instanceof java.math.BigDecimal) {
+          // BigDecimal类型数据
+          BigDecimal bd = (BigDecimal) value;
+          cell.setCellStyle(floatcellStyle);
+          cell.setCellValue(bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        } else if (value instanceof java.lang.Long) {
+          // long类型数据
+          cell.setCellStyle(intcellStyle);
+          cell.setCellValue((Long) value);
+        } else if (value instanceof java.lang.String) {
+          // 字符串类型数据
+          cell.setCellValue((String) value);
+        } else if (value instanceof java.sql.Date || value instanceof java.util.Date
+            || value instanceof java.sql.Timestamp) {
+          // 日期类型数据
+          String pattern = data.getTableFormat().get(j);
+          if (StringUtils.isBlank(pattern)
+              || (StringUtils.isNotBlank(pattern) && !pattern.equals(Constants.DATE_FORMAT))) {
+            cell.setCellStyle(datetimecellStyle);
+            width = Constants.DATETIME_FORMAT.getBytes().length * 256;
+          } else {
+            cell.setCellStyle(datecellStyle);
+            width = Constants.DATE_FORMAT.getBytes().length * 256;
+          }
+          cell.setCellValue((Date) value);
+        }
+        // 重置宽度
+        if (maxColumnWidths.get(j) < width) {
+          maxColumnWidths.set(j, width);
+        }
+      }
+    }
+    // 调整宽度
+    for (int ic = 0; ic < maxColumnWidths.size(); ic++) {
+      sheet.setColumnWidth(ic, maxColumnWidths.get(ic));
+    }
+  }
+}
+]]>
+  </content>
+</template>

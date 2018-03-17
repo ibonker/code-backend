@@ -58,8 +58,10 @@ import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 </#if>
-</#list>
+<#if i == "dict">
 import com.changan.annotation.DictionaryType;
+</#if>
+</#list>
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
@@ -67,8 +69,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * @author TitanCode2
  * ${tableComments}
- * 
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -78,7 +80,7 @@ public class ${className} extends BaseEntity {
 
   <#list columns as c>
   <#if c.javaField != "createdAt" && c.javaField != "updatedAt" && c.javaField != "id">
-  <#if !(c.isNullable)?? || c.isNullable != "1">
+  <#if (c.isNullable)?? && c.isNullable == "0">
   @NotNull
   </#if>
   <#if (c.pattern)?? && c.pattern != "">
@@ -108,12 +110,14 @@ public class ${className} extends BaseEntity {
   </#if>
   private ${c.javaType} ${c.javaField};
   </#if>
+  
   </#list>
   
   <#list relAnns as relAnn>
   <#if !((relAnn.mappedBy)??)>@JoinColumn(name = "${relAnn.columnName}", referencedColumnName = "${relAnn.refColumnName}")</#if>
   ${relAnn.relationType}<#if (relAnn.mappedBy)??>(mappedBy = "${relAnn.mappedBy}", cascade = CascadeType.ALL)<#else>(fetch = FetchType.LAZY)</#if>
   private <#if relAnn.isCollection>List${r'<'}</#if>${relAnn.attrPOName}<#if relAnn.isCollection>${r'>'}</#if> ${relAnn.attrName};
+  
   </#list>
 }
 	]]>

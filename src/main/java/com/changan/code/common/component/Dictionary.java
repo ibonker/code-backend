@@ -4,7 +4,7 @@ import com.changan.code.common.Constants;
 
 public enum Dictionary {
   
-  dictionary("是"), undictionary("否");
+  dictionary("是(将创建dict_value和dict_type数据库表)"), undictionary("否");
   
   private final String cname;
 

@@ -23,7 +23,7 @@
 	</resultMap> 
 	
 	<#list relationMethods as method>
-	<select id="findAppInfoSeniorBy${method.name}" resultMap="${className}ResultMap">
+	<select id="find${className}By${method.nameAttr}" resultMap="${className}ResultMap">
 		select
 		<#list method.attrs as attr>
 			<#list attr.columns as column>

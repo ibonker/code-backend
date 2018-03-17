@@ -6,6 +6,7 @@ package com.changan.code.dto;
 import java.util.List;
 
 import com.changan.code.entity.TableSeniorSlavePO;
+import com.google.common.base.CaseFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,10 +19,16 @@ import lombok.Data;
 @AllArgsConstructor
 public class SeniorDtoRelation {
   
-  private String name;
+  private String name; // 关系名
   
-  private List<SeniorDtoAttribute> attrs;
+  private String desc;
   
-  private List<TableSeniorSlavePO> slaves;
+  private List<SeniorDtoAttribute> attrs; // 实体字段列表
+  
+  private List<TableSeniorSlavePO> slaves; // 关联的从表信息
+  
+  public String getNameAttr() {
+    return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, this.name);
+  }
   
 }

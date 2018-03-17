@@ -78,6 +78,46 @@ public class ProjectPO extends BaseEntity {
   @JsonPropertyDescription("是否启用字典表")
   private String isdictionary = Constants.DATA_IS_NORMAL; //是否启用字典表
   
+  @Column(name = "app_id")
+  @JsonProperty("appId")
+  @JsonPropertyDescription("应用id")
+  private String appId;//应用id
+  
+  @Column(name = "user_id")
+  @JsonProperty("userId")
+  @JsonPropertyDescription("用户id")
+  private String userId;//用户id
+  
+  @Column(name = "user_name")
+  @JsonProperty("userName")
+  @JsonPropertyDescription("用户名称")
+  private String userName;//用户名称
+  
+  @Column(name = "department_name")
+  @JsonProperty("departmentName")
+  @JsonPropertyDescription("部门名称")
+  private String departmentName; //部门名称
+  
+  @Column(name = "modify_id")
+  @JsonProperty("modifyId")
+  @JsonPropertyDescription("修改人Id")
+  private String modifyId; //修改人Id
+  
+  @Column(name = "modify_name")
+  @JsonProperty("modifyName")
+  @JsonPropertyDescription("修改人名称")
+  private String modifyName; //修改人名称
+  
+  @Column(name = "modify_ip")
+  @JsonProperty("modifyIp")
+  @JsonPropertyDescription("修改人ip")
+  private String modifyIp; //修改人ip
+  
+  @Column(name = "created_by")
+  @JsonProperty("createdBy")
+  @JsonPropertyDescription("创建人")
+  private String createdBy; //创建人
+  
   /**
    * 可以更新的属性
    * @param newProject
@@ -90,6 +130,9 @@ public class ProjectPO extends BaseEntity {
     this.name = newProject.getName();
     this.datasources = newProject.getDatasources();
     this.isdictionary = newProject.getIsdictionary();
+    this.userId = newProject.getUserId();
+    this.userName = newProject.getUserName();
+    this.departmentName = newProject.getDepartmentName();
     
     return this;
   }

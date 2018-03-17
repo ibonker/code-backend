@@ -254,7 +254,8 @@ public class ApiObjPO extends BaseEntity {
       if (BaseDTO.ResultPageDTO.name().equals(this.responseObjName)) {
         return "page";
       } else if (!BaseDTO.ResultPageDTO.name().equals(this.responseObjName)
-          && RequestMethod.POST.name().equals(this.requestMethod)) {
+          && RequestMethod.POST.name().equals(this.requestMethod)
+          && !"excel.ResultOfExcelReportDTO".equals(this.responseObjName)) {
         return "insert";
       } else if (RequestMethod.PUT.name().equals(this.requestMethod)) {
         return "update";
@@ -262,6 +263,8 @@ public class ApiObjPO extends BaseEntity {
         return "delete";
       } else if (BaseDTO.ResultJsonSchemaDTO.name().equals(this.responseObjName)) {
         return "jsonschema";
+      } else if ("excel.ResultOfExcelReportDTO".equals(this.responseObjName)) {
+        return "import_excel";
       } else {
         return "show";
       }

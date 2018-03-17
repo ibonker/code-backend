@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @Api(value = "Dict", description = "the Dict API")
-@RequestMapping(value = "/demo/api/v1")
+@RequestMapping(value = "/codegen/api/v1")
 public interface DictApi {
   
   @ApiOperation(value = "查询所有DictType以及DictVlaue", notes = "查询所有DictType以及DictVlaue", response = ResultDictDTO.class,

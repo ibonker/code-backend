@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>excelDTO</name>
+  <filePath>src/main/java/${packageName}/dto/excel/</filePath>
+  <fileName>ExcelDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.dto.excel;
+
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
+
+import lombok.Data;
+
+
+@Data
+public class ExcelDTO {
+  
+  //数据流
+  private MultipartFile file;
+  
+  // excel标题行
+  private List<TitleDTO> excelTitle;
+  
+  // 表名
+  private String tableName;
+  
+  // 查询参数
+  private PageDTO pageDTO;
+  
+  // excel表头
+  private String excelHeader;
+
+}
+]]>
+  </content>
+</template>

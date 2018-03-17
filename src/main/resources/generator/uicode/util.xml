@@ -7,24 +7,41 @@
 import axios from 'axios';
 import env from '../config/env';
 let util = {
-    appName: '${projectTitle}'
+    appName: '${projectDescription}',
+    baseUrl: '${projectTitle}'
 };
-let devUrl =  'http://10.64.13.39:8908';
-let testUrl = 'htpp://127.0.0.1:8080';
-let proUrl = 'htpp://127.0.0.1:8080';
+let devUrl =  'http://127.0.0.1:8080';
+let testUrl = 'http://127.0.0.1:8080';
+let proUrl = 'http://127.0.0.1:8080';
+
+let rescenterDev = 'http://cmpdev.changan.com';
+let rescenterTest= 'http://cmpuat.changan.com';
+let rescenterPro = 'http://cmp.changan.com';
 util.title = function(title) {
     title = title ? title : '${projectTitle}';
     window.document.title = title;
 };
 
 const ajaxUrl = env === 'development' ? devUrl : env === 'production' ? proUrl : testUrl;
-axios.defaults.baseURL = ajaxUrl
+const resUrl = env === 'development' ? rescenterDev : env === 'production' ? rescenterPro : rescenterTest;
+
 util.ajax = axios.create({
     baseURL: ajaxUrl,
-    timeout: 30000
+    timeout: 3000000
 });
 
-util.ajaxUrl = ajaxUrl;
+util.resAjax = axios.create({
+    baseURL: resUrl,
+    timeout: 3000000
+});
+
+util.url = ajaxUrl;
+util.resUrl = resUrl;
+util.indexUrl = '/';
+
+<#if (appId)??>
+util.appId = '${appId}';
+</#if>
 
 export default util;
 ]]>

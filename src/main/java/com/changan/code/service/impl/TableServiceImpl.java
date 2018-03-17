@@ -4,6 +4,7 @@
 package com.changan.code.service.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,6 @@ import com.changan.code.service.IApiBaseService;
 import com.changan.code.service.IApiObjService;
 import com.changan.code.service.IColumnService;
 import com.changan.code.service.IDatasourceService;
-import com.changan.code.service.IGenerateService;
 import com.changan.code.service.IProjectService;
 import com.changan.code.service.ITableService;
 import com.changan.code.service.ITransferObjService;
@@ -102,12 +102,6 @@ public class TableServiceImpl implements ITableService {
   private ITransferObjService transobjService;
 
   @Autowired
-  private IGenerateService generateService;
-
-  @Autowired
-  private GenerateProperties genProperties;
-
-  @Autowired
   private ProjectRepository projectRepo;
 
   @Autowired
@@ -121,6 +115,18 @@ public class TableServiceImpl implements ITableService {
 
   @Autowired
   private TableSeniorColumnRepository tableSeniorColumnRepository;
+  
+  @Autowired
+  private GenerateProperties genProperties;
+  
+  /**
+   * 根据id查找
+   * @param id
+   * @return
+   */
+  public TablePO findById(String id) {
+    return tableRepository.findOne(id);
+  }
 
   /**
    * 更新数据库表
@@ -173,14 +179,17 @@ public class TableServiceImpl implements ITableService {
     // 新建实体
     for (TablePO table : newTables) {
       transobjService.createAutoCrudDTO(datasource.getProjectId(), table.getId(), table.getName(),
-          datasource.getName(),
+          datasource.getPackageName(),
           datasource.getPackageName().concat(".").concat(table.getClassName()));
     }
     // 删除 表
     this.deleteNotExistTables(notExistTables);
-    // 删除实体
+    // 删除实体和api
     for (TablePO table : notExistTables) {
+      // 删除实体
       transobjService.deleteAutoCrudDTO(table.getId());
+      // 删除api
+      apiobjService.deleteAutoCrudApi(table.getId());
     }
     // TODO 删除自动生成的字典表api
   }
@@ -285,11 +294,11 @@ public class TableServiceImpl implements ITableService {
 
   @Override
   @Transactional("jpaTransactionManager")
-  public void activeIsAutoCrud(RequestOfTableIdsDTO tableIds) {
+  public void activeIsAutoCrud(RequestOfTableIdsDTO tableIds, String usercode) {
     // 通过datasourceId获取datasource
     DatasourcePO datasource = datasourceService.findById(tableIds.getDatasourceId());
     // 通过projectId获取project
-    ProjectPO project = projectService.getProjectById(datasource.getProjectId());
+    ProjectPO project = projectService.getProjectById(datasource.getProjectId(), usercode);
     // 获得该项目datasource的数目
     Long dbcount = datasourceService.countByProjectId(project.getId());
     // 获取table
@@ -320,8 +329,15 @@ public class TableServiceImpl implements ITableService {
           tableRelationRepository.findByMasterTableIdOrderByCreatedAtAsc(table.getId());
       for (TableRelationPO relation : relations) {
         // 创建主从关系crud api
+        relation.setMasterTableName(table.getName());
+        relation.setMasterClassName(className);
+        TablePO slaveTable = tableRepository.findOne(relation.getSlaveTableId());
+        TransferObjPO slavedto = transobjService.findTransferObjByTableId(relation.getSlaveTableId());
+        relation.setSlaveTableName(slaveTable.getName());
+        relation.setSlaveClassName(slavedto.getPackageName().concat(".").concat(slaveTable.getClassName()));
+        
         apiobjService.createAutoCruApiForRelation(firstApibase.getId(), relation,
-            showdto.getPackageName().concat(".").concat(showdto.getName()),
+            showdto.getPackageName().concat(".").concat(slavedto.getName()),
             datasource.getName().toLowerCase(), dbcount);
       }
     }
@@ -386,45 +402,28 @@ public class TableServiceImpl implements ITableService {
   }
 
   /**
-   * 生成实体代码
-   */
-  @Override
-  public String generateEntityCodeFiles(String tableId) {
-    // 通过tableId 获取 table对象
-    TablePO table = tableRepository.findOne(tableId);
-    // 获得数据源
-    DatasourcePO datasource = datasourceService.findById(table.getDatasourceId());
-    // 获取项目
-    ProjectPO project = projectRepo.findOne(datasource.getProjectId());
-    // 获取实体表名
-    List<ColumnPO> columns = this.findMergedColumns(tableId);
-    // 生成实体文件代码
-    generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
-        project.getPackages().toLowerCase(), table, columns);
-    return "/codegen/api/v1/" + table.getId() + "/download";
-  }
-
-  /**
    * 下载entity文件
    */
   @Override
-  public File downLoadFile(String tableId) {
+  public String generateTableCodes(String tableId) throws FileNotFoundException{
     // 通过tableId 获取 table对象
     TablePO table = tableRepository.findOne(tableId);
     // 获得数据源
     DatasourcePO datasource = datasourceService.findById(table.getDatasourceId());
     // 获取项目
     ProjectPO project = projectRepo.findOne(datasource.getProjectId());
-    // 获取实体表名
-    List<ColumnPO> columns = this.findMergedColumns(tableId);
-    // 生成实体文件代码
-    generateService.generateEntityFiles(datasource.getPackageName(), project.getName(),
-        project.getPackages().toLowerCase(), table, columns);
-    // 设置项目下的文件路径
-    String projectZipPath = GeneratorUtils.getEntityPath(
-        genProperties.getProjectPath() + project.getName() + "/src/main/java/"
-            + project.getPackages().replace(".", "/") + "/entity/" + datasource.getName(),
-        table.getClassName());
+    // 生成未压缩的项目文件并返回下载url
+    return projectService.generateCodeFilesUnzip(table, project, datasource);
+  }
+  
+  /**
+   * 下载文件
+   */
+  @Override
+  public File downloadZipFiles(String tableName) {
+    String projectZipPath =
+        GeneratorUtils.getProjectZipPath(genProperties.getProjectZipPath(), tableName);
+
     return new File(projectZipPath);
   }
 
@@ -504,6 +503,7 @@ public class TableServiceImpl implements ITableService {
     for (TableRelationPO tableRelationPO : result) {
       TablePO tp = tableRepository.findOne(tableRelationPO.getSlaveTableId());
       tableRelationPO.setSlaveTableName(tp.getName());
+      tableRelationPO.setSlaveTable(tp);
     }
     return result;
   }
@@ -522,6 +522,7 @@ public class TableServiceImpl implements ITableService {
     for (TableRelationPO tableRelationPO : result) {
       TablePO tp = tableRepository.findOne(tableRelationPO.getMasterTableId());
       tableRelationPO.setMasterTableName(tp.getName());
+      tableRelationPO.setMasterTable(tp);
     }
     return result;
   }
@@ -623,20 +624,21 @@ public class TableServiceImpl implements ITableService {
     List<TableSeniorRelationPO> tsrList =
         seniorRelationRepository.findByMasterTableIdOrderByCreatedAtAsc(masterTableId);
     for (TableSeniorRelationPO tsr : tsrList) {
-      String sql = "select * from <b>" + tsr.getMasterTableName() + "</b>";
+      String sql = "select * from <b>" + tsr.getMasterTableName() + "</b><br>";
       // 获取该关系所有从表
       List<TableSeniorSlavePO> sspList =
           tableSeniorSlaveRepository.findBySeniorIdOrderByCreatedAtAsc(tsr.getId());
       for (TableSeniorSlavePO ssp : sspList) {
-        sql += " <br>" + ssp.getRelation() + " <b>" + ssp.getSlaveTableName() + "</b>";
+        sql += " " + ssp.getRelation() + " <b>" + ssp.getSlaveTableName() + "</b>";
         sql += " on" + "<br>";
         // 获取从表下 所有关联字段
         List<TableSeniorColumnPO> cpList =
             tableSeniorColumnRepository.findBySeniorSlaveIdOrderByCreatedAtAsc(ssp.getId());
-        for (TableSeniorColumnPO po : cpList) {
-          sql += " <b>&nbsp;&nbsp;" + tsr.getMasterTableName() + "." + po.getMasterColumnName()
+        for (int i = 0; i < cpList.size(); i++) {
+          TableSeniorColumnPO po = cpList.get(i);
+          sql += "&nbsp;&nbsp;" + (i==0?"":"and  ") + "<b>"  + tsr.getMasterTableName() + "." + po.getMasterColumnName()
               + "</b>" + po.getOperate() + "<b>" + ssp.getSlaveTableName() + "."
-              + po.getSlaveColumnName() + "</b>";
+              + po.getSlaveColumnName() + "</b><br>";
         }
       }
       tsr.setSql(sql);
@@ -720,11 +722,22 @@ public class TableServiceImpl implements ITableService {
     for (String str : project.getComponents().split(",")){
       if(Dictionary.dictionary.toString().equals(str)){
         dictFlag = true;
+        break; 
       }else{
         dictFlag = false;
       }
     }
     return dictFlag;
+  }
+  
+  /**
+   * 创建uiconfig表
+   * @param datasource
+   */
+  @Override
+  @ChangeDatasource
+  public void createUiConfig(DatasourcePO datasource){
+    databaseDao.createUiConfig(datasource.getDbtype());
   }
   
   /**

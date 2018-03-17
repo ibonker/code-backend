@@ -12,6 +12,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.changan.anywhere.common.springsupport.SpringContextHolder;
 import com.changan.anywhere.dal.datasource.DBContextHolder;
 import com.changan.anywhere.dal.datasource.DynamicDataSource;
+import com.changan.code.common.Constants;
 import com.changan.code.entity.DatasourcePO;
 
 /**
@@ -23,7 +24,7 @@ import com.changan.code.entity.DatasourcePO;
  * @since JDK 1.7
  */
 public class DynamicLoadDatasource extends ApplicationObjectSupport {
-
+  
   // 数据源字符串常量
   private static final String DATASOURCE_STR = "datasource-";
 
@@ -44,8 +45,15 @@ public class DynamicLoadDatasource extends ApplicationObjectSupport {
     BeanDefinitionBuilder dataSourceBuider =
         BeanDefinitionBuilder.genericBeanDefinition(DruidDataSource.class);
 
+    // 设置数据库
+    String Dbtype = datasource.getDbtype();
+    if(Dbtype.equals(Constants.DATASOURCE_ORACLE)) {
+    	dataSourceBuider.addPropertyValue("url", Constants.JDBC_ORACLE_PREFIX + datasource.getDburl() + Constants.JDBC_ORACLE_POSTFIX + datasource.getName());
+    }
+    else {
+    	dataSourceBuider.addPropertyValue("url", Constants.JDBC_MYSQL_PREFIX  + datasource.getDburl() + Constants.JDBC_MYSQL_POSTFIX + datasource.getName() + Constants.JDBC_MYSQL_POSTFIX_UTF8_ENCODING);
+    }
     dataSourceBuider.addPropertyValue("driverClassName", datasource.getDbdriver());
-    dataSourceBuider.addPropertyValue("url", datasource.getDburl());
     dataSourceBuider.addPropertyValue("username", datasource.getDbuser());
     dataSourceBuider.addPropertyValue("password", datasource.getDbpassword());
 

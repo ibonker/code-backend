@@ -23,4 +23,6 @@ public class ApiProperties {
   
   private List<String> arrayType;
   
+  private GeneratedDescptionModel generatedModal;
+  
 }

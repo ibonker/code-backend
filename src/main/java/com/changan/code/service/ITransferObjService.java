@@ -49,6 +49,13 @@ public interface ITransferObjService {
    * @return
    */
   public TransferObjPO findTransferObjById(String id);
+  
+  /**
+   * 包含高级关联
+   * @param tableId
+   * @return
+   */
+  public List<TransferObjPO> findAllTransferObjByTableId(String tableId);
 
   /**
    * 根据table id获取DTO

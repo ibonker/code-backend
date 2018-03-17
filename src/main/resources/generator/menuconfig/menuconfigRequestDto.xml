@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>RequestMenuConfigDTO</name>
+	<filePath>src/main/java/${packageName}/dto/other</filePath>
+	<fileName>RequestMenuConfigDTO.java</fileName>
+	<content><![CDATA[
+package ${packageName}.dto.other;
+	
+import lombok.Data;
+
+/**
+ * 
+ * @author TitanCode2
+ */
+@Data
+public class RequestMenuConfigDTO {
+
+  private String data;
+  
+}
+	]]>
+	</content>
+</template>

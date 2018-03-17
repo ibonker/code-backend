@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>excelReportDTO</name>
+  <filePath>src/main/java/${packageName}/dto/excel/</filePath>
+  <fileName>ExcelReportDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.dto.excel;
+
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+import lombok.Data;
+
+/**
+ * excel导入报告DTO
+ * @author TitanCode2
+ */
+@Data
+@JsonInclude(Include.NON_NULL)
+public class ExcelReportDTO {
+  
+  // 导入条数
+  private Integer total;
+  // 成功条数
+  private Integer successTotal;
+  // 失败条数
+  private Integer failedTotal;
+  // 失败原因
+  private List<ExcelFailedDTO> failedDetails;
+  // 耗时
+  private Long timeCost;
+
+}
+
+]]>
+  </content>
+</template>

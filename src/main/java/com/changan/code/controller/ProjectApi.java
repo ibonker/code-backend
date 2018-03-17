@@ -5,12 +5,15 @@ package com.changan.code.controller;
 
 import java.io.FileNotFoundException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
@@ -69,7 +72,8 @@ public interface ProjectApi {
       @ApiResponse(code = 200, message = "返回错误信息", response = ResultDTO.class)})
   @RequestMapping(value = "/project/save", produces = {"application/json"},
       method = RequestMethod.POST)
-  ResponseEntity<ResultDTO> projectSavePost(@RequestBody ProjectPO project);
+  ResponseEntity<ResultDTO> projectSavePost(
+      @RequestBody ProjectPO project, @RequestParam(value = "token", required = false) String token, HttpServletRequest request);
 
   @ApiOperation(value = "项目实体", notes = "项目实体", response = ResultOfTypeDTO.class,
       tags = {"Project"})
@@ -126,10 +130,10 @@ public interface ProjectApi {
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = InputStreamResource.class),
           @ApiResponse(code = 200, message = "返回错误信息", response = InputStreamResource.class)})
-  @RequestMapping(value = "/projects/{projectName}/downloadUI",
+  @RequestMapping(value = "/projects/{projectId}/downloadUI",
       produces = {"application/octet-stream"}, method = RequestMethod.GET)
   ResponseEntity<InputStreamResource> projectsDownloadUIGet(
-      @ApiParam(value = "projectName", required = true) @PathVariable String projectName)
+      @ApiParam(value = "projectId", required = true) @PathVariable String projectId)
       throws FileNotFoundException;
 
   @ApiOperation(value = "启用或关闭字典表", notes = "启用或关闭字典表", response = ResultOfProjectDTO.class,
@@ -140,5 +144,15 @@ public interface ProjectApi {
   @RequestMapping(value = "/project/{id}", produces = {"application/json"},
       method = RequestMethod.POST)
   ResponseEntity<ResultDTO> isDictionaryPost(
+      @ApiParam(value = "id", required = true) @PathVariable String id);
+  
+  @ApiOperation(value = "根据id删除项目", notes = "根据id删除项目", response = ResultOfProjectDTO.class,
+      tags = {"Project"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfProjectDTO.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfProjectDTO.class)})
+  @RequestMapping(value = "/project/{id}/delete", produces = {"application/json"},
+      method = RequestMethod.POST)
+  ResponseEntity<ResultDTO> projectPost(
       @ApiParam(value = "id", required = true) @PathVariable String id);
 }

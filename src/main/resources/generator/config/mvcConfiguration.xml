@@ -18,11 +18,9 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /** 
- * MvcConfiguration 
+ * MVC配置，主要对数据库字段校验进行配置 
  *
  * @author TitanCode2
- * @version  
- * @since JDK 1.8 
  */
 @Configuration
 public class MvcConfiguration extends WebMvcConfigurerAdapter implements EnvironmentAware, MessageSourceAware {

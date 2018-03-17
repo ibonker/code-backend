@@ -11,7 +11,8 @@ public enum BaseParamIn {
   
   PATH("@PathVariable", "org.springframework.web.bind.annotation.PathVariable"), 
   BODY("@RequestBody", "org.springframework.web.bind.annotation.RequestBody"), 
-  QUERY("@RequestParam", "org.springframework.web.bind.annotation.RequestParam"), 
+  QUERY("@RequestParam", "org.springframework.web.bind.annotation.RequestParam"),
+  FORMDATA("", ""),
   HEADER("@RequestHeader", "org.springframework.web.bind.annotation.RequestHeader"), 
   COOKIE("@CookieValue", "org.springframework.web.bind.annotation.CookieValue");
   

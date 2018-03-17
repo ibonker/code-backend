@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>titleDTO</name>
+  <filePath>src/main/java/${packageName}/dto/excel/</filePath>
+  <fileName>TitleDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.dto.excel;
+
+import lombok.Data;
+
+/**
+ * excel数据导入列说明
+ * @author TitanCode2
+ */
+@Data
+public class TitleDTO {
+  
+  // 字段名
+  private String fieldName;
+  
+  // 实体属性
+  private String attrName;
+  
+  // 字典表字段
+  private String dictName;
+  
+  // 对应中文名
+  private String fieldDESC;
+  
+  // 排序
+  private int order;
+  
+  // 参数类型
+  private String type;
+
+  // 格式
+  private String pattern;
+}
+]]>
+  </content>
+</template>

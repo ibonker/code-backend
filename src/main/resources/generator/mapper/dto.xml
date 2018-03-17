@@ -60,15 +60,26 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+<#if isSenior>
+import com.changan.annotation.RelationDesc;
+import com.changan.annotation.SeniorDto;
+</#if>
 
  /**
-  *
+  * @author TitanCode2
   * <#if (transferObj.comments)?? && transferObj.comments != ""> ${transferObj.comments}</#if>
   */
 @Data
 @EqualsAndHashCode(callSuper = <#if (transferObj.inheritObjName)?? && transferObj.inheritObjName != "">true<#else>false</#if>)
 @ToString(callSuper = true)
 @JsonInclude(Include.NON_NULL)
+<#if isSenior>
+@SeniorDto(name = "${seniorName}", relation = {
+	<#list seniorRelations as seniorRelation>
+    @RelationDesc(name = "${seniorRelation.name}", description = "${seniorRelation.desc}")<#if seniorRelation_has_next>, </#if>
+    </#list>
+})
+</#if>
 public class ${transferObj.name} <#if (transferObj.inheritObjName) ?? && transferObj.inheritObjName != "">extends ${transferObj.inheritObjName}</#if>{
 
 	<#list transferObjFileds as t>

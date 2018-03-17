@@ -294,13 +294,13 @@ public class TransferObjServiceImpl implements ITransferObjService {
   // 初始化默认提供的dto
   @PostConstruct
   private void generateDefaultDtoMaps() {
-    log.info("初始化基础实体");
+    log.info(">>>> 初始化基础实体");
     // 创建临时实体 - pagedto
     TransferObjPO pagedto = new TransferObjPO();
     pagedto.setName(BaseDTO.PageDTO.name());
     pagedto.setComments(BaseDTO.PageDTO.getComments());
     pagedto.setGenBasedTableId("default");
-    // 字段 - pagedto
+    // 实体属性 - pagedto
     List<TransferObjFieldPO> pagedtofields = Lists.newArrayList();
     pagedtofields.add(new TransferObjFieldPO(BaseDTO.PageDTO.name(), "collection",
         BaseType.DTO.name().toLowerCase(), "Collection", "过滤参数集合实体"));
@@ -316,7 +316,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     resultdto.setName(BaseDTO.ResultDTO.name());
     resultdto.setComments(BaseDTO.ResultDTO.getComments());
     resultdto.setGenBasedTableId("default");
-    // 字段 - resultdto
+    // 实体属性 - resultdto
     List<TransferObjFieldPO> resultdtofields = Lists.newArrayList();
     resultdtofields.add(new TransferObjFieldPO(BaseDTO.ResultDTO.name(), "statusCode",
         BaseType.BASE.name().toLowerCase(), BaseFormat.String.name(), "返回编码"));
@@ -330,7 +330,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     resultpagedto.setName(BaseDTO.ResultPageDTO.name());
     resultpagedto.setComments(BaseDTO.ResultPageDTO.getComments());
     resultpagedto.setGenBasedTableId("default");
-    // 字段 - resultpagedto
+    // 实体属性 - resultpagedto
     List<TransferObjFieldPO> resultpagedtofields = Lists.newArrayList();
     resultpagedtofields.add(new TransferObjFieldPO(BaseDTO.ResultPageDTO.name(), "pageSize",
         BaseType.BASE.name().toLowerCase(), BaseFormat.Long.name(), "每页大小"));
@@ -348,7 +348,7 @@ public class TransferObjServiceImpl implements ITransferObjService {
     resultschemadto.setName(BaseDTO.ResultJsonSchemaDTO.name());
     resultschemadto.setComments(BaseDTO.ResultJsonSchemaDTO.getComments());
     resultschemadto.setGenBasedTableId("default");
-    // 字段 - resultschemadto
+    // 实体属性 - resultschemadto
     List<TransferObjFieldPO> resultschemadtofields = Lists.newArrayList();
     resultschemadtofields.add(new TransferObjFieldPO(BaseDTO.ResultJsonSchemaDTO.name(),
         "jsonSchema", BaseType.DTO.name().toLowerCase(), "JsonSchema", "jsonSchema实体"));
@@ -357,13 +357,30 @@ public class TransferObjServiceImpl implements ITransferObjService {
     defaultDtoMaps.put(BaseDTO.ResultJsonSchemaDTO.name(), resultschemadto);
   }
 
+  /**
+   * 不包含高级关联
+   */
   @Override
   public TransferObjPO findTransferObjByTableId(String tableId) {
-    List<TransferObjPO> dtos = transferObjRePo.findByGenBasedTableId(tableId);
+    List<TransferObjPO> dtos = transferObjRePo.findByGenBasedTableIdAndIsSeniorNot(tableId, "1");
     if (dtos.isEmpty()) {
       throw new CodeCommonException("未找到DTO: table id -> ".concat(tableId));
     }
     return dtos.get(0);
+  }
+  
+  /**
+   * 包含高级关联
+   * @param tableId
+   * @return
+   */
+  @Override
+  public List<TransferObjPO> findAllTransferObjByTableId(String tableId) {
+    List<TransferObjPO> dtos = transferObjRePo.findByGenBasedTableId(tableId);
+    if (dtos.isEmpty()) {
+      throw new CodeCommonException("未找到DTO: table id -> ".concat(tableId));
+    }
+    return dtos;
   }
 
 

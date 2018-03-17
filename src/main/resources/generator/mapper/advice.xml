@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import ${packageName}.exception.CodeCommonException;
+import ${packageName}.common.RestStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author wenxing
- *
+ * 统一处理CodeCommonException异常
+ * @author TitanCode2
  */
 @ControllerAdvice
 @Slf4j
@@ -26,7 +27,11 @@ public class CodeHandlerAdvice {
   
   @ExceptionHandler(value = CodeCommonException.class)
   public ResponseEntity<ResultDTO> exception(CodeCommonException exception) {
-    log.error("**** 发生异常 ****", exception);
+    // 如果发生系统异常则打印日志
+    if (RestStatus.RESULT_SYSTEM_ERROR.equals(exception.getCode())) {
+      log.error("**** 发生异常 ****", exception);
+    }
+    // 返回
     ResponseEntity<ResultDTO> resultDto = new ResponseEntity<ResultDTO>(
         new ResultDTO().statusCode(exception.getCode()).message(exception.getMessage()), HttpStatus.OK);
     return resultDto;

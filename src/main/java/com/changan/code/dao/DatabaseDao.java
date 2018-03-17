@@ -123,4 +123,9 @@ public interface DatabaseDao extends CrudDao<ColumnPO> {
    * 创建dictValue表
    */
   void creatDictValue();
+  
+  /**
+   * 创建uiconfig表
+   */
+  void createUiConfig(@Param("dbName") String dbName);
 }

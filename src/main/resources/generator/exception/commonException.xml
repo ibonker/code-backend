@@ -10,17 +10,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * 统一异常，用于controller advice统一处理
  * @author TitanCode2
- *
  */
 public class CodeCommonException extends RuntimeException {
   
   /**
-   * 
+   * 序列化
    */
   private static final long serialVersionUID = -7090277986807518L;
 
-    /**
+  /**
    * 返回码
    */
   @Getter

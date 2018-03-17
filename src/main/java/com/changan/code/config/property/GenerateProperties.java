@@ -25,4 +25,10 @@ public class GenerateProperties {
   
   private String projectUiPath;
   
+  private String projectUiTempPath;
+  
+  private String entityZipPath;
+  
+  private String entityPath;
+  
 }

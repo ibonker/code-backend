@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Data;  
 
 /**
- * 持久化实体基类
+ * 持久化实体基类，提供id、created_at和updated_at三个字段的更新和修改的赋值操作
  * 
  * @author TitanCode2
  *
@@ -38,17 +38,20 @@ public class BaseEntity implements Serializable {
    */
   private static final long serialVersionUID = 1L;
 
+  // id
   @Column(name = "id")
   @JsonProperty(value = "id")
   @JsonPropertyDescription("id")
   private String id;
-
+  
+  // 创建时间
   @Column(name = "created_at", nullable = false)
   @JsonPropertyDescription("创建时间")
   @JsonProperty(value = "createdAt", access = Access.READ_ONLY)
   @JsonFormat(pattern = Constants.DATETIME_FORMAT, timezone="GMT+8")
   protected Date createdAt;
-
+  
+  // 更新时间
   @Column(name = "updated_at", nullable = false)
   @JsonPropertyDescription("更新时间")
   @JsonProperty(value = "updatedAt", access = Access.READ_ONLY)

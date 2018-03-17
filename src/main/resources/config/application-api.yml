@@ -1,0 +1,379 @@
+apis:
+  baseType: 
+    - String
+    - Integer
+    - Long
+    - Float
+    - Double
+    - BigDecimal
+    - Date
+    - Timestamp
+    - Boolean
+  arrayType:
+    - base
+    - po
+    - dto
+  generatedModal:
+    # 单表api
+    normalApiModels:
+      # 单表分页查询接口
+      - apiModelName: pageSearch
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s/pages 
+        methodName: ${tableParamName}sPagesPost
+        responseDTO: ResultPageDTO
+        description: 实体${className}分页列表
+        responseGenericType: po
+        responseGenericName: ${className}
+        produces: application/json
+        consumes: ~
+        requestMethod: POST
+        apiParams:
+          - name: searchParams
+            description: 分页参数
+            paramForm: body
+            paramType: dto
+            paramFormat: PageDTO
+      # 单表详情接口
+      - apiModelName: entityInfo
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s/{${tableParamName}Id} 
+        methodName: ${tableParamName}sGET
+        responseDTO: ${dtoName}
+        description: 实体${className}详情
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: GET
+        apiParams:
+          - name: ${tableParamName}Id
+            description: ${tableParamName}对象Id
+            paramForm: path
+            paramType: base
+            paramFormat: String
+      # 单表删除接口
+      - apiModelName: entityDelete
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s/{${tableParamName}Id} 
+        methodName: ${tableParamName}sDelete
+        responseDTO: ${dtoName}
+        description: 实体${className}删除
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: DELETE
+        apiParams:
+          - name: ${tableParamName}Id
+            description: ${tableParamName}对象Id
+            paramForm: path
+            paramType: base
+            paramFormat: String     
+      # 单表新增接口
+      - apiModelName: entityCreate
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s
+        methodName: ${tableParamName}sPost
+        responseDTO: ${dtoName}
+        description: 实体${className}新增
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: POST
+        apiParams:
+          - name: ${tableParamName}
+            description: ${tableParamName}对象
+            paramForm: body
+            paramType: po
+            paramFormat: ${className}    
+      # 单表更新接口
+      - apiModelName: entityUpdate
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s/{${tableParamName}Id}
+        methodName: ${tableParamName}sPut
+        responseDTO: ${dtoName}
+        description: 实体${className}更新
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: PUT
+        apiParams:
+          - name: ${tableParamName}Id
+            description: ${tableParamName}对象Id
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${tableParamName}
+            description: ${tableParamName}对象
+            paramForm: body
+            paramType: po
+            paramFormat: ${className}            
+      # 单表jsonschema接口
+      - apiModelName: entityJsonSchema
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s
+        methodName: ${tableParamName}sGet
+        responseDTO: ResultJsonSchemaDTO
+        description: 实体${className}的json-schema
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/schema+json
+        consumes: ~
+        requestMethod: GET
+      # 单表导入Excel接口
+      - apiModelName: entityImportExcel
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s/import/excel
+        methodName: ${tableParamName}sPost
+        responseDTO: excel.ResultOfExcelReportDTO
+        description: 实体${className}的Excel导入
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: multipart/form-data
+        requestMethod: POST
+        apiParams:
+          - name: excelDTO
+            description: ExcelImportDTO参数
+            paramForm: formdata
+            paramType: dto
+            paramFormat: excel.ExcelImportDTO
+    # 高级查询
+    seniorApiModels:
+      # 高级查询分页接口
+      - apiModelName: pageSearch
+        tag: ${tableParamName}${relationUpper}
+        uri: ${urlPrefix}/${tableName}s/${relation}/pages 
+        methodName: ${tableParamName}s${relationUpper}PagesPost
+        responseDTO: ResultPageDTO
+        description: 实体${className}分页列表
+        responseGenericType: dto
+        responseGenericName: ${className}
+        produces: application/json
+        consumes: ~
+        requestMethod: POST
+        apiParams:
+          - name: searchParams
+            description: 分页参数
+            paramForm: body
+            paramType: dto
+            paramFormat: PageDTO
+      # 单表jsonschema接口
+      - apiModelName: entityJsonSchema
+        tag: ${tableParamName}
+        uri: ${urlPrefix}/${tableName}s
+        methodName: ${tableParamName}sGet
+        responseDTO: ResultJsonSchemaDTO
+        description: 实体${className}的json-schema
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/schema+json
+        consumes: ~
+        requestMethod: GET
+    # rest关联查询
+    restApiModels:
+      # rest查询分页接口(一对多)
+      - apiModelName: OneToManyPageSearch
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}s/pages 
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}PagesPost
+        responseDTO: ResultPageDTO
+        description: 从表实体${slaveClassName}分页列表
+        responseGenericType: po
+        responseGenericName: ${slaveClassName}
+        produces: application/json
+        consumes: ~
+        requestMethod: POST
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: searchParams
+            description: 分页参数
+            paramForm: body
+            paramType: dto
+            paramFormat: PageDTO
+      # rest详情接口
+      - apiModelName: OneToManyEntityInfo
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}s/{${slaveTableParamName}Id}
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sGET
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}详情
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: GET
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${slaveTableParamName}Id
+            description: ${slaveTableParamName}对象Id
+            paramForm: path
+            paramType: base
+            paramFormat: String
+      # rest删除接口
+      - apiModelName: OneToManyEntityDelete
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}s/{${slaveTableParamName}Id} 
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sDelete
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}删除
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: DELETE
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${slaveTableParamName}Id
+            description: ${slaveTableParamName}对象Id
+            paramForm: path
+            paramType: base
+            paramFormat: String     
+      # rest新增接口
+      - apiModelName: OneToManyEntityCreate
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}s
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sPost
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}新增
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: POST
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${slaveTableParamName}
+            description: ${slaveTableParamName}对象
+            paramForm: body
+            paramType: po
+            paramFormat: ${slaveClassName}    
+      # rest更新接口
+      - apiModelName: OneToManyEntityUpdate
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}s/{${slaveTableParamName}Id}
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sPut
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}更新
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: PUT
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${slaveTableParamName}Id
+            description: ${slaveTableParamName}对象Id
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${slaveTableParamName}
+            description: ${slaveTableParamName}对象
+            paramForm: body
+            paramType: po
+            paramFormat: ${slaveClassName}  
+      # rest详情接口(一对一)
+      - apiModelName: OneToOneEntityInfo
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sGET
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}详情
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: GET
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+      # rest删除接口
+      - apiModelName: OneToOneEntityDelete
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName} 
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sDelete
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}删除
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: DELETE
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String     
+      # rest新增接口
+      - apiModelName: OneToOneEntityCreate
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sPost
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}新增
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: POST
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${slaveTableParamName}
+            description: ${slaveTableParamName}对象
+            paramForm: body
+            paramType: po
+            paramFormat: ${slaveClassName}    
+      # rest更新接口
+      - apiModelName: OneToOneEntityUpdate
+        tag: ${masterTableParamName}
+        uri: ${urlPrefix}/${masterTableName}s/{${masterTableParamName}${masterColumnParamName}}/${slaveTableName}
+        methodName: ${masterTableParamName}${masterColumnParamName}${slaveTableParamNameUpper}sPut
+        responseDTO: ${dtoName}
+        description: 从表实体${slaveClassName}更新
+        responseGenericType: ~
+        responseGenericName: ~
+        produces: application/json
+        consumes: ~
+        requestMethod: PUT
+        apiParams:
+          - name: ${masterTableParamName}${masterColumnParamName}
+            description: ${masterTableParamName}对象${masterColumnParamName}
+            paramForm: path
+            paramType: base
+            paramFormat: String
+          - name: ${slaveTableParamName}
+            description: ${slaveTableParamName}对象
+            paramForm: body
+            paramType: po
+            paramFormat: ${slaveClassName}                             

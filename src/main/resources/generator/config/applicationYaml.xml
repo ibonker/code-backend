@@ -5,10 +5,11 @@
     <fileName>application${postfix}.yml</fileName>
     <content><![CDATA[
 <#if postfix == "">
+# 应用信息
 info:
   app_name: TITAN::${projectName}
   app_version: 0.1-SNAPSHOT
-  
+# tomcat配置  
 server:
   tomcat:
     remote_ip_header: x-forwarded-for
@@ -20,7 +21,7 @@ server:
   port: 8080
   session:
     timeout: 1000000
-    
+# spring配置    
 spring:
   profiles:
     active: local
@@ -64,7 +65,10 @@ logging:
     org.springframework.web: INFO
     com.changan.anywhere: DEBUG
 uiconfig:
-  path: ./ui-config/config.txt
+  path: ./ui-config/config.json
+  menuPath: ./ui-config/menu_config.json
+excel:
+  importPath: ./importExcel/
 <#if components?seq_contains("rescentersecurity")>  
   <#if postfix == "-test" || postfix == "-local">
 res:

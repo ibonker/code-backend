@@ -64,8 +64,8 @@ public class ApiParamServiceImpl implements IApiParamService {
         this.saveAllApiParam(apiObjId, apiParams, allApiParam);
       }
     } else {
-      // 逻辑删除ApiObj下所有的参数
-      this.deleteAllParam(apiObjId);
+      // 物理删除ApiObj下所有的参数
+      this.deleteByApiObjId(apiObjId);
     }
   }
 
@@ -138,7 +138,7 @@ public class ApiParamServiceImpl implements IApiParamService {
       }
       // 若没有执行更新操作则执行删除
       if (saveCount == 0) {
-        this.deleteApiParamById(apiParamData.getId());
+        apiParamRepo.delete(apiParamData.getId());
       }
     }
   }

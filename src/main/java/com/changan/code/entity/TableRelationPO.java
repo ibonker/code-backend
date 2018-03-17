@@ -73,6 +73,12 @@ public class TableRelationPO extends BaseEntity {
   @Transient
   private String masterClassName; // 主表实体名
   
+  @Transient
+  private TablePO masterTable; // 主表实体
+  
+  @Transient
+  private TablePO slaveTable; // 从表实体
+  
   
   
   /**

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>excelExportTempDTO</name>
+  <filePath>src/main/java/${packageName}/dto/excel/</filePath>
+  <fileName>ExcelExportTempDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.dto.excel;
+
+import java.util.List;
+
+import lombok.Data;
+
+/**
+ * excel导出临时dto
+ * @author TitanCode2
+ */
+@Data
+public class ExcelExportTempDTO {
+  
+  // 标题
+  private String excelHeader;
+  // 表头
+  private List<String> tableHeader;
+  // 列格式
+  private List<String> tableFormat;
+  // 值
+  private List<List<Object>> value;
+
+}
+]]>
+  </content>
+</template>
