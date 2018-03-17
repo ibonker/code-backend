@@ -1,0 +1,4 @@
+include 'titan-common', 'titan-jsonmeta'
+
+project(':titan-common').projectDir = new File(settingsDir, '../titan-common')
+project(':titan-jsonmeta').projectDir = new File(settingsDir, '../titan-jsonmeta')

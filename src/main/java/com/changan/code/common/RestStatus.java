@@ -3,7 +3,7 @@
  */
 package com.changan.code.common;
 
-import com.changan.anywhere.common.mvc.page.rest.response.BaseRestStatus;
+import com.changan.anywhere.common.mvc.rest.basic.BaseRestStatus;
 
 /**
  * @author wenxing

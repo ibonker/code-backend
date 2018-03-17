@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
 import com.changan.code.dto.ResultOfApiParamDTO;
 import com.changan.code.entity.ApiParamPO;
 

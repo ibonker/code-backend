@@ -20,24 +20,6 @@ import com.google.common.collect.Lists;
 public class BaseController {
 
   /**
-   * 获取json-schema
-   * 
-   * @param typeRef
-   * @return
-   */
-  protected JsonSchema getJsonSchemaByJavaType(TypeReference<?> typeRef) {
-    ValidationSchemaFactoryWrapperExtend visitor = new ValidationSchemaFactoryWrapperExtend();
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      JavaType jt = mapper.getTypeFactory().constructType(typeRef);
-      mapper.acceptJsonFormatVisitor(jt, visitor);
-    } catch (JsonMappingException e) {
-      throw new CodeCommonException("实体映射异常");
-    }
-    return visitor.finalSchema();
-  }
-
-  /**
    * 获取用户信息
    * 
    * @return

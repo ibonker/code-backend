@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.common.RestStatus;
@@ -38,17 +38,7 @@ public class DatasourceApiController extends BaseController implements Datasourc
   // 注入表service
   @Autowired
   private ITableService tableService;
-  
-  /**
-   * 获取table schema
-   */
-  @Override
-  public ResponseEntity<JsonSchema> datasourcesSchemaGet() {
-    return new ResponseEntity<JsonSchema>(
-        this.getJsonSchemaByJavaType(new TypeReference<DatasourcePO>() {}),
-        HttpStatus.OK);
-  }
-
+ 
   /**
    * 检测数据源连接
    */

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.common.RestStatus;
 import com.changan.code.controller.TableApi;
@@ -44,15 +44,6 @@ public class TableApiController extends BaseController implements TableApi {
 
   @Autowired
   private ITableService tableService;
-
-  /**
-   * 获取table schema
-   */
-  @Override
-  public ResponseEntity<JsonSchema> tablesSchemaGet() {
-    return new ResponseEntity<JsonSchema>(
-        this.getJsonSchemaByJavaType(new TypeReference<TablePO>() {}), HttpStatus.OK);
-  }
 
   /**
    * 获取表字段列表

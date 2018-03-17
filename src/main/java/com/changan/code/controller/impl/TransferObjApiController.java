@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.common.RestStatus;
 import com.changan.code.controller.TransferObjApi;

@@ -2,7 +2,7 @@ package com.changan.code.dto;
 
 import java.util.List;
 
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
 import com.changan.code.entity.ApiViewFormConfigPO;
 import com.changan.code.entity.ApiViewPO;
 import com.changan.code.entity.ApiViewTableConfigPO;
