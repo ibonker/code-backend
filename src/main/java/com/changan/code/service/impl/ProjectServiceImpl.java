@@ -277,7 +277,8 @@ public class ProjectServiceImpl implements IProjectService {
       updateProject.setDepartmentName(null);
     }
     // 更新数据库
-    return this.saveProject(updateProject, token, request);
+    project = this.saveProject(updateProject, token, request);
+    return project;
   }
 
   /**
@@ -311,7 +312,7 @@ public class ProjectServiceImpl implements IProjectService {
       datasourceService.saveDatasources(datasources);
     }
     // 创建表
-    this.creatNeedTables(project.getId());
+    this.creatNeedTables(project);
     return project;
   }
 
@@ -448,7 +449,8 @@ public class ProjectServiceImpl implements IProjectService {
         // 获取主表关系表
         List<TableRelationPO> tableRelations =
             tableService.findSlaveTableRelationList(table.getId());
-        if (Constants.IS_ACTIVE.equals(table.getIsAutoCrud())) {
+        if (Constants.IS_ACTIVE.equals(table.getIsAutoCrud())
+            || Constants.Table_UICONFIG.equals(table.getName().toLowerCase())) {
           tableNeedServiceCreated.add(table.getId());
         }
         // 注入从表数据库类型
@@ -573,10 +575,12 @@ public class ProjectServiceImpl implements IProjectService {
               PatternUtils.getMatchedSubString(apiobj.getUri(), "(?<=\\{)(.+?)(?=\\})");
           if (apiobj.getIsSlaveUri()) {
             if (substrs.size() > 1) {
+              // 一对多情况
               // uri的结构为"/a/{aid}/b/{bid}";
               apiobj.setFirstPathVar(substrs.get(substrs.size() - 2));
               apiobj.setLastPathVar(substrs.get(substrs.size() - 1));
             } else {
+              // 单表或者一对一
               apiobj.setFirstPathVar(substrs.get(0));
             }
           } else {
@@ -712,7 +716,7 @@ public class ProjectServiceImpl implements IProjectService {
             tableNames.add(slave.getSlaveTableId());
           }
           if (!relationTableNames.contains(slave.getSlaveTableId())) {
-            // 获取从表用于关联关系sql            
+            // 获取从表用于关联关系sql
             List<ColumnPO> slavecolumns = Lists.newArrayList(slaveTable.getColumnMaps().values());
             // 排序
             slavecolumns.sort((ColumnPO a, ColumnPO b) -> Integer.valueOf(a.getSortWeight())
@@ -860,14 +864,11 @@ public class ProjectServiceImpl implements IProjectService {
    * 判断是否生成dictType和dictValue和uiconfig表
    */
   @Override
-  public String creatNeedTables(String projectId) {
-    // 获取compoent
-    String compoents =
-        projectRepo.findByIdAndDelFlag(projectId, Constants.DATA_IS_NORMAL).getComponents();
+  public String creatNeedTables(ProjectPO project) {
     // 创建判断表示
     Boolean dictFlag = false;
     // 判断是否启用字典表
-    for (String compoent : compoents.split(",")) {
+    for (String compoent : project.getComponents().split(",")) {
       if (Dictionary.dictionary.toString().equals(compoent)) {
         dictFlag = true;
         break;
@@ -875,23 +876,25 @@ public class ProjectServiceImpl implements IProjectService {
     }
     // 判断是否启用前端配置表
     Boolean uienableFlag = false;
-    for (String compoent : compoents.split(",")) {
+    for (String compoent : project.getComponents().split(",")) {
       if (UiConfig.uiConfigEnabled.toString().equals(compoent)) {
         uienableFlag = true;
         break;
       }
     }
     // 获取数据源列表
-    List<DatasourcePO> datasources = datasourceService.findByProjectId(projectId);
+    List<DatasourcePO> datasources = datasourceService.findByProjectId(project.getId());
     for (DatasourcePO datasource : datasources) {
       // 需要创建的表
       List<String> keyTables = this.isExist(datasource);
       // 判断数据源中是否存在表
       if (dictFlag && !keyTables.contains(Constants.Table_Dict_Type)) {
         tableService.creatDictType(datasource);
-      } else if (dictFlag && !keyTables.contains(Constants.Table_Dict_Value)) {
+      }
+      if (dictFlag && !keyTables.contains(Constants.Table_Dict_Value)) {
         tableService.creatDictValue(datasource);
-      } else if (uienableFlag && !keyTables.contains(Constants.Table_UICONFIG)) {
+      }
+      if (uienableFlag && !keyTables.contains(Constants.Table_UICONFIG)) {
         tableService.createUiConfig(datasource);
       }
     }
@@ -908,10 +911,10 @@ public class ProjectServiceImpl implements IProjectService {
     List<String> keyTables = Lists.newArrayList();
     // 返回判断结果
     for (TablePO table : originalTables) {
-      if (Constants.Table_Dict_Type.equals(table.getName())
-          || Constants.Table_Dict_Value.equals(table.getName())
-          || Constants.Table_UICONFIG.equals(table.getName())) {
-        keyTables.add(table.getName());
+      if (Constants.Table_Dict_Type.equals(table.getName().toLowerCase())
+          || Constants.Table_Dict_Value.equals(table.getName().toLowerCase())
+          || Constants.Table_UICONFIG.equals(table.getName().toLowerCase())) {
+        keyTables.add(table.getName().toLowerCase());
       }
     }
     return keyTables;
@@ -1135,7 +1138,8 @@ public class ProjectServiceImpl implements IProjectService {
     }
 
     // 查询表对应的DTO信息
-    List<TransferObjPO> transferObjs = transObjService.findAllTransferObjByTableId(mainTable.getId());
+    List<TransferObjPO> transferObjs =
+        transObjService.findAllTransferObjByTableId(mainTable.getId());
     for (TransferObjPO transferObj : transferObjs) {
       // 查询DTO下对应DTO属性
       List<TransferObjFieldPO> transferObjFileds =
@@ -1152,7 +1156,8 @@ public class ProjectServiceImpl implements IProjectService {
       }
       // 生成DTO文件代码
       generateService.generateDTOFiles(version, project.getName(),
-          project.getPackages().toLowerCase(), transferObj, transferObjFileds, relations, seniorName);
+          project.getPackages().toLowerCase(), transferObj, transferObjFileds, relations,
+          seniorName);
     }
 
     // 获取apibase

@@ -214,7 +214,7 @@ public class ${className}ServiceImpl implements I${className}Service {
 
   //通过id删除
   @Override
-  public int delete${className}(String id) {
+  public int deleteById(String id) {
     return ${lowerName}POMapper.deleteByPrimaryKey(id);
   }
   
@@ -336,7 +336,7 @@ public class ${className}ServiceImpl implements I${className}Service {
    * @param ${lowerName}
    * @return
    */
-  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}, ${className}PO ${lowerName}){
+  public int update${className}By${tableRelation.masterTableNameCap}${tableRelation.masterColumnNameCap}(${tableRelation.masterColumnType} ${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap}<#if 'One to One' != tableRelation.relation>, String id</#if>, ${className}PO ${lowerName}){
   	// 设置值
   	${lowerName}.set${tableRelation.slaveColumnNameCap}(${tableRelation.masterTableNameLower}${tableRelation.masterColumnNameCap});
   	${lowerName}.preUpdate();

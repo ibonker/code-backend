@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
-import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
-import com.changan.anywhere.common.mvc.rest.json.ResultJsonSchemaDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultJsonSchemaDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.common.BaseType;
 import com.changan.code.common.RestStatus;
@@ -182,8 +182,9 @@ public class ProjectApiController extends BaseController implements ProjectApi {
    */
   @Override
   public ResponseEntity<ResultDTO> isDictionaryPost(@PathVariable String id) {
+    ProjectPO project = projectService.getProjectById(id, ""); 
     return new ResponseEntity<>(new ResultOfProjectDTO()
-        .isDictionary(projectService.creatNeedTables(id))
+        .isDictionary(projectService.creatNeedTables(project))
         .message(RestStatus.RESULT_SUCCESS.message()).statusCode(RestStatus.RESULT_SUCCESS.code()),
         HttpStatus.OK);
   }

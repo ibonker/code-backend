@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.common.RestStatus;
 import com.changan.code.controller.ColumnApi;
@@ -20,6 +20,8 @@ import com.changan.code.dto.ResultOfColumnDTO;
 import com.changan.code.dto.ResultOfColumnsDTO;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.service.IColumnService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
 /**
  * @author wenxing
@@ -31,6 +33,17 @@ public class ColumnApiController extends BaseController implements ColumnApi {
   // 注入表字段service
   @Autowired
   private IColumnService columnService;
+
+  /**
+   * 表字段列表schema
+   * 
+   * @return
+   */
+  @Override
+  public ResponseEntity<JsonSchema> columnsSchemaGet() {
+    return new ResponseEntity<JsonSchema>(
+        this.getJsonSchemaByJavaType(new TypeReference<ResultOfColumnsDTO>() {}), HttpStatus.OK);
+  }
 
   /**
    * 批量保存表字段配置

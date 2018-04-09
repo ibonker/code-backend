@@ -37,7 +37,7 @@ public class Constants {
   // 数据库mysql驱动
   public final static String DATASOURCE_MYSQL_DRIVER = "com.mysql.jdbc.Driver";
   // 数据库oracle驱动
-  public final static String DATASOURCE_ORACLE_DRIVER = "oracle.jdbc.driver.OracleDriver";
+  public final static String DATASOURCE_ORACLE_DRIVER = "oracle.jdbc.OracleDriver";
   // api默认版本号
   public final static String API_BASE_DEFAULT_VERSION_NAME = "v1";
   // api默认版本号
@@ -59,7 +59,7 @@ public class Constants {
   // MySQL连接串前缀
   public final static String JDBC_MYSQL_PREFIX = "jdbc:mysql://";
   // Oracle链接串前缀
-  public final static String JDBC_ORACLE_POSTFIX = ":";
+  public final static String JDBC_ORACLE_POSTFIX = "/";
   // MySQL连接串前缀
   public final static String JDBC_MYSQL_POSTFIX = "/";
   // MySQL连接串超后缀

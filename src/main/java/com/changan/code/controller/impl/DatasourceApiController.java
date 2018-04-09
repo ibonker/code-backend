@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
-import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.common.RestStatus;
@@ -38,7 +38,17 @@ public class DatasourceApiController extends BaseController implements Datasourc
   // 注入表service
   @Autowired
   private ITableService tableService;
- 
+  
+  /**
+   * 获取table schema
+   */
+  @Override
+  public ResponseEntity<JsonSchema> datasourcesSchemaGet() {
+    return new ResponseEntity<JsonSchema>(
+        this.getJsonSchemaByJavaType(new TypeReference<DatasourcePO>() {}),
+        HttpStatus.OK);
+  }
+
   /**
    * 检测数据源连接
    */
@@ -47,9 +57,11 @@ public class DatasourceApiController extends BaseController implements Datasourc
     String msg = "数据源连接失败";
     if (datasourceService.checkDatasource(datasource)) {
       msg = "数据源连接成功";
+      return new ResponseEntity<>(
+          new ResultDTO().message(msg).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
     }
     return new ResponseEntity<>(
-        new ResultDTO().message(msg).statusCode(Constants.SUCCESS_API_CODE), HttpStatus.OK);
+        new ResultDTO().message(msg).statusCode(Constants.EXCEPTION_API_CODE), HttpStatus.OK);
   }
 
   /**

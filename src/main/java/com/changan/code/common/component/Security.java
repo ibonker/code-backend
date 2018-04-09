@@ -11,7 +11,7 @@ import com.changan.code.common.Constants;
  */
 public enum Security {
   
-  nosecurity("无安全配置"), rescentersecurity("资源中心安全配置"), cacsecurity("长安认证中心安全配置");
+  nosecurity("无安全配置"), localsecurity("本地安全配置（该配置将创建完整认证和组织体系）"), rescentersecurity("资源中心安全配置");
   
   private final String cname;
 

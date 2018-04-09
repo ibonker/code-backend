@@ -747,7 +747,7 @@ public class TableServiceImpl implements ITableService {
   @Override
   @ChangeDatasource
   public void creatDictType(DatasourcePO datasource){
-    databaseDao.creatDictType();
+    databaseDao.creatDictType(datasource.getDbtype());
   }
   
   /**
@@ -757,6 +757,6 @@ public class TableServiceImpl implements ITableService {
   @Override
   @ChangeDatasource
   public void creatDictValue(DatasourcePO datasource){
-    databaseDao.creatDictValue();
+    databaseDao.creatDictValue(datasource.getDbtype());
   }
 }

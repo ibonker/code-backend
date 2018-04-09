@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
-import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import com.changan.code.entity.DatasourcePO;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +28,19 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = "datasource", description = "the datasource API")
 @RequestMapping(value = "/codegen/api/v1")
 public interface DatasourceApi {
+  
+  /**
+   * 数据源schema
+   * @return
+   */
+  @ApiOperation(value = "数据源schema", notes = "数据源schema", response = JsonSchema.class,
+      tags = {"Datasource"})
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = JsonSchema.class),
+          @ApiResponse(code = 200, message = "返回错误信息", response = JsonSchema.class)})
+  @RequestMapping(value = "/datasources", produces = {"application/schema+json"},
+      method = RequestMethod.GET)
+  ResponseEntity<JsonSchema> datasourcesSchemaGet();
 
   /**
    * 检测数据源连接

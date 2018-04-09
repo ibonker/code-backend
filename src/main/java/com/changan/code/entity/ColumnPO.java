@@ -114,6 +114,7 @@ public class ColumnPO extends BaseEntity {
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "TINYBLOB") // 当数据库中该字段类型为TINYBLOB型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "TINYTEXT") // 当数据库中该字段类型为TINYTEXT型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "BLOB") // 当数据库中该字段类型为BLOB型时
+        || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "CLOB") // 当数据库中该字段类型为CLOB型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "TEXT") // 当数据库中该字段类型为TEXT型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "MEDIUMBLOB") // 当数据库中该字段类型为MEDIUMBLOB型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "MEDIUMTEXT") // 当数据库中该字段类型为MEDIUMTEXT型时

@@ -63,8 +63,8 @@ public class ApiObjServiceImpl implements IApiObjService {
   @Transactional("jpaTransactionManager")
   public ApiObjPO saveApiObj(ApiObjPO apiObj) {
     // 查询重复数
-    int sameCount = apiObjRepo.countByApiBaseIdAndUriAndDelFlag(apiObj.getApiBaseId(),
-        apiObj.getUri(), Constants.DATA_IS_NORMAL);
+    int sameCount = apiObjRepo.countByApiBaseIdAndUriAndRequestMethodAndDelFlag(apiObj.getApiBaseId(),
+        apiObj.getUri(), apiObj.getRequestMethod(), Constants.DATA_IS_NORMAL);
     if (sameCount == 0) {
       // 处理uri
       String[] strs = apiObj.getUri().split("/");
@@ -87,7 +87,7 @@ public class ApiObjServiceImpl implements IApiObjService {
       if (apiObj.getApiParams() != null && !apiObj.getApiParams().isEmpty()) {
         // 通过Uri和ApiBaseId查询刚保存的ApiObj
         ApiObjPO findApiObj =
-            apiObjRepo.findByApiBaseIdAndUri(apiObj.getApiBaseId(), apiObj.getUri());
+            apiObjRepo.findByApiBaseIdAndUriAndRequestMethod(apiObj.getApiBaseId(), apiObj.getUri(), apiObj.getRequestMethod());
         // 批量保存参数
         apiParamService.saveApiParam(apiObj.getApiParams(), findApiObj.getId());
       }
@@ -124,25 +124,10 @@ public class ApiObjServiceImpl implements IApiObjService {
       updateApiObj.setName(
           CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name.toString().toLowerCase())
               .concat(StringUtils.capitalize(updateApiObj.getRequestMethod().toLowerCase())));
-      // 根据Uri和ApiBaseId查询apiObj
-      List<ApiObjPO> apiObjs = apiObjRepo.findByUriAndApiBaseIdAndDelFlag(updateApiObj.getUri(),
-          updateApiObj.getApiBaseId(), Constants.DATA_IS_NORMAL);
-      // 若数组长度为0则直接更新，若为1则判断id是否相同，若不同则更新失败
-      if (apiObjs.isEmpty()) {
-        // 批量保存参数
-        apiParamService.saveApiParam(apiObj.getApiParams(), updateApiObj.getId());
-        // 保存apiObj
-        return apiObjRepo.save(updateApiObj.setArrayType());
-      } else {
-        if (updateApiObj.getId().equals(apiObjs.get(0).getId())) {
-          // 批量保存参数
-          apiParamService.saveApiParam(apiObj.getApiParams(), updateApiObj.getId());
-          // 保存apiObj
-          return apiObjRepo.save(updateApiObj.setArrayType());
-        } else {
-          throw new CodeCommonException("更新失败！Uri重复！");
-        }
-      }
+      // 批量保存参数
+      apiParamService.saveApiParam(apiObj.getApiParams(), updateApiObj.getId());
+      // 保存apiObj
+      return apiObjRepo.save(updateApiObj.setArrayType());
     } else {
       throw new CodeCommonException("更新失败！数据不存在！");
     }

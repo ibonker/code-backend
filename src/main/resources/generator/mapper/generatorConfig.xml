@@ -10,7 +10,7 @@
   "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
 <!-- 数据库驱动-->
-	<classPathEntry location = "<#if dataSource.dbtype == "oracle">ojdbc14-10.2.0.jar</#if><#if dataSource.dbtype == "mysql">mysql-connector-java-5.1.43.jar</#if>" />
+	<classPathEntry location = "<#if dataSource.dbtype == "oracle">ojdbc6-12.1.0.1-atlassian-hosted.jar</#if><#if dataSource.dbtype == "mysql">mysql-connector-java-5.1.43.jar</#if>" />
 	<context id = "DB2Tables" targetRuntime = "MyBatis3">
 		<commentGenerator>
 			<property name="suppressDate" value="true"/>

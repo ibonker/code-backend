@@ -12,7 +12,7 @@ spring:
   application:
     name: titan-code2
   profiles:
-    active: ${PRO_ENV:test}
+    active: ${PRO_ENV:local}
     include: api
   jackson:
     serialization:

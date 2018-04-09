@@ -13,21 +13,6 @@
 			<if test="name != null and name != ''">
 				AND t.TABLE_NAME = lower(#{name})
 			</if>
-			AND t.TABLE_NAME != 'DICT_TYPE'
-			AND
-			t.TABLE_NAME != 'DICT_VALUE'
-			AND
-			t.TABLE_NAME != 'SYS_MENU'
-			AND
-			t.TABLE_NAME != 'SYS_OFFICE'
-			AND
-			t.TABLE_NAME != 'SYS_ROLE'
-			AND
-			t.TABLE_NAME != 'SYS_ROLE_MENU'
-			AND
-			t.TABLE_NAME != 'SYS_USER'
-			AND
-			t.TABLE_NAME != 'SYS_USER_ROLE'
 			ORDER BY
 			t.TABLE_NAME
 		</if>
@@ -221,6 +206,7 @@
 	</select>
 
 	<update id="creatDictType">
+		<if test="dbName == 'mysql'">
 		create table dict_type (
 		id varchar(64) not null primary key,
 		code varchar(64) not null,
@@ -230,34 +216,73 @@
 		updated_by varchar(64),
 		updated_at datetime not null,
 		del_flag char(1) not null
-		);
+		)
+		</if>
+		<if test="dbName == 'oracle'">
+		create table dict_type (
+		id varchar2(64) not null primary key,
+		code varchar2(64) not null,
+		name varchar2(255) not null,
+		created_by varchar2(64),
+		created_at DATE,
+		updated_by varchar2(64),
+		updated_at DATE,
+		del_flag varchar2(1)
+		)
+		</if>
 	</update>
 
 	<update id="creatDictValue">
+		<if test="dbName == 'mysql'">
 		create table dict_value (
 		id varchar(64) not null primary key,
 		name varchar(64) not null,
 		value varchar(255) not null,
 		dict_code varchar(64) not null,
-		sort int(11) not null,
+		sort int(11),
 		created_by varchar(64),
-		created_at datetime not null,
+		created_at datetime,
 		updated_by varchar(64),
-		updated_at datetime not null,
-		del_flag char(1) not null
-		);
+		updated_at datetime,
+		del_flag char(1)
+		)
+		</if>
+		<if test="dbName == 'oracle'">
+		create table dict_value (
+		id varchar2(64) not null primary key,
+		name varchar2(64) not null,
+		value varchar2(255) not null,
+		dict_code varchar2(64) not null,
+		sort NUMBER(11),
+		created_by varchar2(64),
+		created_at DATE,
+		updated_by varchar2(64),
+		updated_at DATE,
+		del_flag varchar2(1)
+		)
+		</if>
 	</update>
 	
 	<update id="createUiConfig">
 		<if test="dbName == 'mysql'">
 		create table ui_config (
 		id varchar(64) not null primary key,
-		config_json longtext,
+		config_json mediumtext,
 		created_by varchar(64),
 		created_at datetime,
 		updated_by varchar(64),
 		updated_at datetime
-		);
+		)
+		</if>
+		<if test="dbName == 'oracle'">
+		create table ui_config (
+		id VARCHAR2(64) not null PRIMARY KEY,
+		config_json CLOB,
+		created_by VARCHAR2(64),
+		created_at DATE,
+		updated_by VARCHAR2(64),
+		updated_at DATE
+		)
 		</if>
 	</update>
 </mapper>

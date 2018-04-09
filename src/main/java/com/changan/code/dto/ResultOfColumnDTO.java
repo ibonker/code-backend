@@ -3,7 +3,7 @@
  */
 package com.changan.code.dto;
 
-import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.entity.ColumnPO;
 import com.changan.code.entity.DictTypePO;
 import com.fasterxml.jackson.annotation.JsonInclude;

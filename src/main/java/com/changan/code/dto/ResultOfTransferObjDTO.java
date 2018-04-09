@@ -2,7 +2,7 @@ package com.changan.code.dto;
 
 import java.util.List;
 
-import com.changan.anywhere.common.mvc.rest.basic.ResultDTO;
+import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
 import com.changan.code.common.Constants;
 import com.changan.code.entity.TransferObjPO;
 import com.fasterxml.jackson.annotation.JsonInclude;

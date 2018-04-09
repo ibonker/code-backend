@@ -3,6 +3,9 @@
  */
 package com.changan.code.service.impl;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.util.JdbcUtils;
 import com.changan.code.common.Constants;
 import com.changan.code.entity.DatasourcePO;
 import com.changan.code.entity.ProjectPO;
@@ -44,10 +49,9 @@ public class DatasourceServiceImpl implements IDatasourceService {
    */
   @Override
   public boolean checkDatasource(DatasourcePO datasource) {
+    // 新建数据源
+    DruidDataSource dataSource = new DruidDataSource();
     try {
-      // 新建数据源
-      DruidDataSource dataSource = new DruidDataSource();
-      
       dataSource.setPassword(datasource.getDbtype());
       // 设置数据源驱动名称
       String Dbtype = datasource.getDbtype();
@@ -63,11 +67,7 @@ public class DatasourceServiceImpl implements IDatasourceService {
       // 设置数据库
       dataSource.setDbType(datasource.getDbtype());
       // 设置数据源连接字符串
-      if(Dbtype.equals(Constants.DATASOURCE_ORACLE))
-    	  dataSource.setUrl(Constants.JDBC_ORACLE_PREFIX + datasource.getDburl() + Constants.JDBC_ORACLE_POSTFIX + datasource.getName());
-      else
-    	  dataSource.setUrl(Constants.JDBC_MYSQL_PREFIX  + datasource.getDburl() + Constants.JDBC_MYSQL_POSTFIX + datasource.getName() + Constants.JDBC_MYSQL_POSTFIX_UTF8_ENCODING);
-      
+      dataSource.setUrl(datasource.getDburl());
       // 数据源连接的测试的其它设置
       dataSource.setInitialSize(5);
       dataSource.setMinIdle(1);
@@ -82,6 +82,7 @@ public class DatasourceServiceImpl implements IDatasourceService {
 
     } catch (Exception e) {
       // 当数据源测试出现异常返回false
+      dataSource.close();
       return false;
     }
   }
@@ -131,5 +132,5 @@ public class DatasourceServiceImpl implements IDatasourceService {
   public Long countByProjectId(String projectId) {
     return datasourceRepo.countByProjectId(projectId);
   }
-
+  
 }

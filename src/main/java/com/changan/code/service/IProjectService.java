@@ -98,7 +98,7 @@ public interface IProjectService extends IComponentService {
    * 判断是否生成dictType和dictValue表
    * @param projectId
    */
-  public String creatNeedTables(String projectId);
+  public String creatNeedTables(ProjectPO project);
   
   /**
    * 根据id删除项目及项目下所有信息

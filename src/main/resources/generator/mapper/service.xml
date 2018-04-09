@@ -98,7 +98,7 @@ public interface I${className}Service {
    * 
    * @param ${lowerName}
    */
-  public int delete${className}(String id);
+  public int deleteById(String id);
   
   <#list tableRelations as tableRelation>
   <#if 'One to One' == tableRelation.relation>

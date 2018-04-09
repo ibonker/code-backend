@@ -24,7 +24,7 @@ public interface ApiObjRepository
    * @param uri
    * @return
    */
-  public int countByApiBaseIdAndUriAndDelFlag(String apiBaseId, String uri, String delFlag);
+  public int countByApiBaseIdAndUriAndRequestMethodAndDelFlag(String apiBaseId, String uri, String requestMethod, String delFlag);
 
   /**
    * 根据ApiBaseId查询 ApiObj
@@ -112,6 +112,15 @@ public interface ApiObjRepository
    * @return
    */
   public ApiObjPO findByApiBaseIdAndUri(String apiBaseId, String uri);
+  
+  /**
+   * 通过baseid和uri和requestmethod查询apiobj
+   * @param apiBaseId
+   * @param uri
+   * @param requestMethod
+   * @return
+   */
+  public ApiObjPO findByApiBaseIdAndUriAndRequestMethod(String apiBaseId, String uri, String requestMethod);
 
   /**
    * 根据apiBaseId、genBasedTableId获取表对应的Api

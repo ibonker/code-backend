@@ -62,7 +62,7 @@ dependencies {
   	compile "io.springfox:springfox-swagger-ui:${r'$'}{swagger_version}"
     compile "com.alibaba:druid-spring-boot-starter:${r'$'}{druid_version}"
     <#if hasOracle == "1">
-    compile "com.oracle:ojdbc14:${r'$'}{oracle_version}"
+    compile "com.oracle:ojdbc6:${r'$'}{oracle_version}"
     </#if>
     <#if hasMysql == "1">
     compile "mysql:mysql-connector-java"

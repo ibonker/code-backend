@@ -60,7 +60,7 @@ public class ${controllerName}ApiController extends BaseController implements ${
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
     <#if apiObj.apiType == "delete">
-    ${apiObj.attrServiceNameNoPack}.delete<#if apiObj.lastPathVar?? && !apiObj.isSlaveUri>${apiObj.tableAttrNameCap}<#else>By${apiObj.firstPathVarCap}</#if>(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>);
+    ${apiObj.attrServiceNameNoPack}.delete<#if apiObj.lastPathVar?? || (!apiObj.lastPathVar?? && !apiObj.isSlaveUri)>ById<#else>By${apiObj.firstPathVarCap}</#if>(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>);
     return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>
@@ -72,7 +72,7 @@ public class ${controllerName}ApiController extends BaseController implements ${
     </#if>
     <#if apiObj.apiType == "show">
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}()
-        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findBy<#if apiObj.lastPathVar?? && !apiObj.isSlaveUri>Id<#else>${apiObj.firstPathVarCap}</#if>(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>))
+        .${apiObj.tableAttrName}(${apiObj.attrServiceNameNoPack}.findBy<#if apiObj.lastPathVar?? || (!apiObj.lastPathVar?? && !apiObj.isSlaveUri)>Id<#else>${apiObj.firstPathVarCap}</#if>(<#if apiObj.lastPathVar??>${apiObj.lastPathVar}<#else>${apiObj.firstPathVar}</#if>))
         .message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>

@@ -169,7 +169,9 @@ public class GenerateServiceImpl implements IGenerateService {
         firstApiBase == null ? "/" : ("/" + firstApiBase.getBasePath().toLowerCase().split("/")[1]));
     model.put("projectDesc", StringUtils.trimToEmpty(project.getDescription()));
     model.put("datasourcelist", datasources);
-    model.put("datasourceName", datasources.get(0).getPackageName());
+    if (!datasources.isEmpty()) {
+      model.put("datasourceName", datasources.get(0).getPackageName());
+    }
     model.put("moduleName", "");
     model.put("projectName", project.getName());
     model.put("hasMysql", "0");
@@ -213,14 +215,18 @@ public class GenerateServiceImpl implements IGenerateService {
           true);
     }
     // 生成ui配置模块文件
-    for (UiFile uiFile : UiFile.values()) {
-      this.generateToFile(pathPostfix, null,
-          GeneratorUtils.fileToObject(uiFile.getPath(), Template.class), model, true);
+    if (!datasources.isEmpty()) {
+      for (UiFile uiFile : UiFile.values()) {
+        this.generateToFile(pathPostfix, null,
+            GeneratorUtils.fileToObject(uiFile.getPath(), Template.class), model, true);
+      }
     }
-    // 生成excel导出模块文件
-    for (ExcelFile excelFile : ExcelFile.values()) {
-      this.generateToFile(pathPostfix, null,
-          GeneratorUtils.fileToObject(excelFile.getPath(), Template.class), model, true);
+    if (!datasources.isEmpty()) {
+      // 生成excel导出模块文件
+      for (ExcelFile excelFile : ExcelFile.values()) {
+        this.generateToFile(pathPostfix, null,
+            GeneratorUtils.fileToObject(excelFile.getPath(), Template.class), model, true);
+      }
     }
   }
 

@@ -46,13 +46,7 @@ public class DynamicLoadDatasource extends ApplicationObjectSupport {
         BeanDefinitionBuilder.genericBeanDefinition(DruidDataSource.class);
 
     // 设置数据库
-    String Dbtype = datasource.getDbtype();
-    if(Dbtype.equals(Constants.DATASOURCE_ORACLE)) {
-    	dataSourceBuider.addPropertyValue("url", Constants.JDBC_ORACLE_PREFIX + datasource.getDburl() + Constants.JDBC_ORACLE_POSTFIX + datasource.getName());
-    }
-    else {
-    	dataSourceBuider.addPropertyValue("url", Constants.JDBC_MYSQL_PREFIX  + datasource.getDburl() + Constants.JDBC_MYSQL_POSTFIX + datasource.getName() + Constants.JDBC_MYSQL_POSTFIX_UTF8_ENCODING);
-    }
+    dataSourceBuider.addPropertyValue("url", datasource.getDburl());
     dataSourceBuider.addPropertyValue("driverClassName", datasource.getDbdriver());
     dataSourceBuider.addPropertyValue("username", datasource.getDbuser());
     dataSourceBuider.addPropertyValue("password", datasource.getDbpassword());
