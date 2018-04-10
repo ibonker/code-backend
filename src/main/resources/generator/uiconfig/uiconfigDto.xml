@@ -8,7 +8,7 @@ package ${packageName}.dto.other;
 	
 import java.util.Map;
 	
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;

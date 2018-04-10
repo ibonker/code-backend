@@ -22,18 +22,18 @@ import ${packageName}.entity.${moduleName}.${className}POExample;
 import ${packageName}.service.${moduleName}.I${className}Service;
 import ${packageName}.dao.${moduleName}.${className}<#if !isSenior>PO</#if>Mapper;
 
-import com.changan.anywhere.common.utils.MybatisFilterUtils;
-import com.changan.anywhere.common.mvc.page.rest.request.PageDTO;
-import com.changan.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultPageDTO;
 <#if hasOneToMany>
-import com.changan.anywhere.common.mvc.page.rest.request.Collection;
-import com.changan.anywhere.common.mvc.page.rest.request.Filter;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Collection;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Filter;
 </#if>
-import com.changan.anywhere.common.utils.StringUtils;
+import org.hotpotmaterial.anywhere.common.utils.StringUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.changan.jsonmeta.JsonSchema;
-import com.changan.jsonmeta.ResourceMetaManager;
+import org.hotpotmaterial.jsonmeta.JsonSchema;
+import org.hotpotmaterial.jsonmeta.ResourceMetaManager;
 
 import ${packageName}.dto.excel.ExcelReportDTO;
 import ${packageName}.dto.excel.ExcelImportDTO;

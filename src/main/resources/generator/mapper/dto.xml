@@ -61,8 +61,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 <#if isSenior>
-import com.changan.annotation.RelationDesc;
-import com.changan.annotation.SeniorDto;
+import org.hotpotmaterial.annotation.RelationDesc;
+import org.hotpotmaterial.annotation.SeniorDto;
 </#if>
 
  /**

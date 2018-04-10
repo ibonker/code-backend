@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
 import ${packageName}.dto.excel.ExcelDTO;
 
 import io.swagger.annotations.Api;

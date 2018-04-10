@@ -59,7 +59,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 </#if>
 <#if i == "dict">
-import com.changan.annotation.DictionaryType;
+import org.hotpotmaterial.annotation.DictionaryType;
 </#if>
 </#list>
 import com.fasterxml.jackson.annotation.JsonProperty;

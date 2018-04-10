@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.changan.anywhere.common.mvc.page.rest.response.ResultDTO;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
 import ${packageName}.exception.CodeCommonException;
 import ${packageName}.common.RestStatus;
 

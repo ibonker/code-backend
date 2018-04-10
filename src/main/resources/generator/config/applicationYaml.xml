@@ -63,7 +63,7 @@ logging:
     ROOT: INFO
     org.springframework.boot: INFO
     org.springframework.web: INFO
-    com.changan.anywhere: DEBUG
+    org.hotpotmaterial.anywhere: DEBUG
 uiconfig:
   path: ./ui-config/config.json
   menuPath: ./ui-config/menu_config.json

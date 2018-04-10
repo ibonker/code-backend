@@ -60,7 +60,7 @@ import ${packageName}.common.BaseEntity;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = {"${packageName}.dao"<#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>, "com.changan.dict.mapper"</#if>},
+@MapperScan(basePackages = {"${packageName}.dao"<#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>, "org.hotpotmaterial.dict.mapper"</#if>},
     sqlSessionFactoryRef = "<#if dbcount == 1>sqlSessionFactory<#else>${datasource.lowerCamelPackageName}SqlSessionFactory</#if>")
 public class ${datasource.upperCamelPackageName}DatasourceConfiguration implements TransactionManagementConfigurer {
 
@@ -97,7 +97,7 @@ public class ${datasource.upperCamelPackageName}DatasourceConfiguration implemen
     // 给mybatis设置数据源
     sessionBean.setDataSource(dataSource());
     // 配置typeAliasesPackage
-    sessionBean.setTypeAliasesPackage("com.changan.testproj.entity.${datasource.packageName}");
+    sessionBean.setTypeAliasesPackage("org.hotpotmaterial.testproj.entity.${datasource.packageName}");
     sessionBean.setTypeAliasesSuperType(BaseEntity.class);
     sessionBean.setConfiguration(mybatisConfig());
     // 配置扫描xml文件所在的路径

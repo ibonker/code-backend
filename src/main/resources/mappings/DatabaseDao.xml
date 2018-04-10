@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.changan.code.dao.DatabaseDao">
+<mapper namespace="org.hotpotmaterial.code.dao.DatabaseDao">
 
-	<select id="findTableList" resultType="com.changan.code.entity.TablePO">
+	<select id="findTableList" resultType="org.hotpotmaterial.code.entity.TablePO">
 		<if test="dbName == 'oracle'">
 			SELECT
 			t.TABLE_NAME AS name,
@@ -28,7 +28,7 @@
 		</if>
 	</select>
 
-	<select id="findTable" resultType="com.changan.code.entity.TablePO">
+	<select id="findTable" resultType="org.hotpotmaterial.code.entity.TablePO">
 		<if test="dbName == 'oracle'">
 			SELECT t.TABLE_NAME AS name,
 			c.COMMENTS AS comments
@@ -48,7 +48,7 @@
 		</if>
 	</select>
 
-	<select id="findTableColumnList" resultType="com.changan.code.entity.ColumnPO">
+	<select id="findTableColumnList" resultType="org.hotpotmaterial.code.entity.ColumnPO">
 		<if test="dbName == 'oracle'">
 			SELECT
 			t.COLUMN_NAME AS name,<!-- t.DATA_TYPE, t.DATA_LENGTH, t.DATA_PRECISION, 
@@ -142,12 +142,12 @@
 	</select>
 
 	<select id="findDictValueByCode" parameterType="String"
-		resultType="com.changan.code.entity.DictValuePO">
+		resultType="org.hotpotmaterial.code.entity.DictValuePO">
 		SELECT * FROM dict_value WHERE dict_code = #{dictCode} AND
 		del_flag = #{delFlag}
 	</select>
 
-	<insert id="saveDictValue" parameterType="com.changan.code.entity.DictValuePO">
+	<insert id="saveDictValue" parameterType="org.hotpotmaterial.code.entity.DictValuePO">
 		INSERT INTO
 		dict_value(id,name,value,dict_code,sort,created_by,created_at,updated_by,updated_at,del_flag)
 		VALUES
@@ -159,7 +159,7 @@
 		#{dictValue.updatedAt}, #{dictValue.delFlag})
 	</insert>
 
-	<update id="updateDictValue" parameterType="com.changan.code.entity.DictValuePO">
+	<update id="updateDictValue" parameterType="org.hotpotmaterial.code.entity.DictValuePO">
 		UPDATE dict_value
 		SET
 		name = #{dictValue.name}, value = #{dictValue.value}, dict_code =
@@ -190,7 +190,7 @@
 		del_flag = #{delFlag}
 	</select>
 
-	<insert id="insertDictType" parameterType="com.changan.code.entity.DictTypePO">
+	<insert id="insertDictType" parameterType="org.hotpotmaterial.code.entity.DictTypePO">
 		INSERT INTO
 		dict_type(id, code, name, created_by, created_at, updated_by,
 		updated_at, del_flag)
@@ -201,7 +201,7 @@
 	</insert>
 
 	<select id="findDictTypes" parameterType="String"
-		resultType="com.changan.code.entity.DictTypePO">
+		resultType="org.hotpotmaterial.code.entity.DictTypePO">
 		SELECT * FROM dict_type WHERE del_flag = #{delFlag}
 	</select>
 

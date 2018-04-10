@@ -41,9 +41,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.changan.anywhere.common.utils.FileUtils;
-import com.changan.anywhere.common.utils.IdGen;
-import com.changan.anywhere.common.utils.MybatisFilterUtils;
+import org.hotpotmaterial.anywhere.common.utils.FileUtils;
+import org.hotpotmaterial.anywhere.common.utils.IdGen;
+import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
 import ${packageName}.common.Constants;
 import ${packageName}.common.RestStatus;
 import ${packageName}.dao.excel.SearchMapper;

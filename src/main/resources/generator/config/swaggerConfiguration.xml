@@ -43,7 +43,7 @@ public class SwaggerConfiguration {
   public Docket customImplementation() {
     return new Docket(DocumentationType.SWAGGER_2).select()
         .apis(Predicates.or(RequestHandlerSelectors.basePackage("${packageName}.controller")<#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>, 
-            RequestHandlerSelectors.basePackage("com.changan.dict.controller")</#if>)).build()
+            RequestHandlerSelectors.basePackage("org.hotpotmaterial.dict.controller")</#if>)).build()
         .apiInfo(apiInfo());
   }
 

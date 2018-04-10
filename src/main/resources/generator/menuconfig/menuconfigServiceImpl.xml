@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.changan.anywhere.common.utils.FileUtils;
+import org.hotpotmaterial.anywhere.common.utils.FileUtils;
 import ${packageName}.common.RestStatus;
 import ${packageName}.exception.CodeCommonException;
 import ${packageName}.service.IMenuConfigService;

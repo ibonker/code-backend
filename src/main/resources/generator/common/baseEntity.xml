@@ -11,8 +11,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 
-import com.changan.anywhere.common.utils.IdGen;
-import com.changan.anywhere.common.utils.StringUtils;
+import org.hotpotmaterial.anywhere.common.utils.IdGen;
+import org.hotpotmaterial.anywhere.common.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

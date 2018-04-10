@@ -6,7 +6,7 @@
   <content><![CDATA[
 package ${packageName}.common;
 
-import com.changan.anywhere.common.mvc.page.rest.response.BaseRestStatus;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.BaseRestStatus;
 
 /**
  * 提供返回值和返回值说明的对应，请查看父类BaseRestStatus提供的三种基本返回值（成功、系统错误和数据不存在）

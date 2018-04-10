@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.changan.code.Application;
-import com.changan.code.config.property.ApiProperties;
-import com.changan.code.service.ITableService;
+import org.hotpotmaterial.code.Application;
+import org.hotpotmaterial.code.config.property.ApiProperties;
+import org.hotpotmaterial.code.service.ITableService;
 import com.google.common.collect.Maps;
 
 /**

@@ -8,7 +8,7 @@ package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base
 
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.exception.CodeCommonException;
 import ${packageName}<#if moduleName != "">.${moduleName}</#if>.common.RestStatus;
-import com.changan.anywhere.common.mvc.page.rest.response.ValidationSchemaFactoryWrapperExtend;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ValidationSchemaFactoryWrapperExtend;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;

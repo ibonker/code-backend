@@ -10,9 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.changan.code.Application;
-import com.changan.code.entity.ProjectPO;
-import com.changan.code.service.IProjectService;
+import org.hotpotmaterial.code.Application;
+import org.hotpotmaterial.code.entity.ProjectPO;
+import org.hotpotmaterial.code.service.IProjectService;
 import com.google.common.base.CaseFormat;
 import com.google.common.io.Files;
 
@@ -32,7 +32,7 @@ public class ProjectServiceTest {
     ProjectPO updateProject = new ProjectPO();
     // updateProject.setId("6e89a8c3-c7e1-4f8b-9947-ac43bf4a28d6");
     updateProject.setName("测试项目002");
-    updateProject.setPackages("com.changan.testproj");
+    updateProject.setPackages("org.hotpotmaterial.testproj");
     updateProject.setComponents("springsecurity");
     updateProject.setDescription("测试项目002");
     // projectService.updateProject(updateProject);

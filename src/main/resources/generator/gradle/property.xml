@@ -16,7 +16,7 @@ jar_name = ${projectName}
 
 jar_version = 0.0.1
 
-group_name = com.changan
+group_name = org.hotpotmaterial
 
 titan_dependencies_version = 0.1.0-SNAPSHOT
 
