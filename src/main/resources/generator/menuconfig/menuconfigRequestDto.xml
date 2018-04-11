@@ -10,7 +10,7 @@ import lombok.Data;
 
 /**
  * 
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Data
 public class RequestMenuConfigDTO {

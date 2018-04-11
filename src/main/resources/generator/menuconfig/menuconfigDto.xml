@@ -21,7 +21,7 @@ import lombok.ToString;
 	
 /**
  * 
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

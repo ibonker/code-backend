@@ -9,7 +9,7 @@ package ${packageName}.service;
 import java.util.Map;
 
 /**
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  *
  */
 public interface IMenuConfigService {

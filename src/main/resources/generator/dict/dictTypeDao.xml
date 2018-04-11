@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dictTypeDao</name>
+	<filePath>src/main/java/${packageName}/dao/dict</filePath>
+	<fileName>DictTypeMapper.java</fileName>
+	<content><![CDATA[
+package ${packageName}.dao.dict;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import ${packageName}.entity.${datasourceName}.DictValuePO;
+import ${packageName}.entity.${datasourceName}.DictValuePOExample;
+import ${packageName}.entity.${datasourceName}.DictValuePO;
+
+/**
+ * @author Hotpotmaterial-Code2
+ *
+ */
+public interface DictTypeMapper{
+
+  /**
+   * 查询所有DictType
+   * @param delFlag
+   * @return
+   */
+  @Select("SELECT * FROM dict_type WHERE del_flag = #{delFlag}")
+  @Results({
+    @Result(property = "createdBy", column = "created_by"),
+    @Result(property = "updatedBy", column = "updated_by"),
+    @Result(property = "createdAt", column = "created_at"),
+    @Result(property = "updatedAt", column = "updated_at")
+  })
+  List<DictTypePO> getAll(String delFlag);
+  
+  /**
+   * 根据id查询DictType
+   * @param id
+   * @return
+   */
+  @Select("SELECT * FROM dict_type WHERE del_flag = #{arg1} AND id = #{arg0}")
+  @Results({
+    @Result(property = "createdBy", column = "created_by"),
+    @Result(property = "updatedBy", column = "updated_by"),
+    @Result(property = "createdAt", column = "created_at"),
+    @Result(property = "updatedAt", column = "updated_at")
+  })
+  DictTypePO findDictType(String id, String delFlag);
+  
+  /**
+   * 根据id删除DictType
+   * @param id
+   * @param delFlag
+   * @return
+   */
+  @Update("UPDATE dict_type SET del_flag = #{arg1} WHERE id = #{arg0}")
+  void deleteDictType(String id, String delFlag);
+  
+  /**
+   * 更新dictType
+   * @param dictType
+   */
+  @Update("UPDATE dict_type SET code = #{code}, name = #{name}, created_by = #{createdBy}, "
+      + "updated_by = #{updatedBy}, updated_at = #{updatedAt}, created_at = #{createdAt} WHERE id = #{id}")
+  void updateDictType(DictTypePO dictType);
+  
+  /**
+   * 新增dictType
+   * @param dictType
+   */
+  @Insert("INSERT INTO dict_type (id,code,name,created_by,created_at,updated_by,updated_at,del_flag) "
+      + "VALUES(#{id},#{code}, #{name}, #{createdBy},#{createdAt},#{updatedBy},#{updatedAt},#{delFlag})")
+  void insertDictType(DictTypePO dictType);
+  
+  /**
+   * 分页查询
+   * @param example
+   * @return
+   */
+  List<DictTypePO> selectByExample(DictTypePOExample example);
+  
+  /**
+   * 根据code查询DictType
+   * @param code
+   * @return
+   */
+  @Select("SELECT id FROM dict_type WHERE code = #{arg0} AND del_flag = #{arg1}")
+  String selectByCode(String code, String delFlag);
+  
+  /**
+   * 根据code查询DictValues
+   * @param code
+   * @param delFlag
+   * @return
+   */
+  @Select("SELECT * FROM dict_value WHERE dict_code = #{arg0} AND del_flag = #{arg1}")
+  List<DictValuePO> findDictValueByCode(String code, String delFlag);
+}
+	]]>
+	</content>
+</template>

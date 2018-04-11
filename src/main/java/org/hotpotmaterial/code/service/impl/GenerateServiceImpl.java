@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import org.hotpotmaterial.anywhere.common.utils.FileUtils;
 import org.hotpotmaterial.anywhere.common.utils.FreeMarkerUtils;
 import org.hotpotmaterial.anywhere.common.utils.StringUtils;
@@ -26,10 +23,14 @@ import org.hotpotmaterial.code.common.BaseProfile;
 import org.hotpotmaterial.code.common.BaseType;
 import org.hotpotmaterial.code.common.Constants;
 import org.hotpotmaterial.code.common.ParamerConstant;
+import org.hotpotmaterial.code.common.component.Dictionary;
+import org.hotpotmaterial.code.common.component.Excel;
+import org.hotpotmaterial.code.common.component.UiConfig;
 import org.hotpotmaterial.code.common.template.AdviceFile;
 import org.hotpotmaterial.code.common.template.ConfigFile;
 import org.hotpotmaterial.code.common.template.DAOFile;
 import org.hotpotmaterial.code.common.template.DTOFile;
+import org.hotpotmaterial.code.common.template.DictFile;
 import org.hotpotmaterial.code.common.template.EntityFile;
 import org.hotpotmaterial.code.common.template.ExcelFile;
 import org.hotpotmaterial.code.common.template.GeneratorConfigFile;
@@ -58,6 +59,9 @@ import org.hotpotmaterial.code.entity.TransferObjFieldPO;
 import org.hotpotmaterial.code.entity.TransferObjPO;
 import org.hotpotmaterial.code.service.IGenerateService;
 import org.hotpotmaterial.code.utils.GeneratorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -155,7 +159,8 @@ public class GenerateServiceImpl implements IGenerateService {
 
   @Override
   public void generateConfigFiles(String pathPostfix, ProjectPO project,
-      List<DatasourcePO> datasources, List<ApiBasePO> apiBases, ApiBasePO firstApiBase) {
+      List<DatasourcePO> datasources, List<ApiBasePO> apiBases, ApiBasePO firstApiBase,
+      List<String> components) {
     // 构建basePath数组
     List<String> basePaths = new ArrayList<>();
     for (ApiBasePO apiBase : apiBases) {
@@ -165,12 +170,14 @@ public class GenerateServiceImpl implements IGenerateService {
     Map<String, Object> model = Maps.newHashMap();
     model.put("packageName", project.getPackages().toLowerCase());
     model.put("basePaths", basePaths);
-    model.put("mainpath",
-        firstApiBase == null ? "/" : ("/" + firstApiBase.getBasePath().toLowerCase().split("/")[1]));
+    model.put("mainpath", firstApiBase == null ? "/"
+        : ("/" + firstApiBase.getBasePath().toLowerCase().split("/")[1]));
     model.put("projectDesc", StringUtils.trimToEmpty(project.getDescription()));
     model.put("datasourcelist", datasources);
     if (!datasources.isEmpty()) {
+      // 默认第一个
       model.put("datasourceName", datasources.get(0).getPackageName());
+      model.put("dbtype", datasources.get(0).getDbtype());
     }
     model.put("moduleName", "");
     model.put("projectName", project.getName());
@@ -214,18 +221,25 @@ public class GenerateServiceImpl implements IGenerateService {
           GeneratorUtils.fileToObject(ConfigFile.applicationYml.getPath(), Template.class), model,
           true);
     }
-    // 生成ui配置模块文件
-    if (!datasources.isEmpty()) {
+    if (components.contains(UiConfig.uiConfigEnabled.toString())) {
+      // 生成ui配置模块文件
       for (UiFile uiFile : UiFile.values()) {
         this.generateToFile(pathPostfix, null,
             GeneratorUtils.fileToObject(uiFile.getPath(), Template.class), model, true);
       }
     }
-    if (!datasources.isEmpty()) {
+    if (components.contains(Excel.excelEnabled.toString())) {
       // 生成excel导出模块文件
       for (ExcelFile excelFile : ExcelFile.values()) {
         this.generateToFile(pathPostfix, null,
             GeneratorUtils.fileToObject(excelFile.getPath(), Template.class), model, true);
+      }
+    }
+    if (components.contains(Dictionary.dictionary.toString())) {
+      // 生成字典表模块文件
+      for (DictFile dictFile : DictFile.values()) {
+        this.generateToFile(pathPostfix, null,
+            GeneratorUtils.fileToObject(dictFile.getPath(), Template.class), model, true);
       }
     }
   }
@@ -449,7 +463,7 @@ public class GenerateServiceImpl implements IGenerateService {
   @Override
   public void generateIServiceAndServiceImpl(String pathPostfix, String moduleName,
       String projectName, String packageName, String tableName, List<TableRelationPO> tableRelation,
-      List<TableSeniorRelationPO> relations, boolean isSenior) {
+      List<TableSeniorRelationPO> relations, boolean isSenior, List<String> components) {
     // 添加model
     Map<String, Object> model = Maps.newHashMap();
     // 首字母大写
@@ -486,6 +500,7 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("hasOneToOne", hasOneToOne);
     model.put("seniorRelations", relations);
     model.put("isSenior", isSenior);
+    model.put("enableExcel", components.contains(Excel.excelEnabled.toString()));
     // 生成service文件
     this.generateToFile(pathPostfix, null,
         GeneratorUtils.fileToObject(ServiceFile.Service.getPath(), Template.class), model, true);

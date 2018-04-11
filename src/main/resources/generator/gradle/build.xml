@@ -7,7 +7,7 @@
 buildscript {
     repositories {
         maven { 
-            url anywhere_repo
+            url aliyun_repo
         }
     }
     
@@ -23,7 +23,7 @@ apply plugin: 'java'
 
 repositories {
     maven { 
-        url anywhere_repo
+        url aliyun_repo
     }
 }
 
@@ -41,12 +41,6 @@ configurations {
     all*.exclude group: 'commons-logging', module: 'commons-logging'
     all*.exclude group: 'log4j', module: 'log4j'
     all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-}
-  
-dependencyManagement {
-    imports {
-        mavenBom "org.hotpotmaterial:titan-dependencies:${r'$'}{titan_dependencies_version}"
-    }
 }
     
 dependencies {
@@ -71,25 +65,17 @@ dependencies {
     compile "com.google.guava:guava"
     compile "org.jadira.usertype:usertype.core:${r'$'}{usertype_version}"
     compile "org.projectlombok:lombok:${r'$'}{lombok_version}"
-    compile "org.hotpotmaterial:titan-common:${r'$'}{titan_common_version}"
+    compile "org.hotpotmaterial:hotpotmaterial-common:${r'$'}{hotpotmaterial_common_version}"
     compile "org.mybatis:mybatis-typehandlers-jsr310:${r'$'}{mybatis_typehandlers_jsr310_version}"
     compile "com.github.pagehelper:pagehelper:${r'$'}{pagehelper_version}"
     compile "com.github.pagehelper:pagehelper-spring-boot-starter:${r'$'}{pagehelper_spring_boot_starter_version}"
     compile "org.hibernate:hibernate-java8:${r'$'}{hibernate_java8_version}"
     
-    <#if components?seq_contains("rescentersecurity")>
-    compile "org.hotpotmaterial:spring-boot-starter-rescenter-rest:${r'$'}{rescenter_rest_version}"
-    </#if>
-    compile "org.hotpotmaterial:titan-jsonmeta:${r'$'}{titan_jsonmeta_version}"
-    <#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>
-    compile "org.hotpotmaterial:titan-dict:${r'$'}{titan_dict_version}"
-    </#if>
+    compile "org.hotpotmaterial:hotpotmaterial-jsonmeta:${r'$'}{hotpotmaterial_jsonmeta_version}"
     compile "org.apache.poi:poi:3.17"
     compile "org.apache.poi:poi-ooxml:3.17"
     
     testCompile "org.springframework.boot:spring-boot-starter-test"
-    testCompile "org.powermock:powermock-module-junit4"
-    testCompile "org.powermock:powermock-api-mockito"
 }
 
 springBoot {

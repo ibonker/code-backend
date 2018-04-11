@@ -216,6 +216,9 @@ public class TableServiceImpl implements ITableService {
     tableRepository.delete(tables);
   }
 
+  /**
+   * 获取表列表
+   */
   @Override
   public Page<TablePO> findTablesPage(String datasourceId, PageDTO searchParams) {
     List<Order> orders = Lists.newArrayList();
@@ -245,6 +248,8 @@ public class TableServiceImpl implements ITableService {
         predicates.add(cb.equal(root.get("delFlag"), Constants.DATA_IS_NORMAL));
         // datasource id
         predicates.add(cb.equal(root.get("datasourceId"), datasourceId));
+        // 排除表
+        predicates.add(cb.not(cb.lower(root.get("name")).in(Constants.TABLE_UNSHOWN)));
         return cb.and(predicates.toArray(new Predicate[predicates.size()]));
       }
     };
@@ -402,7 +407,7 @@ public class TableServiceImpl implements ITableService {
   }
 
   /**
-   * 下载entity文件
+   * 下载单表相关文件
    */
   @Override
   public String generateTableCodes(String tableId) throws FileNotFoundException{

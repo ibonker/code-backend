@@ -13,22 +13,18 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
-<#if components?seq_contains("rescentersecurity")>
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
-</#if>
 
 
 /** 
  * 主类 
  *
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
-<#if components?seq_contains("rescentersecurity")>@EnableFeignClients(basePackages = {"org.hotpotmaterial.rescenter.auth"})</#if>
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class,
     DataSourceTransactionManagerAutoConfiguration.class<#if dbcount gt 1>,
     MybatisAutoConfiguration.class, PageHelperAutoConfiguration.class</#if>})
-@ComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>"<#if components?seq_contains("rescentersecurity")>, "org.hotpotmaterial.rescenter.auth"</#if><#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>, "org.hotpotmaterial.dict"</#if>})
+@ComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>"})
 public class Application {
   
   /**

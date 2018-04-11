@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
 	<name>uiconfigService</name>
-	<filePath>src/main/java/${packageName}/service/other</filePath>
+	<filePath>src/main/java/${packageName}/service/uiconfig</filePath>
 	<fileName>IUiConfigService.java</fileName>
 	<content><![CDATA[
-package ${packageName}.service.other;
+package ${packageName}.service.uiconfig;
 	
 import java.util.Map;
+import ${packageName}.entity.${datasourceName}.UiConfigPO;
 
 /**
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  * 前端配置文件业务接口声明（文件保存）
  */
 public interface IUiConfigService {
@@ -25,6 +26,24 @@ public interface IUiConfigService {
    * @param data
    */
   public void saveUiConfig(String data);
+
+  /**
+   * 获取ui数据
+   * @param id
+   */
+  public UiConfigPO findById(String id);
+
+  /**
+   * 修改ui数据
+   * @param id
+   */
+  public UiConfigPO updateUiConfig(UiConfigPO configObj);
+
+  /**
+   * 新增ui数据
+   * @param id
+   */
+  public UiConfigPO insertUiConfig(String id, UiConfigPO configObj);
 }
 	]]>
 	</content>

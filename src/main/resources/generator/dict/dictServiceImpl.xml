@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dictServiceImpl</name>
+	<filePath>src/main/java/${packageName}/service/dict/impl</filePath>
+	<fileName>DictServiceImpl.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service.dict.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Collection;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Filter;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Operator;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.ResultPageDTO;
+import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
+import ${packageName}.common.Constants;
+import ${packageName}.dto.dict.ResultDictDTO;
+import ${packageName}.entity.${datasourceName}.DictTypePO;
+import ${packageName}.entity.${datasourceName}.DictTypePOExample;
+import ${packageName}.entity.${datasourceName}.DictValuePO;
+import ${packageName}.entity.${datasourceName}.DictValuePOExample;
+import ${packageName}.exception.CodeCommonException;
+import ${packageName}.dao.dict.DictTypeMapper;
+import ${packageName}.dao.dict.DictValueMapper;
+import ${packageName}.service.dict.impl.CacheService;
+import ${packageName}.service.dict.IDictService;
+import org.hotpotmaterial.jsonmeta.JsonSchema;
+import org.hotpotmaterial.jsonmeta.ResourceMetaManager;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+/**
+ * @author Hotpotmaterial-Code2
+ *
+ */
+@Service
+public class DictServiceImpl implements IDictService {
+
+  @Autowired
+  public DictTypeMapper dictTypeMapper;
+
+  @Autowired
+  public DictValueMapper dictValueMapper;
+
+  @Autowired
+  CacheService cacheService;
+
+  @Autowired
+  private ResourceMetaManager metaManager;
+
+  /**
+   * 查询DictType 和 DictValue
+   */
+  @Override
+  public ResultDictDTO findAll(int version) {
+    // 如果版本号相同则直接返回内存中的数据
+    if (Integer.valueOf(cacheService.getResultDictDTO().getVersion()) == version) {
+      return new ResultDictDTO().DictIsUpdate("0");
+    } else {
+      // 获取内存数据对象并返回
+      return cacheService.getResultDictDTO();
+    }
+  }
+
+  /**
+   * 更新DictType
+   */
+  @Override
+  public void updateDictType(String dictTypeId, DictTypePO updateDictType) {
+    // 通过id查询
+    DictTypePO dictType = this.findDictType(dictTypeId);
+    // 根据code查询DictType
+    String id = dictTypeMapper.selectByCode(updateDictType.getCode(), Constants.DATA_IS_NORMAL);
+    if (dictType != null && (id == null || dictTypeId.equals(id))) {
+      // 查询DictType下的DictValue
+      List<DictValuePO> dictValues =
+          dictTypeMapper.findDictValueByCode(dictType.getCode(), Constants.DATA_IS_NORMAL);
+      if (dictValues != null) {
+        // 更新dictValues
+        dictValueMapper.updateDictValues(updateDictType.getCode(), dictType.getCode(),
+            Constants.DATA_IS_NORMAL);
+      }
+      // 更新属性
+      dictType.updateAttrs(updateDictType);
+      dictType.preInsert();
+      // 更新数据库
+      dictTypeMapper.updateDictType(dictType);
+      // 获取内存数据,设置版本
+      this.refreshVersion();
+    } else {
+      throw new CodeCommonException(Constants.DATA_IS_NORMAL, "需要修改的数据不存在或CODE已存在！");
+    }
+  }
+
+  /**
+   * 更新DictValue
+   */
+  @Override
+  public void updateDictValue(String dictValueId, DictValuePO updateDictValue) {
+    // 根据id查询DictValue
+    DictValuePO dictValue = this.findDictValue(dictValueId);
+    if (dictValue != null) {
+      // 更新属性
+      dictValue.updateAttrs(updateDictValue);
+      dictValue.preInsert();
+      // 更新数据库
+      dictValueMapper.updateDictValue(dictValue);
+      // 获取内存数据，设置版本
+      this.refreshVersion();
+    } else {
+      throw new CodeCommonException(Constants.DATA_IS_NORMAL, "需要修改的数据不存在！");
+    }
+  }
+
+  /**
+   * 逻辑删除DictType
+   */
+  @Override
+  public void deleteDictType(String id) {
+    // 如果需要删除的DictType存在
+    DictTypePO dictType = this.findDictType(id);
+    if (dictType != null) {
+      // 删除DictType
+      dictTypeMapper.deleteDictType(id, Constants.DATA_IS_INVALID);
+      List<DictValuePO> dictValues =
+          dictValueMapper.getAll(dictType.getCode(), Constants.DATA_IS_NORMAL);
+      if (dictValues != null && !dictValues.isEmpty()) {
+        // 根据DicteTypeId删除DictValue
+        dictValueMapper.deleteDictValues(dictType.getCode(), Constants.DATA_IS_INVALID);
+      }
+      // 获取内存数据，设置版本
+      this.refreshVersion();
+    } else {
+      throw new CodeCommonException(Constants.DATA_IS_NORMAL, "需要删除的数据不存在！");
+    }
+  }
+
+  /**
+   * 新增DictType
+   */
+  @Override
+  public void insertDictType(DictTypePO dictType) {
+    // 根据code查询DictTypeId
+    String id = dictTypeMapper.selectByCode(dictType.getCode(), Constants.DATA_IS_NORMAL);
+    if (id == null) {
+      // 设置属性
+      dictType.preInsert();
+      dictType.setDelFlag(Constants.DATA_IS_NORMAL);
+      // 新增DictType
+      dictTypeMapper.insertDictType(dictType);
+      // 获取内存数据，设置版本
+      this.refreshVersion();
+    } else {
+      throw new CodeCommonException(Constants.DATA_IS_NORMAL,
+          "CODE:" + dictType.getCode() + "已存在!");
+    }
+  }
+
+  /**
+   * 根据id查询DictType
+   */
+  @Override
+  public DictTypePO findDictType(String id) {
+    // 返回查询结果
+    return dictTypeMapper.findDictType(id, Constants.DATA_IS_NORMAL);
+  }
+
+  /**
+   * 根据id查询DictValue
+   */
+  @Override
+  public DictValuePO findDictValue(String id) {
+    // 返回查询结果
+    return dictValueMapper.findDictValue(id, Constants.DATA_IS_NORMAL);
+  }
+
+  /**
+   * 重置版本号
+   */
+  public void refreshVersion() {
+    // 取出版本号
+    int oldVersion = cacheService.getResultDictDTO().getVersion();
+    // 更新内存数据
+    cacheService.CacheDictTypeAndValue();
+    // 获取内存数据对象
+    ResultDictDTO resultDictDTO = cacheService.getResultDictDTO();
+    // 更新版本号
+    resultDictDTO.DictVersion(oldVersion + 1);
+    // 设置是否更新标识符
+    resultDictDTO.DictIsUpdate("1");
+  }
+
+  /**
+   * 根据id删除DictValue
+   */
+  @Override
+  public void deleteDictValue(String id) {
+    // 查询dictValue
+    DictValuePO dictValue = this.findDictValue(id);
+    if (dictValue != null) {
+      dictValueMapper.deleteDictValue(id, Constants.DATA_IS_INVALID);
+      // 更新版本
+      this.refreshVersion();
+    } else {
+      throw new CodeCommonException(Constants.DATA_IS_NORMAL, "需要删除的数据不存在！");
+    }
+  }
+
+  /**
+   * 新增DictValue
+   */
+  @Override
+  public void insertDictValue(String code, DictValuePO dictValue) {
+    // 设置属性
+    dictValue.preInsert();
+    dictValue.setDelFlag(Constants.DATA_IS_NORMAL);
+    dictValue.setDictCode(code);
+    // 新增DictValue
+    dictValueMapper.insertDictValue(dictValue);
+    // 更新版本
+    this.refreshVersion();
+  }
+
+  /**
+   * 分页查询DictType
+   */
+  @Override
+  public ResultPageDTO<DictTypePO> getDictTypeList(PageDTO page) {
+    ResultPageDTO<DictTypePO> result = new ResultPageDTO<DictTypePO>();
+
+    // 构建删除标识过滤对象
+    Filter delFlagFilter = new Filter();
+    // 设置属性
+    delFlagFilter.setField("delFlag");
+    delFlagFilter.setOperator(Operator.EQ);
+    delFlagFilter.setValue(Constants.DATA_IS_NORMAL);
+
+    // 若传入参数中没有filters对象，则构建一个并传入filter值
+    if (page.getCollection() == null) {
+      Collection collection = new Collection();
+      List<Filter> filters = new ArrayList<>();
+      page.setCollection(collection);
+      page.getCollection().setFilters(filters);
+    }
+
+    page.getCollection().getFilters().add(delFlagFilter);
+
+    DictTypePOExample ce = new DictTypePOExample();
+    // 获取json schema
+    JsonSchema jsonschema = metaManager.fetchJsonSchema(DictTypePO.class, null);
+    MybatisFilterUtils.transformForMybatis(ce.createCriteria(), page.getCollection(), jsonschema);
+    PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
+    PageHelper.orderBy(MybatisFilterUtils.transformOrderBy(page, jsonschema));
+    PageInfo<DictTypePO> list = new PageInfo<>(dictTypeMapper.selectByExample(ce));
+
+    result.setData(list.getList());
+    result.setPageNumber(list.getPageNum());
+    result.setPageSize(list.getPageSize());
+    result.setTotalElements(list.getTotal());
+    return result;
+  }
+
+  /**
+   * 分页查询DictValue
+   */
+  @Override
+  public ResultPageDTO<DictValuePO> getDictValueList(String code, PageDTO page) {
+    ResultPageDTO<DictValuePO> result = new ResultPageDTO<DictValuePO>();
+    // 构建filter对象
+    Filter codefilter = new Filter();
+    // 默认添加filter
+    codefilter.setField("dictCode");
+    codefilter.setOperator(Operator.EQ);
+    codefilter.setValue(code);
+    // 构建删除标识过滤对象
+    Filter delFlagFilter = new Filter();
+    // 设置属性
+    delFlagFilter.setField("delFlag");
+    delFlagFilter.setOperator(Operator.EQ);
+    delFlagFilter.setValue(Constants.DATA_IS_NORMAL);
+    // 若传入参数中没有filters对象，则构建一个并传入filter值
+    if (page.getCollection() == null) {
+      Collection collection = new Collection();
+      List<Filter> filters = new ArrayList<>();
+      page.setCollection(collection);
+      page.getCollection().setFilters(filters);
+    }
+    // 默认添加filter
+    page.getCollection().getFilters().add(codefilter);
+    page.getCollection().getFilters().add(delFlagFilter);
+    DictValuePOExample ce = new DictValuePOExample();
+    // 获取json schema
+    JsonSchema jsonschema = metaManager.fetchJsonSchema(DictValuePO.class, null);
+    MybatisFilterUtils.transformForMybatis(ce.createCriteria(), page.getCollection(), jsonschema);
+    PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
+    PageHelper.orderBy(MybatisFilterUtils.transformOrderBy(page, jsonschema));
+    PageInfo<DictValuePO> list = new PageInfo<>(dictValueMapper.selectByExample(ce));
+
+    result.setData(list.getList());
+    result.setPageNumber(list.getPageNum());
+    result.setPageSize(list.getPageSize());
+    result.setTotalElements(list.getTotal());
+    return result;
+  }
+}
+
+	]]>
+	</content>
+</template>

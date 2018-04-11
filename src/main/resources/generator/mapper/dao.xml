@@ -12,7 +12,7 @@ import ${packageName}.dto.${moduleName}.${className}DTO;
 	
 	
 /**
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  * ${className}mapper高级查询接口dao
  */
 public interface ${className}Mapper {

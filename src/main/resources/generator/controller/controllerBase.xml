@@ -17,7 +17,7 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 
 /**
  * 控制器基础类，一些基础的方法可以写在此处供控制器子类调用
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 public class BaseController {
 

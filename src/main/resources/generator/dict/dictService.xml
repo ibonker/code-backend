@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dictService</name>
+	<filePath>src/main/java/${packageName}/service/dict</filePath>
+	<fileName>IDictService.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service.dict;
+
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import ${packageName}.dto.dict.ResultDictDTO;
+import ${packageName}.entity.${datasourceName}.DictTypePO;
+import ${packageName}.entity.${datasourceName}.DictValuePO;
+
+/**
+ * @author Hotpotmaterial-Code2
+ *
+ */
+public interface IDictService {
+
+  /**
+   * 查询DictType 和 DictValue
+   * 
+   * @param version
+   * @return
+   */
+  public ResultDictDTO findAll(int version);
+
+  /**
+   * 更新DictType
+   * 
+   * @param dictTypePO
+   */
+  public void updateDictType(String dictTypeId, DictTypePO dictTypePO);
+
+  /**
+   * 更新DictValue
+   * 
+   * @param dictValuePO
+   */
+  public void updateDictValue(String dictValueId, DictValuePO dictValue);
+  
+  /**
+   * 根据id删除DictType
+   * @param id
+   */
+  public void deleteDictType(String id);
+  
+  /**
+   * 根据id删除DictValue
+   * @param id
+   */
+  public void deleteDictValue(String id);
+  
+  /**
+   * 新增DictType
+   * @param dictTypePO
+   */
+  public void insertDictType(DictTypePO dictType);
+  
+  /**
+   * 新增DictValue
+   */
+  public void insertDictValue(String code, DictValuePO dictValue);
+  
+  /**
+   * 根据id查询DictType
+   * @param id
+   */
+  public DictTypePO findDictType(String id);
+  
+  /**
+   * 根据id查询DictValue
+   * @param id
+   */
+  public DictValuePO findDictValue(String id);
+  
+  /**
+   * 分页查询DictValue
+   * @param searchParams
+   * @return
+   */
+  public ResultPageDTO<DictTypePO> getDictTypeList(PageDTO searchParams);
+  
+  /**
+   * 分页查询DictValue
+   */
+  public ResultPageDTO<DictValuePO> getDictValueList(String code,PageDTO searchParams);
+}
+	]]>
+	</content>
+</template>

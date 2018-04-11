@@ -12,12 +12,9 @@ import ${packageName}.<#if isSenior>dto<#else>entity</#if>.${moduleName}.${class
 import org.hotpotmaterial.jsonmeta.JsonSchema;
 import ${packageName}.dto.excel.ExcelReportDTO;
 import ${packageName}.dto.excel.ExcelImportDTO;
-<#if className == 'UiConfig'>
-import java.util.Map;
-</#if>
 
 /**
- * @author TitanCode2 
+ * @author Hotpotmaterial-Code2 
  * 业务接口声明 - I${className}Service
  */
 public interface I${className}Service {
@@ -48,6 +45,7 @@ public interface I${className}Service {
    */
   public ResultPageDTO<${className}PO> get${className}List(PageDTO page);
   
+  <#if enableExcel>
   /**
    * 导入
    * 
@@ -55,20 +53,7 @@ public interface I${className}Service {
    * @return
    */
   public ExcelReportDTO importExcel${className}(ExcelImportDTO excelDTO);
-  <#if className == 'UiConfig'>	
-  /**
-   * 获取ui配置
-   * @return
-   */
-  public Map<String, Object> getUiConfig(String version);
-
-  /**
-   * 保存ui配置
-   * @param data
-   */
-  public void saveUiConfig(String data);
-  </#if>
-    
+  </#if>  
   /**
    * 新增
    * 

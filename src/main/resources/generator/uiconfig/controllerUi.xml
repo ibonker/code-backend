@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
   <name>controllerUi</name>
-  <filePath>src/main/java/${packageName}/${moduleName}/controller/base</filePath>
+  <filePath>src/main/java/${packageName}/${moduleName}/controller/uiconfig</filePath>
   <fileName>UIConfigController.java</fileName>
   <content><![CDATA[
-package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base;
+package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.uiconfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,13 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
-import ${packageName}.dto.other.UiConfigDTO;
-import ${packageName}.dto.other.RequestUiConfigDTO;
-<#if components?seq_contains("uiConfigEnabled")>
-import ${packageName}.service.${servuceModuleName}.IUiConfigService;
-<#else>
-import ${packageName}.service.other.IUiConfigService;
-</#if>
+import ${packageName}.dto.uiconfig.UiConfigDTO;
+import ${packageName}.dto.uiconfig.RequestUiConfigDTO;
+import ${packageName}.service.uiconfig.IUiConfigService;
 import ${packageName}.common.RestStatus;
 
 import io.swagger.annotations.Api;
@@ -34,7 +30,7 @@ import io.swagger.annotations.ApiParam;
 
 /**
  * 前端配置文件保存接口
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Controller
 @Api(value = "UiConfig", description = "the UiConfig API")

@@ -24,7 +24,7 @@ import ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.${ver
 
 /** 
  * 控制器实现类
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Controller
 public class ${controllerName}ApiController extends BaseController implements ${controllerName}Api {

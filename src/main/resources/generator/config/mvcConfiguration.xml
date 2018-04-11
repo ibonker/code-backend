@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 /** 
  * MVC配置，主要对数据库字段校验进行配置 
  *
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Configuration
 public class MvcConfiguration extends WebMvcConfigurerAdapter implements EnvironmentAware, MessageSourceAware {

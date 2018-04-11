@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>uiconfigMapper</name>
+  <filePath>src/main/resources/mappings/${datasourceName}/uiconfig</filePath>
+  <fileName>UiconfigMapper.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace = "${packageName}.dao.uiconfig.uiconfigMapper">
+
+  <resultMap id="BaseResultMap" type="${packageName}.entity.${datasourceName}.UiConfigPO">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="${packageName}.entity.${datasourceName}.UiConfigPO">
+    <result column="config_json" jdbcType="<#if dbtype == 'oracle'>CLOB<#else>LONGVARCHAR</#if>" property="configJson" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, created_by, created_at, updated_by, updated_at
+  </sql>
+  <sql id="Blob_Column_List">
+    config_json
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from ui_config
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="insertSelective" parameterType="${packageName}.entity.${datasourceName}.UiConfigPO">
+    insert into ui_config
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="updatedAt != null">
+        updated_at,
+      </if>
+      <if test="configJson != null">
+        config_json,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedAt != null">
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="configJson != null">
+        #{configJson,jdbcType=<#if dbtype == 'oracle'>CLOB<#else>LONGVARCHAR</#if>},
+      </if>
+    </trim>
+  </insert>  
+
+  <update id="updateByPrimaryKeySelective" parameterType="${packageName}.entity.${datasourceName}.UiConfigPO">
+    update ui_config
+    <set>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="configJson != null">
+        config_json = #{configJson,jdbcType=<#if dbtype == 'oracle'>CLOB<#else>LONGVARCHAR</#if>},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+</mapper>
+]]>
+  </content>
+</template>

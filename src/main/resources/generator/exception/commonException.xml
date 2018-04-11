@@ -11,7 +11,7 @@ import lombok.Setter;
 
 /**
  * 统一异常，用于controller advice统一处理
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 public class CodeCommonException extends RuntimeException {
   

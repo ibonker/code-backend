@@ -44,14 +44,11 @@ import ${packageName}.exception.CodeCommonException;
 import ${packageName}.common.RestStatus;
 </#if>
 import com.google.common.collect.Lists;
-<#if className == 'UiConfig'>
-import ${packageName}.cache.UICache;
-</#if>
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  * 业务接口声明实现类 - ${className}ServiceImpl
  */
 @Service
@@ -74,48 +71,11 @@ public class ${className}ServiceImpl implements I${className}Service {
   @Autowired
   private ResourceMetaManager metaManager;
   
-  <#if className == 'UiConfig'>
-  @Autowired
-  private UICache uiCache;
-  </#if>
-  
   // 获取json schema
   @Override
   public JsonSchema get${className}JsonSchema(String url) {
     return metaManager.fetchJsonSchema(${className}<#if isSenior>DTO<#else>PO</#if>.class, url);
   }
-  
-  <#if className == 'UiConfig'>
-  @Override
-  public Map<String, Object> getUiConfig(String version) {
-    // 如果版本号相同返回空,否则返回内存数据
-    if (uiCache.getUIMap().get("version").toString().equals(version)) {
-      return null;
-    } else {
-      return uiCache.getUIMap();
-    }
-  }
-  
-  @Override
-  public void saveUiConfig(String data) {
-    // 获取内存版本号
-    int version = Integer.valueOf(uiCache.getUIMap().get("version").toString());
-    UiConfigPO configObj = this.findById("all");
-    if (null != configObj) {
-      configObj.setConfigJson(data.replace("'", "\""));
-      this.updateUiConfig(configObj.getId(), configObj);
-    } else {
-      configObj = new UiConfigPO();
-      configObj.setConfigJson(data.replace("'", "\""));
-      configObj.setId("all");
-      this.insertUiConfig(configObj);
-    }
-    // 更新内存数据
-    uiCache.saveUiMap(configObj);
-    // 更新内存版本号
-    uiCache.getUIMap().put("version", version + 1);
-  }
-  </#if>
   
   <#if isSenior>
   <#list seniorRelations as relation> 

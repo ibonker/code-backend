@@ -26,7 +26,7 @@ import lombok.Data;
 /**
  * 持久化实体基类，提供id、created_at和updated_at三个字段的更新和修改的赋值操作
  * 
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  *
  */
 @Data

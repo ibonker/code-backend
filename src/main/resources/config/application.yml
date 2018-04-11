@@ -10,7 +10,7 @@ server:
 #      pattern: '%h %t "%r" %s %b %{Location}o'
 spring:
   application:
-    name: titan-code2
+    name: hotpotmaterial-code2
   profiles:
     active: ${PRO_ENV:local}
     include: api

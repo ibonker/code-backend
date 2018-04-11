@@ -3,6 +3,9 @@
  */
 package org.hotpotmaterial.code.common;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 
  * @author wenxing
@@ -90,4 +93,6 @@ public class Constants {
   public final static String Proxy_Client_IP = "Proxy-Client-IP";
   // WL-Proxy-Client-IP
   public final static String WL_Proxy_Client_IP = "WL-Proxy-Client-IP";
+  // 不显示的表
+  public final static List<String> TABLE_UNSHOWN = Arrays.asList("ui_config","dict_type","dict_value");
 }

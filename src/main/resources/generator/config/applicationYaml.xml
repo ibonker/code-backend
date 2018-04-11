@@ -25,12 +25,6 @@ server:
 spring:
   profiles:
     active: local
-  <#if components?seq_contains("rescentersecurity")>  
-  security:
-    rest:
-      ignorePath: /login
-      matchPath: <#if (basePaths)?? ><#list basePaths as b>${b}/**,</#list></#if>/dict/api/v1/**,/logout
-  </#if>
 <#if dbcount == 1>
 mybatis:
   type-aliases-package: ${packageName}.entity
@@ -38,14 +32,6 @@ mybatis:
 </#if>
 <#else>
 spring:
-<#if components?seq_contains("rescentersecurity")> 
-  <#if postfix == "-test" || postfix == "-local">
-  redis:
-    database: 0
-    host: 10.64.13.80
-    port: 6379
-  </#if>
-</#if>
   datasource:
     <#list datasourcelist as datasource>
     druid:
@@ -69,13 +55,6 @@ uiconfig:
   menuPath: ./ui-config/menu_config.json
 excel:
   importPath: ./importExcel/
-<#if components?seq_contains("rescentersecurity")>  
-  <#if postfix == "-test" || postfix == "-local">
-res:
-  center:
-    server: 10.64.19.104:8085
-  </#if>
-</#if>
 </#if>]]>
     </content>
 </template>
