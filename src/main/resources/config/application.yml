@@ -17,7 +17,3 @@ spring:
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
-  security:
-    rest:
-      ignorePath: /login
-      matchPath: /logout
