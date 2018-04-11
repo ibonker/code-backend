@@ -1,2 +1,0 @@
-include 'hotpotmaterial-common'
-project(':hotpotmaterial-common').projectDir = new File(settingsDir, '../../hotpotmaterial-common')
