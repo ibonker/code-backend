@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dictcache</name>
+	<filePath>src/main/java/${packageName}/service/dict/impl</filePath>
+	<fileName>CacheService.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service.dict.impl;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ${packageName}.common.Constants;
+import ${packageName}.dto.dict.ResultDictDTO;
+import ${packageName}.entity.${datasourceName}.DictTypePO;
+import ${packageName}.dao.dict.DictTypeMapper;
+import ${packageName}.dao.dict.DictValueMapper;
+
+/**
+ * 字典表缓存
+ * @author Hotpotmaterial-Code2
+ */
+@Service
+public class CacheService {
+
+  //构建缓存容器
+  ResultDictDTO resultDictDTO = new ResultDictDTO();
+
+  @Autowired
+  public DictTypeMapper dictTypeMapper;
+  
+  @Autowired
+  public DictValueMapper dictValueMapper;
+
+  @PostConstruct
+  public void CacheDictTypeAndValue() {
+    List<Map<String, Object>> list = new ArrayList<>();
+    // 获取DictType数据
+    List<DictTypePO> dictTypes = dictTypeMapper.getAll(Constants.DATA_IS_NORMAL);
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    for(DictTypePO dictType:dictTypes){
+      Map<String, Object> map = new HashMap<>();
+      map.put("id", dictType.getId());
+      map.put("name", dictType.getName());
+      map.put("code", dictType.getCode());
+      map.put("createdAt", df.format(dictType.getCreatedAt()));
+      map.put("value", dictValueMapper.getAll(dictType.getCode(),Constants.DATA_IS_NORMAL));
+      list.add(map);
+    }
+    resultDictDTO.setDictTypeAndValue(list);
+    resultDictDTO.setVersion(0);
+    resultDictDTO.setIsUpdate("0");
+  }
+  
+  public ResultDictDTO getResultDictDTO(){
+    return this.resultDictDTO;
+  }
+}
+
+	]]>
+	</content>
+</template>

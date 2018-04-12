@@ -23,7 +23,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 /** 
  * Swagger-UI配置 SwaggerConfiguration 
  *
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Configuration
 @EnableSwagger2

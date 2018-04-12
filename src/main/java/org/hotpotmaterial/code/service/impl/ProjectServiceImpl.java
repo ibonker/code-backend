@@ -4,7 +4,7 @@
 package org.hotpotmaterial.code.service.impl;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,25 +19,6 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Filter;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.utils.FileUtil;
@@ -48,6 +29,7 @@ import org.hotpotmaterial.code.common.Constants;
 import org.hotpotmaterial.code.common.PredictUtils;
 import org.hotpotmaterial.code.common.component.Consul;
 import org.hotpotmaterial.code.common.component.Dictionary;
+import org.hotpotmaterial.code.common.component.Excel;
 import org.hotpotmaterial.code.common.component.Security;
 import org.hotpotmaterial.code.common.component.UiConfig;
 import org.hotpotmaterial.code.config.property.GenerateProperties;
@@ -86,6 +68,16 @@ import org.hotpotmaterial.code.service.ITransferObjFieldService;
 import org.hotpotmaterial.code.service.ITransferObjService;
 import org.hotpotmaterial.code.utils.GeneratorUtils;
 import org.hotpotmaterial.code.utils.PatternUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -100,12 +92,6 @@ import com.google.common.collect.Sets;
  */
 @Service
 public class ProjectServiceImpl implements IProjectService {
-
-  @Value("${appId.url}")
-  private String appIdUrl;
-
-  @Value("${token.url}")
-  private String tokenUrl;
 
   @Autowired
   private GenerateProperties genProperties;
@@ -265,17 +251,6 @@ public class ProjectServiceImpl implements IProjectService {
     project.setDatasources(newDbs);
     // 更新属性
     updateProject.updateAttrs(project);
-    // 判断是否使用资源中心配置
-    if (updateProject.getComponents() != null
-        && updateProject.getComponents().indexOf(Security.rescentersecurity.toString()) != -1) {
-      // 获取appid
-      updateProject.setAppId(this.getAppId(project));
-    } else {
-      updateProject.setAppId(null);
-      updateProject.setUserId(null);
-      updateProject.setUserName(null);
-      updateProject.setDepartmentName(null);
-    }
     // 更新数据库
     project = this.saveProject(updateProject, token, request);
     return project;
@@ -286,22 +261,6 @@ public class ProjectServiceImpl implements IProjectService {
    */
   @Override
   public ProjectPO saveProject(ProjectPO project, String token, HttpServletRequest request) {
-    // 构建修改人容器
-    Map<String, String> userMessage = new HashMap<String, String>();
-    if (token != null) {
-      // 更新修改人信息
-      userMessage = this.getUserByToken(token, request);
-      project.setModifyId(userMessage.get("userId"));
-      project.setModifyName(userMessage.get("userFullName"));
-      project.setModifyIp(userMessage.get("userIp"));
-    }
-
-    // 判断是否使用资源中心配置
-    if (project.getComponents() != null
-        && project.getComponents().indexOf(Security.rescentersecurity.toString()) != -1) {
-      // 获取appid
-      project.setAppId(this.getAppId(project));
-    }
     List<DatasourcePO> datasources = project.getDatasources();
     project = projectRepo.save(project);
     // 存入数据源
@@ -417,8 +376,12 @@ public class ProjectServiceImpl implements IProjectService {
     List<ApiBasePO> ApiBases = apiBaseService.findAllApiBase(id);
     // 获取最新的apibase
     ApiBasePO firstApiBase = apiBaseService.findEarlestApiBaseByProjectId(id);
+    // 获取组件
+    List<String> components = Lists.newArrayList();
+    components.addAll(Arrays.asList(project.getComponents().split(",")));
     // 生成配置文件代码
-    generateService.generateConfigFiles(version, project, datasources, ApiBases, firstApiBase);
+    generateService.generateConfigFiles(version, project, datasources, ApiBases, firstApiBase,
+        components);
 
     // 生成advice代码
     generateService.generateAdvice(version, project.getPackages(), project.getName());
@@ -449,8 +412,7 @@ public class ProjectServiceImpl implements IProjectService {
         // 获取主表关系表
         List<TableRelationPO> tableRelations =
             tableService.findSlaveTableRelationList(table.getId());
-        if (Constants.IS_ACTIVE.equals(table.getIsAutoCrud())
-            || Constants.Table_UICONFIG.equals(table.getName().toLowerCase())) {
+        if (Constants.IS_ACTIVE.equals(table.getIsAutoCrud())) {
           tableNeedServiceCreated.add(table.getId());
         }
         // 注入从表数据库类型
@@ -480,7 +442,7 @@ public class ProjectServiceImpl implements IProjectService {
           // 生成servcie和serviceImpl
           generateService.generateIServiceAndServiceImpl(version, datasource.getPackageName(),
               project.getName(), project.getPackages(), table.getName(),
-              table.getMasterTableRelations(), null, false);
+              table.getMasterTableRelations(), null, false, components);
           // TODO 判断mybatis和jpa 生成JPAService和JPAServiceImpl
           // generateService.generateJPAServiceAndJPAServiceImpl(datasource.getPackageName(),
           // project.getName(), project.getPackages(), table, transferObjs.get(0).getPackageName());
@@ -499,7 +461,7 @@ public class ProjectServiceImpl implements IProjectService {
       generateService.generateMybatisFiles(version, project.getName());
     }
 
-    // 获取实体表名
+    // 生成实体
     for (DatasourcePO datasource : datasources) {
       // 查询对应数据源下的所有表
       for (TablePO table : datasource.getTableMaps().values()) {
@@ -644,6 +606,9 @@ public class ProjectServiceImpl implements IProjectService {
     List<String> tableNames = Lists.newArrayList();
     // dto包含的关系
     List<SeniorDtoRelation> relationMethods = Lists.newArrayList();
+    // 获取组件
+    List<String> components = Lists.newArrayList();
+    components.addAll(Arrays.asList(project.getComponents().split(",")));
     // 如果不为空
     if (!relations.isEmpty()) {
       List<ColumnPO> columns = Lists.newArrayList(table.getColumnMaps().values());
@@ -658,7 +623,8 @@ public class ProjectServiceImpl implements IProjectService {
       tableNames.add(table.getId());
       // 创建service
       generateService.generateIServiceAndServiceImpl(version, datasource.getPackageName(),
-          project.getName(), project.getPackages(), seniorTableName, null, relations, true);
+          project.getName(), project.getPackages(), seniorTableName, null, relations, true,
+          components);
       // 创建mapper文件
       int i = 1;
       for (TableSeniorRelationPO relation : relations) {
@@ -687,7 +653,7 @@ public class ProjectServiceImpl implements IProjectService {
                 // 数据库获取表
                 slaveTable = tableService.findById(slave.getSlaveTableId());
                 // 数据库获取字段
-                List<ColumnPO> slavecolumns = tableService.findMergedColumns(table.getId());
+                List<ColumnPO> slavecolumns = tableService.findMergedColumns(slaveTable.getId());
                 LinkedHashMap<String, ColumnPO> columnMaps = Maps.newLinkedHashMap();
                 for (ColumnPO column : slavecolumns) {
                   // 该表所有字段
@@ -806,6 +772,13 @@ public class ProjectServiceImpl implements IProjectService {
             components.add(new Component(uiconfig.name(), uiconfig.getCname()));
           }
         }));
+    // excel组件
+    categories.add(this.getComponentCategory(() -> Excel.isMultiSelect(),
+        () -> Excel.getTypeCname(), (List<Component> components) -> {
+          for (Excel excel : Excel.values()) {
+            components.add(new Component(excel.name(), excel.getCname()));
+          }
+        }));
     return categories;
   }
 
@@ -884,18 +857,19 @@ public class ProjectServiceImpl implements IProjectService {
     }
     // 获取数据源列表
     List<DatasourcePO> datasources = datasourceService.findByProjectId(project.getId());
-    for (DatasourcePO datasource : datasources) {
+    // 默认第一个数据库添加
+    if (null != datasources && !datasources.isEmpty()) {
       // 需要创建的表
-      List<String> keyTables = this.isExist(datasource);
+      List<String> keyTables = this.isExist(datasources.get(0));
       // 判断数据源中是否存在表
       if (dictFlag && !keyTables.contains(Constants.Table_Dict_Type)) {
-        tableService.creatDictType(datasource);
+        tableService.creatDictType(datasources.get(0));
       }
       if (dictFlag && !keyTables.contains(Constants.Table_Dict_Value)) {
-        tableService.creatDictValue(datasource);
+        tableService.creatDictValue(datasources.get(0));
       }
       if (uienableFlag && !keyTables.contains(Constants.Table_UICONFIG)) {
-        tableService.createUiConfig(datasource);
+        tableService.createUiConfig(datasources.get(0));
       }
     }
 
@@ -921,53 +895,6 @@ public class ProjectServiceImpl implements IProjectService {
   }
 
   /**
-   * 获取appId
-   * 
-   * @param name
-   * @param id
-   * @return
-   */
-  public String getAppId(ProjectPO project) {
-    RestTemplate restTemplate = new RestTemplate();
-    // 构建httpheader对象
-    HttpHeaders headers = new HttpHeaders();
-    // 设置contentType
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    JSONObject json = new JSONObject();
-    try {
-      json.put("code", project.getName());
-      json.put("name", project.getName());
-      json.put("description", this.getDescription(project.getComponents()));
-      json.put("url", "http://127.0.0.1:8080");
-      json.put("enabled", "Y");
-      json.put("useExtraCode", "N");
-      json.put("titile", project.getName());
-      json.put("demain", "http://127.0.0.1:8080");
-      json.put("hostAddress", "http://127.0.0.1:8080");
-      json.put("key", "");
-      json.put("ipList", "http://127.0.0.1:8080");
-      json.put("personCatagrayList", "LOCAL");
-      json.put("id", project.getAppId());
-      json.put("managerById", project.getUserId());
-
-      HttpEntity<String> requestEntity = new HttpEntity<String>(json.toString(), headers);
-      // 调用方法获取返回值
-      ResponseEntity<String> result =
-          restTemplate.exchange(appIdUrl, HttpMethod.PUT, requestEntity, String.class);
-      // 判断请求是否成功
-      if (result.getStatusCode().toString().equals(Constants.SUCCESS_API_CODE)) {
-        // 将获取的结果转换成map
-        JSONObject resultJson = new JSONObject(result.getBody());
-        return resultJson.getString("result");
-      } else {
-        throw new CodeCommonException("获取appId失败！");
-      }
-    } catch (JSONException e) {
-      throw new CodeCommonException("获取appId异常！");
-    }
-  }
-
-  /**
    * 逻辑删除项目
    */
   @Override
@@ -979,67 +906,6 @@ public class ProjectServiceImpl implements IProjectService {
     } else {
       throw new CodeCommonException("需要删除的项目不存在!");
     }
-  }
-
-  /**
-   * 根据token获取用户信息
-   * 
-   * @param token
-   */
-  public Map<String, String> getUserByToken(String identityToken, HttpServletRequest request) {
-    // 构建返回值容器
-    Map<String, String> userMessage = new HashMap<String, String>();
-    RestTemplate restTemplate = new RestTemplate();
-    // 构建httpheader对象
-    HttpHeaders headers = new HttpHeaders();
-    // 设置contentType
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    try {
-      // 调用方法获取返回值
-      ResponseEntity<String> result =
-          restTemplate.getForEntity(tokenUrl + "?identityToken=" + identityToken, String.class);
-      // 判断请求是否成功
-      if (result.getStatusCode().toString().equals(Constants.SUCCESS_API_CODE)) {
-        // 将获取的结果转换成map
-        JSONObject resultJson = new JSONObject(result.getBody());
-        userMessage.put("userFullName", resultJson.getJSONObject("data").getString("userFullName"));
-        userMessage.put("userId", resultJson.getJSONObject("data").getString("userId"));
-      } else {
-        throw new CodeCommonException("token无效或者已失效！");
-      }
-    } catch (JSONException e) {
-      throw new CodeCommonException("获取用户信息失败！");
-    }
-    userMessage.put("userIp", this.getRemoteHost(request));
-    return userMessage;
-  }
-
-  /**
-   * 获取Ip
-   * 
-   * @param request
-   * @return
-   */
-  public String getRemoteHost(javax.servlet.http.HttpServletRequest request) {
-    // 获取x-forwarded-for中定义的ip
-    String ip = request.getHeader(Constants.X_Forwarded_For);
-    // 若ip不为空
-    if (ip == null || ip.length() == 0 || Constants.Unknown.equalsIgnoreCase(ip)) {
-      // 获取Proxy-Client-IP中定义的ip
-      ip = request.getHeader(Constants.Proxy_Client_IP);
-    }
-    // 若ip不为空
-    if (ip == null || ip.length() == 0 || Constants.Unknown.equalsIgnoreCase(ip)) {
-      // 获取WL-Proxy-Client-IP中定义的ip
-      ip = request.getHeader(Constants.WL_Proxy_Client_IP);
-    }
-    // 若ip不为空
-    if (ip == null || ip.length() == 0 || Constants.Unknown.equalsIgnoreCase(ip)) {
-      // 获取客户端ip
-      ip = request.getRemoteAddr();
-    }
-    // 返回ip
-    return ip;
   }
 
   /**
@@ -1057,9 +923,6 @@ public class ProjectServiceImpl implements IProjectService {
       if (Dictionary.dictionary.toString().equals(str)) {
         description.append(Dictionary.dictionary.toString() + ",");
       }
-      if (Security.rescentersecurity.toString().equals(str)) {
-        description.append(Security.rescentersecurity.toString() + ",");
-      }
     }
     return description.toString();
   }
@@ -1069,6 +932,9 @@ public class ProjectServiceImpl implements IProjectService {
    */
   public String generateCodeFilesUnzip(TablePO mainTable, ProjectPO project,
       DatasourcePO datasource) {
+    // 获取组件
+    List<String> components = Lists.newArrayList();
+    components.addAll(Arrays.asList(project.getComponents().split(",")));
     // 日期版本
     String version = String.valueOf(System.currentTimeMillis());
     // 需要创建service的关联表
@@ -1111,7 +977,7 @@ public class ProjectServiceImpl implements IProjectService {
       table.setPackageName(datasource.getPackageName());
       generateService.generateIServiceAndServiceImpl(version, datasource.getPackageName(),
           project.getName(), project.getPackages(), table.getName(),
-          table.getMasterTableRelations(), null, false);
+          table.getMasterTableRelations(), null, false, components);
     }
     // 数据库代码生成xml
     if (!tableMap.values().isEmpty()) {

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
-	<name>UICache</name>
-	<filePath>src/main/java/${packageName}/cache</filePath>
+	<name>uicache</name>
+	<filePath>src/main/java/${packageName}/service/uiconfig/impl</filePath>
 	<fileName>UICache.java</fileName>
 	<content><![CDATA[
-package ${packageName}.cache;
+package ${packageName}.service.uiconfig.impl;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +17,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ${packageName}.common.RestStatus;
@@ -26,28 +26,21 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hotpotmaterial.anywhere.common.utils.StringUtils;
-<#if components?seq_contains("uiConfigEnabled")>
 import ${packageName}.entity.${servuceModuleName}.UiConfigPO;
-import ${packageName}.service.${servuceModuleName}.IUiConfigService;
-</#if>
+import ${packageName}.service.uiconfig.IUiConfigService;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 前端配置文件缓存
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Service
 @Slf4j
 public class UICache {
-
-  @Value("${r'$'}{uiconfig.path}")
-  private String configPath;
   
-  <#if components?seq_contains("uiConfigEnabled")>
   @Autowired
   private IUiConfigService uiconfigService;
-  </#if>
 
   //初始化版本号
   private int version = 0;
@@ -55,7 +48,6 @@ public class UICache {
   //构建缓存容器
   private Map <String, Object> UIMap = new HashMap<>();
   
-  <#if components?seq_contains("uiConfigEnabled")>
   public void saveUiMap(UiConfigPO configObj) {
     String configStr = "";
     if (configObj != null) {
@@ -83,69 +75,17 @@ public class UICache {
     }
     UIMap.put("version", version);
   }
-  </#if>
-  
-  <#if !components?seq_contains("uiConfigEnabled")>
-  /**
-   * 缓存UIconfig
-   */ 
-  @PostConstruct
-  public void initUiConfig() {
-    log.info(">>>>>>>> 初始化UI配置缓存");
-    // 读取数据库
-    this.getUiConfig();
-  }
-  <#else>
+
   /**
    * 缓存UIconfig
    */
   @PostConstruct
   public void initUiConfig() {
-    log.info(">>>>>>>> 初始化UI配置缓存");
+    log.info(">>>>>>>> 初始化UI配置缓存 <<<<<<<<");
     // 读取数据库
     UiConfigPO configObj = uiconfigService.findById("all");
     // 保存到缓存
     this.saveUiMap(configObj);
-  }
-  </#if>
-  
-  /**
-   * 文件方式保存前端配置
-   */
-  public void getUiConfig() {
-    log.info(">>>>>>>> 初始化UI配置缓存");
-    File file = new File(configPath);
-    StringBuilder sb = new StringBuilder();
-    // 读取文件
-    if (file.exists()) {
-       try (BufferedReader br =
-          new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
-        String line = "";
-        while ((line = br.readLine()) != null) {
-          sb.append(line);
-        }
-      } catch (IOException e) {
-        // 抛出异常
-        throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
-            RestStatus.RESULT_SYSTEM_ERROR.message(), e);
-      }
-    }
-
-    // 解析文件内容到json node
-    ObjectMapper mapper = new ObjectMapper();
-    JsonFactory factory = mapper.getFactory();
-    JsonParser parser;
-    JsonNode actualObj = null;
-    try {
-      parser = factory.createParser(sb.toString());
-      actualObj = mapper.readTree(parser);
-    } catch (IOException e) {
-      // 抛出异常
-      throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
-          RestStatus.RESULT_SYSTEM_ERROR.message(), e);
-    }
-    UIMap.put("actualObj", actualObj);
-    UIMap.put("version", version);
   }
   
   /**

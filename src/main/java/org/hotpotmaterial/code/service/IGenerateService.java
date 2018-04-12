@@ -44,7 +44,8 @@ public interface IGenerateService {
    * @return
    */
   public void generateConfigFiles(String pathPostfix, ProjectPO project,
-      List<DatasourcePO> datasources, List<ApiBasePO> apiBases, ApiBasePO firstApiBase);
+      List<DatasourcePO> datasources, List<ApiBasePO> apiBases, ApiBasePO firstApiBase,
+      List<String> components);
 
   /**
    * 生成实体类
@@ -85,7 +86,7 @@ public interface IGenerateService {
    */
   public void generateIServiceAndServiceImpl(String pathPostfix, String moduleName,
       String projectName, String packageName, String tableName, List<TableRelationPO> tableRelation,
-      List<TableSeniorRelationPO> relations, boolean isSenior);
+      List<TableSeniorRelationPO> relations, boolean isSenior, List<String> components);
 
   /**
    * 生成controller文件
@@ -145,8 +146,8 @@ public interface IGenerateService {
    * 
    * @param projectName
    */
-  public void generateUIFiles(String projectDescription, String projectName,
-      String projecTitle, String appId);
+  public void generateUIFiles(String projectDescription, String projectName, String projecTitle,
+      String appId);
 
   /**
    * 生成前台文件
@@ -157,6 +158,6 @@ public interface IGenerateService {
    * @param isReplaceFile
    * @return
    */
-  public String generateToUIFile(String basePath, Template tpl,
-      Map<String, Object> model, boolean isReplaceFile);
+  public String generateToUIFile(String basePath, Template tpl, Map<String, Object> model,
+      boolean isReplaceFile);
 }

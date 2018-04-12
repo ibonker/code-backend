@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>uiconfigDao</name>
+	<filePath>src/main/java/${packageName}/dao/uiconfig</filePath>
+	<fileName>UiconfigMapper.java</fileName>
+	<content><![CDATA[
+package ${packageName}.dao.uiconfig;
+
+import ${packageName}.entity.${datasourceName}.UiConfigPO;
+	
+	
+/**
+ * ui配置dao
+ * @author Hotpotmaterial-Code2
+ */
+public interface uiconfigMapper {
+  
+  /**
+   * 获取ui数据
+   * @param id
+   */
+  UiConfigPO selectByPrimaryKey(String id);
+
+  /**
+   * 新增ui数据
+   * @param id
+   */
+  int insertSelective(UiConfigPO record);
+
+  /**
+   * 修改ui数据
+   * @param id
+   */
+  int updateByPrimaryKeySelective(UiConfigPO record);
+  
+}
+	]]>
+	</content>
+</template>

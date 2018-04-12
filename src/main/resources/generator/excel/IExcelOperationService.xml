@@ -20,7 +20,7 @@ import ${packageName}.dto.excel.ExcelImportDTO;
 
 /**
  * 通用excel导入导出方法声明接口
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 public interface IExcelOperationService {
   

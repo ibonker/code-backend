@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
 	<name>uiconfigServiceImpl</name>
-	<filePath>src/main/java/${packageName}/service/other/impl</filePath>
+	<filePath>src/main/java/${packageName}/service/uiconfig/impl</filePath>
 	<fileName>UiConfigServiceImpl.java</fileName>
 	<content><![CDATA[
-package ${packageName}.service.other.impl;
+package ${packageName}.service.uiconfig.impl;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -19,24 +19,27 @@ import org.springframework.stereotype.Service;
 import org.hotpotmaterial.anywhere.common.utils.FileUtils;
 import ${packageName}.common.RestStatus;
 import ${packageName}.exception.CodeCommonException;
-import ${packageName}.service.other.IUiConfigService;
-import ${packageName}.cache.UICache;
+import ${packageName}.service.uiconfig.IUiConfigService;
+import ${packageName}.service.uiconfig.impl.UICache;
+import ${packageName}.entity.${datasourceName}.UiConfigPO;
 	
 	
 /**
  * 前端配置文件业务接口声明实现类（文件保存）
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
-@Service("OtherUiConfigService")
+@Service("UiConfigService")
 public class UiConfigServiceImpl implements IUiConfigService {
   
-  // 文件路径
-  @Value("${r'$'}{uiconfig.path}")
-  private String configPath;
   // 注入缓存bean
   @Autowired
   private UICache uiCache;
 
+  // 注入mapper
+  @Autowired
+  private UiConfigPOMapper uiConfigPOMapper;
+
+  // 根据版本获取ui配置
   @Override
   public Map<String, Object> getUiConfig(String version) {
     // 如果版本号相同返回空,否则返回内存数据
@@ -46,28 +49,42 @@ public class UiConfigServiceImpl implements IUiConfigService {
       return uiCache.getUIMap();
     }
   }
-
+  
+  // 保存数据
   @Override
   public void saveUiConfig(String data) {
-    // 配置文件
-    FileUtils.createFile(configPath);
     // 获取内存版本号
     int version = Integer.valueOf(uiCache.getUIMap().get("version").toString());
-    // 将配置写入文件
-    try {
-      Writer writer =
-          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configPath), "UTF-8"));
-      writer.write(data.replace("'", "\""));
-      writer.close();
-    } catch (Exception e) {
-      // 抛出异常
-      throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
-          RestStatus.RESULT_SYSTEM_ERROR.message(), e);
+    UiConfigPO configObj = this.findById("all");
+    if (null != configObj) {
+      configObj.setConfigJson(data.replace("'", "\""));
+      this.updateUiConfig(configObj.getId(), configObj);
+    } else {
+      configObj = new UiConfigPO();
+      configObj.setConfigJson(data.replace("'", "\""));
+      configObj.setId("all");
+      this.insertUiConfig(configObj);
     }
     // 更新内存数据
-    uiCache.getUiConfig();
+    uiCache.saveUiMap(configObj);
     // 更新内存版本号
-    uiCache.getUIMap().put("version", version+1);
+    uiCache.getUIMap().put("version", version + 1);
+  }
+
+  //新增
+  @Override
+  public int insertUiConfig(UiConfigPO uiConfig) {
+    // 设置值
+    uiConfig.preInsert();
+    return uiConfigPOMapper.insertSelective(uiConfig);
+  }
+
+  //修改
+  @Override
+  public int updateUiConfig(String id, UiConfigPO uiConfig) {
+    uiConfig.preUpdate();
+    uiConfig.setId(id);
+    return uiConfigPOMapper.updateByPrimaryKeySelective(uiConfig);
   }
 
 }

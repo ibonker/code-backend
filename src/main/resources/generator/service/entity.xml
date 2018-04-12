@@ -69,7 +69,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  * ${tableComments}
  */
 @Data

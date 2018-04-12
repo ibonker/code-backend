@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dictValueDao</name>
+	<filePath>src/main/java/${packageName}/dao/dict</filePath>
+	<fileName>DictValueMapper.java</fileName>
+	<content><![CDATA[
+package ${packageName}.dao.dict;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import ${packageName}.entity.${datasourceName}.DictValuePO;
+import ${packageName}.entity.${datasourceName}.DictValuePOExample;
+
+/**
+ * @author Hotpotmaterial-Code2
+ *
+ */
+public interface DictValueMapper{
+  
+  /**
+   * 查询所有DictValue
+   * @param delFlag
+   * @return
+   */
+  @Select("SELECT * FROM dict_value WHERE dict_code = #{arg0} AND del_flag = #{arg1}")
+  @Results({
+    @Result(property = "dictCode", column = "dict_code")
+  })
+  List<DictValuePO> getAll(String code,String delFlag);
+  
+  /**
+   * 根据id查询DictValue
+   * @param id
+   * @return
+   */
+  @Select("SELECT * FROM dict_value WHERE del_flag = #{arg1} AND id = #{arg0}")
+  @Results({
+    @Result(property = "createdBy", column = "created_by"),
+    @Result(property = "updatedBy", column = "updated_by"),
+    @Result(property = "dictCode", column = "dict_code")
+  })
+  DictValuePO findDictValue(String id, String delFlag);
+  
+  /**
+   * 根据DictType删除DictValue
+   * @param id
+   * @param delFlag
+   */
+  @Update("UPDATE dict_value SET del_flag = #{arg1} WHERE dict_code = #{arg0}")
+  void deleteDictValues(String code, String delFlag);
+  
+  /**
+   * 更新DictValue
+   * @param dictValue
+   */
+  @Update("UPDATE dict_value SET name = #{name}, value = #{value}, "
+      + "sort = #{sort}, dict_code = #{dictCode}, created_by = #{createdBy}, updated_by =#{updatedBy}, "
+      + "created_at = #{createdAt}, updated_at = #{updatedAt} WHERE id = #{id}")
+  void updateDictValue(DictValuePO dictValue);
+  
+  /**
+   * 新增DictValue
+   * @param dictValue
+   */
+  @Insert("INSERT INTO dict_value(id,name,value,sort,dict_code,created_by,updated_by,created_at,updated_at,del_flag) "
+      + "VALUES "
+      + "(#{id},#{name},#{value},#{sort},#{dictCode},#{createdBy},#{updatedBy},#{createdAt},#{updatedAt},#{delFlag})")
+  void insertDictValue(DictValuePO dictValue);
+  
+  /**
+   * 删除dictValue
+   * @param id
+   * @param delFlag
+   */
+  @Update("UPDATE dict_value SET del_flag = #{arg1} WHERE id = #{arg0}")
+  void deleteDictValue(String id, String delFlag);
+  
+  /**
+   * 分页查询
+   * @param example
+   * @return
+   */
+  List<DictValuePO> selectByExample(DictValuePOExample example);
+  
+  /**
+   * 更新DictType下所有的DictValue
+   * @param code
+   * @param delFlag
+   */
+  @Update("UPDATE dict_value SET dict_code = #{arg0} WHERE dict_code = #{arg1} AND del_flag = #{arg2} ")
+  void updateDictValues(String newCode, String oldCode, String delFlag);
+}
+
+	]]>
+	</content>
+</template>

@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiResponses;
 
 /**
  * Excel导出控制器声明接口
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Api(value = "ExcelExport", description = "the Excel Export API")
 @RequestMapping(value = "${mainpath}/api/common")

@@ -8,7 +8,7 @@ package ${packageName}.common;
 
 /**
  * 提供基本的常量
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  *
  */
 public class Constants {

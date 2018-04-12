@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 统一处理CodeCommonException异常
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @ControllerAdvice
 @Slf4j

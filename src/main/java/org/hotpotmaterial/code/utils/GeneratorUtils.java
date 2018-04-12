@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.hotpotmaterial.anywhere.common.mapper.JaxbMapper;
+import org.hotpotmaterial.anywhere.common.utils.FileUtils;
+import org.hotpotmaterial.anywhere.common.utils.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-
-import org.hotpotmaterial.anywhere.common.mapper.JaxbMapper;
-import org.hotpotmaterial.anywhere.common.utils.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class GeneratorUtils {
   // 压缩文件后缀
   private static final String ZIP_FILE_EXTENSION = ".zip";
-  // 实体文件后缀
-  private static final String JAVA_FILE_EXTENSION = ".java";
 
   /**
    * XML文件转换为对象
@@ -84,6 +82,9 @@ public class GeneratorUtils {
   public static String getProjectZipPath(String projectZipPath, String name) {
     // 如果配置了工程路径，则直接返回，否则自动获取。
     if (StringUtils.isNotBlank(projectZipPath)) {
+      // 创建文件夹
+      FileUtils.createDirectory(projectZipPath);
+      // 返回路径
       return projectZipPath + File.separator + name + ZIP_FILE_EXTENSION;
     }
     File f = new File(
@@ -92,19 +93,4 @@ public class GeneratorUtils {
     return projectZipPath;
   }
   
-  /**
-   * 获取实体下载路径
-   * 
-   * @return
-   */
-  public static String getEntityPath(String projectPath, String name) {
-    // 如果配置了工程路径，则直接返回，否则自动获取。
-    if (StringUtils.isNotBlank(projectPath)) {
-      return projectPath + File.separator + name + JAVA_FILE_EXTENSION;
-    }
-    File f = new File(
-        "E:/" + name + File.separator + "src" + File.separator + "main" + JAVA_FILE_EXTENSION);
-    String returnPath = f.toString();
-    return returnPath;
-  }
 }

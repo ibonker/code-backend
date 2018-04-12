@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * excel数据导出查询sql声明dao
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 public interface SearchMapper {
   

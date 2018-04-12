@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiResponses;
 /** 
  * 控制器的声明接口，可以与FeignClient配合使用 
  * 
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Api(value = "${controllerName}")
 @RequestMapping(value = "${basePath}")

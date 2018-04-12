@@ -4,21 +4,21 @@
     <filePath>/</filePath>
     <fileName>gradle.properties</fileName>
     <content><![CDATA[
-anywhere_repo = http://172.16.1.188:8082/content/groups/public
+aliyun_repo = http://maven.aliyun.com/nexus/content/groups/public
 
-titan_common_version = 0.1.79-SNAPSHOT
+hotpotmaterial_common_version = 0.0.2
+
+hotpotmaterial_jsonmeta_version = 0.0.1
 
 spring_boot_version = 1.5.4.RELEASE
 
 java_version = 1.8
 
-jar_name = ${projectName}
-
-jar_version = 0.0.1
-
 group_name = org.hotpotmaterial
 
-titan_dependencies_version = 0.1.0-SNAPSHOT
+jar_name = ${projectName}
+
+jar_version = 0.0.1-SNAPSHOT
 
 druid_version = 1.1.0
 
@@ -27,12 +27,6 @@ usertype_version = 5.0.0.GA
 lombok_version = 1.16.16
 
 hibernate_java8_version = 5.0.11.Final
-
-rescenter_rest_version = 3.6.0-SNAPSHOT
-
-titan_jsonmeta_version = 0.0.17-SNAPSHOT
-
-titan_dict_version = 0.0.9-SNAPSHOT
 
 mybatis_typehandlers_jsr310_version = 1.0.2
 

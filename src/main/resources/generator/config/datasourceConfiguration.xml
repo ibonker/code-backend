@@ -56,7 +56,7 @@ import ${packageName}.common.BaseEntity;
 /** 
  * 数据源配置 - ${datasource.upperCamelPackageName}DatasourceConfiguration 
  *
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Configuration
 @EnableTransactionManagement

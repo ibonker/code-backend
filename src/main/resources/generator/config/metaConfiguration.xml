@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * 元数据配置。该配置主要用于激活元数据信息，通过接口返回相应实体的信息如属性名，数据库最大的长度，数据类型等
  *
- * @author TitanCode2
+ * @author Hotpotmaterial-Code2
  */
 @Configuration
 public class ResourceMetadataConfiguration {
