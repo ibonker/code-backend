@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    druid:
+      staff_manage:
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.2.121:3306/staff_manage?useUnicode=true&characterEncoding=utf-8
+        username: root
+        password: X19890314
+        filters: stat
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+logging:
+  file: logs/application_log
+  level:
+    ROOT: INFO
+    org.springframework.boot: INFO
+    org.springframework.web: INFO
+    org.hotpotmaterial.anywhere: DEBUG
+uiconfig:
+  path: ./ui-config/config.json
+  menuPath: ./ui-config/menu_config.json
+excel:
+  importPath: ./importExcel/

@@ -1,0 +1,84 @@
+package pers.fj.staffmanage.common;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+
+import org.hotpotmaterial.anywhere.common.utils.IdGen;
+import org.hotpotmaterial.anywhere.common.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
+import lombok.Data;  
+
+/**
+ * 持久化实体基类，提供id、created_at和updated_at三个字段的更新和修改的赋值操作
+ * 
+ * @author Hotpotmaterial-Code2
+ *
+ */
+@Data
+@JsonInclude(Include.NON_NULL)
+public class BaseEntity implements Serializable {
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+  // id
+  @Column(name = "id")
+  @JsonProperty(value = "id")
+  @JsonPropertyDescription("id")
+  private String id;
+  
+  // 创建时间
+  @Column(name = "created_at", nullable = false)
+  @JsonPropertyDescription("创建时间")
+  @JsonProperty(value = "createdAt", access = Access.READ_ONLY)
+  @JsonFormat(pattern = Constants.DATETIME_FORMAT, timezone="GMT+8")
+  protected Date createdAt;
+  
+  // 更新时间
+  @Column(name = "updated_at", nullable = false)
+  @JsonPropertyDescription("更新时间")
+  @JsonProperty(value = "updatedAt", access = Access.READ_ONLY)
+  @JsonFormat(pattern = Constants.DATETIME_FORMAT, timezone="GMT+8")
+  protected Date updatedAt;
+
+  /**
+   * 创建之前执行方法，手动调用 添加id和更新时间/创建时间
+   */
+  public void preInsert() {
+    // 不限制ID为UUID,可以使用其他规则
+    if (this.isNew()) {
+      setId(IdGen.uuid());
+    }
+    this.createdAt = new Date();
+    this.updatedAt = this.createdAt;
+  }
+
+  /**
+   * 更新之前执行方法，需要手动调用
+   */
+  public void preUpdate() {
+    this.updatedAt = new Date();
+  }
+
+  /**
+   * 判断是否新增
+   * 
+   * @return
+   */
+  @JsonIgnore 
+  public boolean isNew() {
+    return StringUtils.isEmpty(getId());
+  }
+
+}

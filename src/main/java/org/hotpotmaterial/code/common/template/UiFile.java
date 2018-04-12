@@ -10,11 +10,13 @@ package org.hotpotmaterial.code.common.template;
 public enum UiFile {
   
   controllerUi("uiconfig/controllerUi.xml"),
-  uiconfigDto("uiconfig/uiconfigDto.xml"),
+  uiconfigDao("uiconfig/uiconfigDao.xml"),
+  uiconfigMapper("uiconfig/uiconfigMapper.xml"),
   uiconfigService("uiconfig/uiconfigService.xml"),
   uiconfigServiceImpl("uiconfig/uiconfigServiceImpl.xml"),
+  uiconfigDto("uiconfig/uiconfigDto.xml"),
   uiconfigRequestDto("uiconfig/uiconfigRequestDto.xml"),
-  uiconfig("uiconfig/uicache.xml");
+  uicache("uiconfig/uicache.xml");
   
   private String path;
   

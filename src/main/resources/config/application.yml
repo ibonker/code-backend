@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8085
 #  tomcat:
 #    remote-ip-header: x-forwarded-for
 #    protocol-header: x-forwarded-proto

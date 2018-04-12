@@ -1,0 +1,89 @@
+buildscript {
+    repositories {
+        maven { 
+            url aliyun_repo
+        }
+    }
+    
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
+    }
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'idea'
+apply plugin: 'java'
+
+repositories {
+    maven { 
+        url aliyun_repo
+    }
+}
+
+jar {
+    baseName = jar_name
+    version =  jar_version
+}
+
+group = group_name
+    
+sourceCompatibility = java_version
+targetCompatibility = java_version
+    
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+    all*.exclude group: 'log4j', module: 'log4j'
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+}
+    
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile "org.springframework.boot:spring-boot-starter-aop"
+	compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter'
+    
+    compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jackson_version}"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jackson_version}"
+    compile "io.springfox:springfox-swagger2:${swagger_version}"
+  	compile "io.springfox:springfox-swagger-ui:${swagger_version}"
+    compile "com.alibaba:druid-spring-boot-starter:${druid_version}"
+    compile "mysql:mysql-connector-java"
+ 
+    compile "com.google.guava:guava"
+    compile "org.jadira.usertype:usertype.core:${usertype_version}"
+    compile "org.projectlombok:lombok:${lombok_version}"
+    compile "org.hotpotmaterial:hotpotmaterial-common:${hotpotmaterial_common_version}"
+    compile "org.mybatis:mybatis-typehandlers-jsr310:${mybatis_typehandlers_jsr310_version}"
+    compile "com.github.pagehelper:pagehelper:${pagehelper_version}"
+    compile "com.github.pagehelper:pagehelper-spring-boot-starter:${pagehelper_spring_boot_starter_version}"
+    compile "org.hibernate:hibernate-java8:${hibernate_java8_version}"
+    
+    compile "org.hotpotmaterial:hotpotmaterial-jsonmeta:${hotpotmaterial_jsonmeta_version}"
+    compile "org.apache.poi:poi:3.17"
+    compile "org.apache.poi:poi-ooxml:3.17"
+    
+    testCompile "org.springframework.boot:spring-boot-starter-test"
+}
+
+springBoot {
+    mainClass = 'pers.fj.staffmanage.Application'
+}
+    
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+task createJavaProject << {
+    sourceSets*.java.srcDirs*.each {
+        it.mkdirs()
+    }
+    sourceSets*.resources.srcDirs*.each {
+        it.mkdirs()
+    }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = gradle_version
+}

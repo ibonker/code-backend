@@ -23,7 +23,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL5Dialect
 generate:
   mybatisGenlibsPath: ./mybatis-genlibs/
-  rootPath: ${GEN_ROOT_PATH:'./code-gen'}
+  rootPath: ${GEN_ROOT_PATH:./code-gen/}
   projectPath: ${generate.rootPath}codedir/
   projectZipPath: ${generate.rootPath}codedir/zip/
   projectUiPath: ${generate.rootPath}ui-code/mould/

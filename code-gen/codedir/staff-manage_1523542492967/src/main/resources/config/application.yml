@@ -1,0 +1,23 @@
+# 应用信息
+info:
+  app_name: TITAN::staff-manage
+  app_version: 0.1-SNAPSHOT
+# tomcat配置  
+server:
+  tomcat:
+    remote_ip_header: x-forwarded-for
+    protocol_header: x-forwarded-proto
+    baseDir: ''
+    backgroundProcessorDelay: 1
+    accessLogEnabled: true
+    accessLogPattern: '%h %l %u %t "%r" %s %b %{Host}i %{Location}o'
+  port: 8080
+  session:
+    timeout: 1000000
+# spring配置    
+spring:
+  profiles:
+    active: local
+mybatis:
+  type-aliases-package: pers.fj.staffmanage.entity
+  mapper-locations: classpath*:/mappings/*.xml,classpath*:/mappings/**/*.xml

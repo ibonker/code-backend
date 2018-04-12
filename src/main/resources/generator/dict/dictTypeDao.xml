@@ -29,7 +29,7 @@ public interface DictTypeMapper{
    * @param delFlag
    * @return
    */
-  @Select("SELECT * FROM dict_type WHERE del_flag = #{delFlag}")
+  @Select("SELECT * FROM dict_type WHERE del_flag = ${r'#'}{delFlag}")
   @Results({
     @Result(property = "createdBy", column = "created_by"),
     @Result(property = "updatedBy", column = "updated_by"),
@@ -43,7 +43,7 @@ public interface DictTypeMapper{
    * @param id
    * @return
    */
-  @Select("SELECT * FROM dict_type WHERE del_flag = #{arg1} AND id = #{arg0}")
+  @Select("SELECT * FROM dict_type WHERE del_flag = ${r'#'}{arg1} AND id = ${r'#'}{arg0}")
   @Results({
     @Result(property = "createdBy", column = "created_by"),
     @Result(property = "updatedBy", column = "updated_by"),
@@ -58,15 +58,15 @@ public interface DictTypeMapper{
    * @param delFlag
    * @return
    */
-  @Update("UPDATE dict_type SET del_flag = #{arg1} WHERE id = #{arg0}")
+  @Update("UPDATE dict_type SET del_flag = ${r'#'}{arg1} WHERE id = ${r'#'}{arg0}")
   void deleteDictType(String id, String delFlag);
   
   /**
    * 更新dictType
    * @param dictType
    */
-  @Update("UPDATE dict_type SET code = #{code}, name = #{name}, created_by = #{createdBy}, "
-      + "updated_by = #{updatedBy}, updated_at = #{updatedAt}, created_at = #{createdAt} WHERE id = #{id}")
+  @Update("UPDATE dict_type SET code = ${r'#'}{code}, name = ${r'#'}{name}, created_by = ${r'#'}{createdBy}, "
+      + "updated_by = ${r'#'}{updatedBy}, updated_at = ${r'#'}{updatedAt}, created_at = ${r'#'}{createdAt} WHERE id = ${r'#'}{id}")
   void updateDictType(DictTypePO dictType);
   
   /**
@@ -74,7 +74,7 @@ public interface DictTypeMapper{
    * @param dictType
    */
   @Insert("INSERT INTO dict_type (id,code,name,created_by,created_at,updated_by,updated_at,del_flag) "
-      + "VALUES(#{id},#{code}, #{name}, #{createdBy},#{createdAt},#{updatedBy},#{updatedAt},#{delFlag})")
+      + "VALUES(${r'#'}{id},${r'#'}{code}, ${r'#'}{name}, ${r'#'}{createdBy},${r'#'}{createdAt},${r'#'}{updatedBy},${r'#'}{updatedAt},${r'#'}{delFlag})")
   void insertDictType(DictTypePO dictType);
   
   /**
@@ -89,7 +89,7 @@ public interface DictTypeMapper{
    * @param code
    * @return
    */
-  @Select("SELECT id FROM dict_type WHERE code = #{arg0} AND del_flag = #{arg1}")
+  @Select("SELECT id FROM dict_type WHERE code = ${r'#'}{arg0} AND del_flag = ${r'#'}{arg1}")
   String selectByCode(String code, String delFlag);
   
   /**
@@ -98,7 +98,7 @@ public interface DictTypeMapper{
    * @param delFlag
    * @return
    */
-  @Select("SELECT * FROM dict_value WHERE dict_code = #{arg0} AND del_flag = #{arg1}")
+  @Select("SELECT * FROM dict_value WHERE dict_code = ${r'#'}{arg0} AND del_flag = ${r'#'}{arg1}")
   List<DictValuePO> findDictValueByCode(String code, String delFlag);
 }
 	]]>

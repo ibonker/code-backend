@@ -645,7 +645,11 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("packageName", packageName);
     model.put("dataSource", datasource);
     model.put("tables", tables);
-    model.put("projectPath", genProperties.getProjectPath());
+    String projectPath = genProperties.getProjectPath();
+    if (!projectPath.startsWith("/") && projectPath.indexOf(":") < 0) {
+    	projectPath = ".." + File.separator + projectPath;
+    }
+    model.put("projectPath", projectPath);
     // 生成xml文件
     this.generateToFile(pathPostfix, genProperties.getMybatisGenlibsPath(), GeneratorUtils
         .fileToObject(GeneratorConfigFile.generatorConfigFile.getPath(), Template.class), model,

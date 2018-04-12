@@ -10,16 +10,16 @@ package org.hotpotmaterial.code.common.template;
 public enum DictFile {
   
   dictcache("dict/dictcache.xml"),
-  dictController("uiconfig/dictController.xml"),
-  dictDto("uiconfig/dictDto.xml"),
-  dictService("uiconfig/dictService.xml"),
-  dictServiceImpl("uiconfig/dictServiceImpl.xml"),
-  dictTypeDao("uiconfig/dictTypeDao.xml"),
-  dictValueExample("uiconfig/dictValueExample.xml"),
-  dictTypeMapper("uiconfig/dictTypeMapper.xml"),
-  dictValueDao("uiconfig/dictValueDao.xml"),
-  dictTypeExample("uiconfig/dictTypeExample.xml"),
-  dictValueMapper("uiconfig/dictValueMapper.xml");
+  dictController("dict/dictController.xml"),
+  dictDto("dict/dictDto.xml"),
+  dictService("dict/dictService.xml"),
+  dictServiceImpl("dict/dictServiceImpl.xml"),
+  dictTypeDao("dict/dictTypeDao.xml"),
+  dictValueExample("dict/dictValueExample.xml"),
+  dictTypeMapper("dict/dictTypeMapper.xml"),
+  dictValueDao("dict/dictValueDao.xml"),
+  dictTypeExample("dict/dictTypeExample.xml"),
+  dictValueMapper("dict/dictValueMapper.xml");
   
   private String path;
   

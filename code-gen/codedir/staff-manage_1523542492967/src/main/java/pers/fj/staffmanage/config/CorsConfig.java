@@ -1,0 +1,41 @@
+package pers.fj.staffmanage.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+/**
+ * 跨域请求配置
+ *
+ * @author Hotpotmaterial-Code2
+ *
+ */
+@Configuration
+public class CorsConfig {
+  
+  /**
+   * 跨域过滤器
+   * 
+   * @return
+   */
+  @Bean
+  public CorsFilter corsFilter() {
+    // 初始化配置实例
+    CorsConfiguration corsConfiguration = new CorsConfiguration();
+    // 允许任意来源的请求
+    corsConfiguration.addAllowedOrigin("*");
+    // 允许任意的请求头
+    corsConfiguration.addAllowedHeader("*");
+    // 允许暴露给前端的响应头
+    corsConfiguration.addExposedHeader("AUTH_TOKEN");
+    // 允许任意请求方法
+    corsConfiguration.addAllowedMethod("*");
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    // 所有的接口都适用相同跨域配置
+    source.registerCorsConfiguration("/**", corsConfiguration);
+    return new CorsFilter(source);
+  }
+  
+}

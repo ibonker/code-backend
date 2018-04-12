@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
   <name>dictTypeMapper</name>
-  <filePath>src/main/resources/mappings/${datasourceName}/dict</filePath>
+  <filePath>src/main/resources/mappings/dict</filePath>
   <fileName>DictTypeMapper.xml</fileName>
   <content><![CDATA[
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -31,20 +31,20 @@
 						<foreach collection="criteria.criteria" item="criterion">
 							<choose>
 								<when test="criterion.noValue">
-									and ${criterion.condition}
+									and ${r'$'}{criterion.condition}
 								</when>
 								<when test="criterion.singleValue">
-									and ${criterion.condition} #{criterion.value}
+									and ${r'$'}{criterion.condition} ${r'#'}{criterion.value}
 								</when>
 								<when test="criterion.betweenValue">
-									and ${criterion.condition} #{criterion.value} and
-									#{criterion.secondValue}
+									and ${r'$'}{criterion.condition} ${r'#'}{criterion.value} and
+									${r'#'}{criterion.secondValue}
 								</when>
 								<when test="criterion.listValue">
-									and ${criterion.condition}
+									and ${r'$'}{criterion.condition}
 									<foreach close=")" collection="criterion.value" item="listItem"
 										open="(" separator=",">
-										#{listItem}
+										${r'#'}{listItem}
 									</foreach>
 								</when>
 							</choose>
@@ -67,7 +67,7 @@
 			<include refid="Example_Where_Clause" />
 		</if>
 		<if test="orderByClause != null">
-			order by ${orderByClause}
+			order by ${r'$'}{orderByClause}
 		</if>
 	</select>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
   <name>uiconfigMapper</name>
-  <filePath>src/main/resources/mappings/${datasourceName}/uiconfig</filePath>
+  <filePath>src/main/resources/mappings/uiconfig</filePath>
   <fileName>UiconfigMapper.xml</fileName>
   <content><![CDATA[
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -32,7 +32,7 @@
     ,
     <include refid="Blob_Column_List" />
     from ui_config
-    where id = #{id,jdbcType=VARCHAR}
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
   </select>
 
   <insert id="insertSelective" parameterType="${packageName}.entity.${datasourceName}.UiConfigPO">
@@ -59,22 +59,22 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=VARCHAR},
+        ${r'#'}{id,jdbcType=VARCHAR},
       </if>
       <if test="createdBy != null">
-        #{createdBy,jdbcType=VARCHAR},
+        ${r'#'}{createdBy,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
-        #{createdAt,jdbcType=TIMESTAMP},
+        ${r'#'}{createdAt,jdbcType=TIMESTAMP},
       </if>
       <if test="updatedBy != null">
-        #{updatedBy,jdbcType=VARCHAR},
+        ${r'#'}{updatedBy,jdbcType=VARCHAR},
       </if>
       <if test="updatedAt != null">
-        #{updatedAt,jdbcType=TIMESTAMP},
+        ${r'#'}{updatedAt,jdbcType=TIMESTAMP},
       </if>
       <if test="configJson != null">
-        #{configJson,jdbcType=<#if dbtype == 'oracle'>CLOB<#else>LONGVARCHAR</#if>},
+        ${r'#'}{configJson,jdbcType=<#if dbtype == 'oracle'>CLOB<#else>LONGVARCHAR</#if>},
       </if>
     </trim>
   </insert>  
@@ -83,22 +83,22 @@
     update ui_config
     <set>
       <if test="createdBy != null">
-        created_by = #{createdBy,jdbcType=VARCHAR},
+        created_by = ${r'#'}{createdBy,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
-        created_at = #{createdAt,jdbcType=TIMESTAMP},
+        created_at = ${r'#'}{createdAt,jdbcType=TIMESTAMP},
       </if>
       <if test="updatedBy != null">
-        updated_by = #{updatedBy,jdbcType=VARCHAR},
+        updated_by = ${r'#'}{updatedBy,jdbcType=VARCHAR},
       </if>
       <if test="updatedAt != null">
-        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+        updated_at = ${r'#'}{updatedAt,jdbcType=TIMESTAMP},
       </if>
       <if test="configJson != null">
-        config_json = #{configJson,jdbcType=<#if dbtype == 'oracle'>CLOB<#else>LONGVARCHAR</#if>},
+        config_json = ${r'#'}{configJson,jdbcType=<#if dbtype == 'oracle'>CLOB<#else>LONGVARCHAR</#if>},
       </if>
     </set>
-    where id = #{id,jdbcType=VARCHAR}
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
   </update>
 
 </mapper>
