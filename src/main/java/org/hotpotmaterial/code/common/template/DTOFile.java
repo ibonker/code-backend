@@ -1,7 +1,7 @@
 package org.hotpotmaterial.code.common.template;
 
 public enum DTOFile {
-  dto("mapper/dto.xml");
+  dto("service/dto.xml");
   
   private String path;
   

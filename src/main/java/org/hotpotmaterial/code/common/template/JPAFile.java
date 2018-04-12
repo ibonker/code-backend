@@ -1,11 +1,11 @@
 package org.hotpotmaterial.code.common.template;
 
 public enum JPAFile {
-  JPAservice("mapper/JPAservice.xml"),
+  JPAservice("service/JPAservice.xml"),
   
-  JPAserviceImpl("mapper/JPAserviceImpl.xml"),
+  JPAserviceImpl("service/JPAserviceImpl.xml"),
   
-  repository("mapper/repository.xml");
+  repository("service/repository.xml");
   
   private String path;
   

@@ -1,7 +1,7 @@
 package org.hotpotmaterial.code.common.template;
 
 public enum ServiceFile {
-  Service("mapper/service.xml");
+  Service("service/service.xml");
   
   private String path;
   

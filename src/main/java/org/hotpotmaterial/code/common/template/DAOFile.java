@@ -1,8 +1,8 @@
 package org.hotpotmaterial.code.common.template;
 
 public enum DAOFile {
-  dao("mapper/dao.xml"),
-  mapper("mapper/mapper.xml");
+  dao("service/dao.xml"),
+  mapper("service/mapper.xml");
   
   private String path;
   

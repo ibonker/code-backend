@@ -2,7 +2,7 @@ package org.hotpotmaterial.code.common.template;
 
 public enum EntityFile {
   
-  entity("mapper/entity.xml");
+  entity("service/entity.xml");
   
   private String path;
   

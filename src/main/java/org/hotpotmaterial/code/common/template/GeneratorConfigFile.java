@@ -1,7 +1,7 @@
 package org.hotpotmaterial.code.common.template;
 
 public enum GeneratorConfigFile {
-  generatorConfigFile("mapper/generatorConfig.xml");
+  generatorConfigFile("service/generatorConfig.xml");
   
   private String path;
   

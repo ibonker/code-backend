@@ -2,7 +2,7 @@ package org.hotpotmaterial.code.common.template;
 
 public enum AdviceFile {
 
-  advice("mapper/advice.xml");
+  advice("service/advice.xml");
   
   private String path;
   
