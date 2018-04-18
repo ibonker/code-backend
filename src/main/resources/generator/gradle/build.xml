@@ -48,7 +48,11 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile "org.springframework.boot:spring-boot-starter-aop"
 	compile "org.springframework.boot:spring-boot-starter-actuator"
-    compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter'
+	<#if components?seq_contains("localsecurity")>
+	compile "org.springframework.boot:spring-boot-starter-actuator"
+	compile "io.jsonwebtoken:jjwt:${r'$'}{jwt_version}"
+	</#if>
+    compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:${r'$'}{mybatis_spring_version}'
     
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${r'$'}{jackson_version}"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${r'$'}{jackson_version}"
@@ -59,10 +63,13 @@ dependencies {
     compile "com.oracle:ojdbc6:${r'$'}{oracle_version}"
     </#if>
     <#if hasMysql == "1">
-    compile "mysql:mysql-connector-java"
+    compile "mysql:mysql-connector-java:${r'$'}{mysql_version}"
     </#if>
  
-    compile "com.google.guava:guava"
+ 	<#if components?seq_contains("rescentersecurity")>
+    compile "com.changan:spring-boot-starter-rescenter-rest:${r'$'}{rescenter_rest_version}"
+    </#if>
+    compile "com.google.guava:guava:${r'$'}{guava_version}"
     compile "org.jadira.usertype:usertype.core:${r'$'}{usertype_version}"
     compile "org.projectlombok:lombok:${r'$'}{lombok_version}"
     compile "org.hotpotmaterial:hotpotmaterial-common:${r'$'}{hotpotmaterial_common_version}"

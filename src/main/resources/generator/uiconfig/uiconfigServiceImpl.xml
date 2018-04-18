@@ -15,13 +15,15 @@ import ${packageName}.service.uiconfig.IUiConfigService;
 import ${packageName}.dao.uiconfig.UiconfigMapper;
 import ${packageName}.service.uiconfig.impl.UICache;
 import ${packageName}.entity.${datasourceName}.UiConfigPO;
-	
+
+import lombok.extern.slf4j.Slf4j;	
 	
 /**
  * 前端配置文件业务接口声明实现类（文件保存）
  * @author Hotpotmaterial-Code2
  */
 @Service("UiConfigService")
+@Slf4j
 public class UiConfigServiceImpl implements IUiConfigService {
   
   // 注入缓存bean
@@ -84,6 +86,18 @@ public class UiConfigServiceImpl implements IUiConfigService {
   @Override
   public UiConfigPO findById(String id) {
     return uiConfigPOMapper.selectByPrimaryKey(id);
+  }
+  
+  /**
+   * 缓存UIconfig
+   */
+  @PostConstruct
+  public void initUiConfig() {
+    log.info(">>>>>>>> 初始化UI配置缓存 <<<<<<<<");
+    // 读取数据库
+    UiConfigPO configObj = this.findById("all");
+    // 保存到缓存
+    uiCache.saveUiMap(configObj);
   }
 
 }

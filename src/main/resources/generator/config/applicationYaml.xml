@@ -50,9 +50,6 @@ logging:
     org.springframework.boot: INFO
     org.springframework.web: INFO
     org.hotpotmaterial.anywhere: DEBUG
-uiconfig:
-  path: ./ui-config/config.json
-  menuPath: ./ui-config/menu_config.json
 excel:
   importPath: ./importExcel/
 </#if>]]>
