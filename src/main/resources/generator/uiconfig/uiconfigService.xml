@@ -37,13 +37,13 @@ public interface IUiConfigService {
    * 修改ui数据
    * @param id
    */
-  public UiConfigPO updateUiConfig(UiConfigPO configObj);
+  public int updateUiConfig(String id, UiConfigPO configObj);
 
   /**
    * 新增ui数据
    * @param id
    */
-  public UiConfigPO insertUiConfig(String id, UiConfigPO configObj);
+  public int insertUiConfig(UiConfigPO configObj);
 }
 	]]>
 	</content>

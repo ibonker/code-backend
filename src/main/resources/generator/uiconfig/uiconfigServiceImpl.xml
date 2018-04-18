@@ -6,20 +6,13 @@
 	<content><![CDATA[
 package ${packageName}.service.uiconfig.impl;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.hotpotmaterial.anywhere.common.utils.FileUtils;
-import ${packageName}.common.RestStatus;
-import ${packageName}.exception.CodeCommonException;
 import ${packageName}.service.uiconfig.IUiConfigService;
+import ${packageName}.dao.uiconfig.UiconfigMapper;
 import ${packageName}.service.uiconfig.impl.UICache;
 import ${packageName}.entity.${datasourceName}.UiConfigPO;
 	
@@ -37,7 +30,7 @@ public class UiConfigServiceImpl implements IUiConfigService {
 
   // 注入mapper
   @Autowired
-  private UiConfigPOMapper uiConfigPOMapper;
+  private UiconfigMapper uiConfigPOMapper;
 
   // 根据版本获取ui配置
   @Override
@@ -85,6 +78,12 @@ public class UiConfigServiceImpl implements IUiConfigService {
     uiConfig.preUpdate();
     uiConfig.setId(id);
     return uiConfigPOMapper.updateByPrimaryKeySelective(uiConfig);
+  }
+  
+  // 获取详情
+  @Override
+  public UiConfigPO findById(String id) {
+    return uiConfigPOMapper.selectByPrimaryKey(id);
   }
 
 }

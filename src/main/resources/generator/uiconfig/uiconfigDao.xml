@@ -13,7 +13,7 @@ import ${packageName}.entity.${datasourceName}.UiConfigPO;
  * ui配置dao
  * @author Hotpotmaterial-Code2
  */
-public interface uiconfigMapper {
+public interface UiconfigMapper {
   
   /**
    * 获取ui数据

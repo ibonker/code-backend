@@ -24,7 +24,7 @@ import ${packageName}.dao.${moduleName}.${className}<#if !isSenior>PO</#if>Mappe
 
 import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
-import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultPageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 <#if hasOneToMany>
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Collection;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Filter;
@@ -35,10 +35,12 @@ import com.github.pagehelper.PageInfo;
 import org.hotpotmaterial.jsonmeta.JsonSchema;
 import org.hotpotmaterial.jsonmeta.ResourceMetaManager;
 
+<#if enableExcel>
 import ${packageName}.dto.excel.ExcelReportDTO;
 import ${packageName}.dto.excel.ExcelImportDTO;
 import ${packageName}.dto.excel.ExcelFailedDTO;
 import ${packageName}.service.excel.IExcelOperationService;
+</#if>
 <#if hasOneToOne>
 import ${packageName}.exception.CodeCommonException;
 import ${packageName}.common.RestStatus;
@@ -62,10 +64,11 @@ public class ${className}ServiceImpl implements I${className}Service {
   private ${className}Mapper ${lowerName}Mapper;
   <#else>
   private ${className}POMapper ${lowerName}POMapper;
-  
+  <#if enableExcel>
   // 注入excelservice
   @Autowired
   private IExcelOperationService excelOperationService;
+  </#if>
   </#if>
   
   @Autowired
@@ -113,6 +116,7 @@ public class ${className}ServiceImpl implements I${className}Service {
     return ${lowerName}POMapper.insertSelective(${lowerName});
   }
   
+  <#if enableExcel>
   //导入excel
   @Override
   public ExcelReportDTO importExcel${className}(ExcelImportDTO excelDTO) {
@@ -157,7 +161,7 @@ public class ${className}ServiceImpl implements I${className}Service {
     
     return excelReport;
   }
-  	
+  </#if>	
   //修改
   @Override
   public int update${className}(String id, ${className}PO ${lowerName}) {

@@ -11,3 +11,5 @@ bin
 .gitignore
 .project
 configfiles
+code-gen
+

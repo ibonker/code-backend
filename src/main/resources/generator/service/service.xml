@@ -7,11 +7,13 @@
 package ${packageName}.service.${moduleName};
 
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
-import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultPageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import ${packageName}.<#if isSenior>dto<#else>entity</#if>.${moduleName}.${className}<#if isSenior>DTO<#else>PO</#if>;
 import org.hotpotmaterial.jsonmeta.JsonSchema;
+<#if enableExcel>
 import ${packageName}.dto.excel.ExcelReportDTO;
 import ${packageName}.dto.excel.ExcelImportDTO;
+</#if>
 
 /**
  * @author Hotpotmaterial-Code2 
