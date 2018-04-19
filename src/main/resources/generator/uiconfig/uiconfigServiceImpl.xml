@@ -16,6 +16,8 @@ import ${packageName}.dao.uiconfig.UiconfigMapper;
 import ${packageName}.service.uiconfig.impl.UICache;
 import ${packageName}.entity.${datasourceName}.UiConfigPO;
 
+import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;	
 	
 /**

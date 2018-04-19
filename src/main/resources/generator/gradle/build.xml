@@ -52,7 +52,7 @@ dependencies {
 	compile "org.springframework.boot:spring-boot-starter-actuator"
 	compile "io.jsonwebtoken:jjwt:${r'$'}{jwt_version}"
 	</#if>
-    compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:${r'$'}{mybatis_spring_version}'
+    compile "org.mybatis.spring.boot:mybatis-spring-boot-starter:${r'$'}{mybatis_spring_version}"
     
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${r'$'}{jackson_version}"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${r'$'}{jackson_version}"
