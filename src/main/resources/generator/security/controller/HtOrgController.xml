@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HtOrgController</name>
+  <filePath>src/main/java/${packageName}/security/controller</filePath>
+  <fileName>HtOrgController.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+import ${packageName}.common.RestStatus;
+import ${packageName}.controller.base.BaseController;
+import ${packageName}.security.entity.HotpotOrganizationPO;
+import ${packageName}.security.service.IOrgService;
+
+@Controller
+@RequestMapping("/orgMag")
+public class HtOrgController extends BaseController{
+  
+  @Autowired
+  private IOrgService orgService;
+  
+  @PostMapping("/list")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> list(@RequestBody PageDTO searchParams){
+    return new ResponseEntity<ResultDTO>(orgService.orgList(searchParams)
+        .message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @PostMapping("/org")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> saveOrg(@RequestBody HotpotOrganizationPO organizationPO){
+    orgService.saveOrg(organizationPO);
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @PutMapping("/org/{id}")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> updateOrg(@PathVariable String id, @RequestBody HotpotOrganizationPO organizationPO){
+    orgService.updateOrg(id, organizationPO, getUser());
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @DeleteMapping("/org/{id}")
+  public ResponseEntity<ResultDTO> deleteOrg(@PathVariable String id){
+    int f = orgService.delete(id);
+    if (f > 0) {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+          .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+    } else if (f == -1){
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message("该组织下存在用户，不能删除！")
+          .statusCode(RestStatus.RESULT_SYSTEM_ERROR.code()), HttpStatus.BAD_REQUEST);
+    } else {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message("删除失败！")
+          .statusCode(RestStatus.RESULT_SYSTEM_ERROR.code()), HttpStatus.BAD_REQUEST);
+    }
+  }
+}
+]]>
+  </content>
+</template>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>ResultOfHotpotOrganizationDTO</name>
+  <filePath>src/main/java/${packageName}/security/dto</filePath>
+  <fileName>ResultOfHotpotOrganizationDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.dto;
+
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+import ${packageName}.security.entity.HotpotOrganizationPO;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+ /**
+  * @author TitanCode2
+  *  ddemo.HotpotOrganizationPO详情实体
+  */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@JsonInclude(Include.NON_NULL)
+public class ResultOfHotpotOrganizationDTO extends ResultDTO{
+
+	@JsonProperty(value = "hotpotOrganization")
+	@JsonPropertyDescription("hotpot_organization对象")				
+	@ApiModelProperty(value = "hotpot_organization对象")
+	private HotpotOrganizationPO hotpotOrganization;
+	
+
+	public ResultOfHotpotOrganizationDTO hotpotOrganization (HotpotOrganizationPO hotpotOrganization){
+	  this.hotpotOrganization = hotpotOrganization;
+	  return this;
+	}
+}
+]]>
+  </content>
+</template>

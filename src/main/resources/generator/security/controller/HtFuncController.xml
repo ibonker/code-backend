@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HtFuncController</name>
+  <filePath>src/main/java/${packageName}/security/controller</filePath>
+  <fileName>HtFuncController.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+import ${packageName}.common.RestStatus;
+import ${packageName}.controller.base.BaseController;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.service.IFuncService;
+
+@Controller
+@RequestMapping("/funcMag")
+public class HtFuncController extends BaseController{
+  
+  @Autowired
+  private IFuncService funcService;
+  
+  @PostMapping("/funcs")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> list(@RequestBody PageDTO searchParams){
+    return new ResponseEntity<ResultDTO>(funcService.getHotpotFunctionList(searchParams)
+        .message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @PostMapping("/func")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> saveFunc(@RequestBody HotpotFunctionPO hotpotFunctionPO){
+    funcService.saveFunc(hotpotFunctionPO);
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @PutMapping("/func/{id}")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> updateFunc(@PathVariable String id ,@RequestBody HotpotFunctionPO hotpotFunctionPO){
+    funcService.updateFunc(id, hotpotFunctionPO);
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @DeleteMapping("/func/{id}")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> saveOrg(@PathVariable String id){
+    if (funcService.delete(id) > 0) {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+          .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message("必须先删除子节点!")
+          .statusCode(RestStatus.RESULT_SYSTEM_ERROR.code()), HttpStatus.BAD_REQUEST);
+    }
+  }
+  
+}
+]]>
+  </content>
+</template>

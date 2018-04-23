@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>OrgPOMapper</name>
+  <filePath>src/main/java/${packageName}/security/dao</filePath>
+  <fileName>OrgPOMapper.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.dao;
+
+import java.util.List;
+
+import ${packageName}.security.entity.HotpotOrganizationPO;
+import ${packageName}.security.entity.HotpotUserPO;
+
+public interface OrgPOMapper {
+  
+  List<HotpotOrganizationPO> selectAllOrg();
+  
+  int saveOrg(HotpotOrganizationPO organizationPO);
+  
+  int updateOrg(HotpotOrganizationPO organizationPO);
+  
+  int deleteOrg(String id);
+  
+  List<HotpotOrganizationPO> searchOrg(HotpotOrganizationPO organizationPO);
+  
+  List<HotpotUserPO> selectOrgUser(String orgId);
+  
+}
+
+]]>
+  </content>
+</template>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>UserPOMapper</name>
+  <filePath>src/main/java/${packageName}/security/dao</filePath>
+  <fileName>UserPOMapper.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.dao;
+
+import java.util.List;
+
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.entity.HotpotUserPO;
+
+public interface UserPOMapper {
+  
+  HotpotUserSeniorDTO selectByUserName(String username);
+  
+  List<HotpotFunctionPO> selectFunctionByPartyIdList(List<String> partyIdList);
+  
+  HotpotUserSeniorDTO selectById(String id);
+  
+  int updatePassword(HotpotUserSeniorDTO user);
+  
+  List<HotpotUserSeniorDTO> findHotpotUserSeniorByRelation1(String _parameter);
+  
+  int insertUser(HotpotUserPO hotpotUserPO);
+  
+  int deleteUser(String id);
+  
+  HotpotUserPO findByUsername(String username);
+  
+  int updateUser(HotpotUserPO hotpotUserPO);
+  
+  HotpotUserPO findById(String id);
+}
+
+]]>
+  </content>
+</template>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HtUserController</name>
+  <filePath>src/main/java/${packageName}/security/controller</filePath>
+  <fileName>HtUserController.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+import ${packageName}.common.RestStatus;
+import ${packageName}.controller.base.BaseController;
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
+import ${packageName}.security.dto.ResultOfUserSeniorDTO;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.entity.HotpotUserPO;
+import ${packageName}.security.service.IUserService;
+
+@Controller
+@RequestMapping("/security")
+public class HtUserController extends BaseController{
+  
+  @Autowired
+  private IUserService userService;
+  
+  /**
+   * 用户获取对应目录
+   * @return
+   */
+  @GetMapping("/functions")
+  @ResponseBody
+  public List<HotpotFunctionPO> fucntions(){
+    return userService.selectFuncByPartyIdList(getUser());
+  }
+  
+  @PostMapping("/users")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> search(@RequestBody PageDTO searchParams) {
+    return new ResponseEntity<ResultDTO>(userService.getHotpotUserSeniorListByRelation1(searchParams)
+      .message(RestStatus.RESULT_SUCCESS.message())
+      .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  
+  @GetMapping("/user")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> user(){
+    return new ResponseEntity<ResultDTO>(new ResultOfUserSeniorDTO().hotpotUserSeniorDTO(userService.getMyUserInfo(getUser().getId()))
+        .message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @PostMapping("/user")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> createUser(@RequestBody HotpotUserPO hotpotUserPO){
+    userService.createUser(hotpotUserPO);
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @PutMapping("/user/{id}")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> updateUser(@PathVariable String id, @RequestBody HotpotUserPO hotpotUserPO){
+    if (userService.updateUser(id, hotpotUserPO) > 0) {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+          .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message("修改失败！")
+          .statusCode(RestStatus.RESULT_SYSTEM_ERROR.code()), HttpStatus.BAD_REQUEST);
+    }
+  }
+  
+  @DeleteMapping("/user/{id}")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> delete(@PathVariable String id){
+    userService.deleteUser(id);
+    return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+        .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+  }
+  
+  @PutMapping("/password")
+  @ResponseBody
+  public ResponseEntity<ResultDTO> upPass(@RequestBody HotpotUserSeniorDTO seniorDTO){
+    if (userService.updatePassword(seniorDTO) > 0) {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
+          .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<ResultDTO>(new ResultDTO().message("密码输入错误")
+          .statusCode(RestStatus.RESULT_NO_DATA.code()), HttpStatus.NO_CONTENT);
+    }
+  }
+  
+}
+]]>
+  </content>
+</template>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>FuncPOMapper</name>
+  <filePath>src/main/java/${packageName}/security/dao</filePath>
+  <fileName>FuncPOMapper.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.dao;
+
+import java.util.List;
+
+import ${packageName}.security.entity.HotpotFunctionPO;
+
+public interface FuncPOMapper {
+
+    List<HotpotFunctionPO> getAllFunc();
+    
+    int insert(HotpotFunctionPO record);
+    
+    int update(HotpotFunctionPO record);
+    
+    int delete(String id);
+    
+    List<HotpotFunctionPO> getAllChildren(String id);
+
+}
+]]>
+  </content>
+</template>
