@@ -14,34 +14,20 @@ let devUrl =  'http://127.0.0.1:8080';
 let testUrl = 'http://127.0.0.1:8080';
 let proUrl = 'http://127.0.0.1:8080';
 
-let rescenterDev = 'http://cmpdev.changan.com';
-let rescenterTest= 'http://cmpuat.changan.com';
-let rescenterPro = 'http://cmp.changan.com';
 util.title = function(title) {
-    title = title ? title : '${projectTitle}';
+    title = title ? title : 'front';
     window.document.title = title;
 };
 
 const ajaxUrl = env === 'development' ? devUrl : env === 'production' ? proUrl : testUrl;
-const resUrl = env === 'development' ? rescenterDev : env === 'production' ? rescenterPro : rescenterTest;
 
 util.ajax = axios.create({
     baseURL: ajaxUrl,
     timeout: 3000000
 });
 
-util.resAjax = axios.create({
-    baseURL: resUrl,
-    timeout: 3000000
-});
-
 util.url = ajaxUrl;
-util.resUrl = resUrl;
 util.indexUrl = '/';
-
-<#if (appId)??>
-util.appId = '${appId}';
-</#if>
 
 export default util;
 ]]>
