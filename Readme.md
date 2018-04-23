@@ -14,7 +14,7 @@
 
 运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT`
 
-访问`http:localhost:8080/swagger-ui.html`看项目是否启动成功
+访问`http://localhost:8080/swagger-ui.html`看项目是否启动成功
 
 后端服务启动成功过后，请查看[前端服务](https://github.com/hotpotmaterial/code-frontend)启动
 
