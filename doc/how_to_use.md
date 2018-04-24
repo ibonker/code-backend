@@ -11,6 +11,8 @@
 选择需要使用的组件，然后点击完成
 ![save_step3](./images/save_step3.png)
 
+**注意，如果在数据库配置中激活了`CRUD API`，之后需要取消生成Excel组件相关代码，则需要先将Project信息对话框中的Excel组件置为`否`，然后取消激活`CRUD API`后重新激活`CRUD API`，否则会出现Controller中Excel相关代码报错的情况**
+
 #### 获取配置数据库信息
 
 ![datasource_config1](./images/datasource_config1.png)
