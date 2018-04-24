@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HotpotRolePOMapper</name>
+  <filePath>src/main/resources/mappings/security</filePath>
+  <fileName>HotpotRolePOMapper.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.security.dao.RolePOMapper">
+	<select id="selectFunctionByRoleId" resultType="${packageName}.security.entity.HotpotFunctionPO">
+		SELECT
+			f.id as id,
+			f.function_name as functionName,
+			f.code as code,
+			f.url as url,
+			f.is_menu as isMenu,
+			f.description as description,
+			f.parent_id	as parentId,
+			f.level as level,
+			f.image1_id as image1Id,
+			f.image2_id as image2Id,
+			f.created_at as createdAt,
+			f.updated_at as updatedAt,
+			f.created_by as createdBy,
+			f.updated_by as updatedBy,
+			CASE
+			WHEN rf.function_id IS NOT NULL THEN
+				'Y'
+			ELSE
+				'N'
+			END AS enabled
+		FROM
+			hotpot_function f
+		LEFT JOIN (
+			SELECT
+				rf.*
+			FROM
+				hotpot_role_function rf
+			WHERE
+				rf.role_id = #{roleId}
+		) rf ON f.id = rf.function_id
+	</select>
+	
+	<select id="selectUsersByRoleId" resultType="${packageName}.security.entity.HotpotUserPO">
+		SELECT
+			u.id AS id,
+			u.user_name AS userName,
+			u.`name` AS NAME,
+			u.org_id AS orgId,
+			o.org_name AS orgName,
+			o.org_full_id as orgFullId,
+			o.org_full_name as orgFullName,
+			u.created_at AS createdAt,
+			u.updated_at AS updatedAt,
+			u.del_flag AS delFlag
+		FROM
+			hotpot_user u
+		LEFT JOIN hotpot_organization o ON o.id = u.org_id
+		INNER JOIN hotpot_role_user ru ON u.id = ru.party_id
+		AND ru.role_id = #{roleId}
+		WHERE
+			u.del_flag = '0'
+		ORDER BY
+			u.created_at
+	</select>
+	
+	<select id="selectOrgsByRoleId" resultType="${packageName}.security.entity.HotpotOrganizationPO">
+		SELECT 
+			o.id as id,
+			o.org_name as orgName,
+			o.org_full_id as orgFullId,
+			o.org_full_name as orgFullName,
+			o.parent_id as parentId,
+			o.description as description,
+			o.created_at as createdAt,
+			o.updated_at as updatedAt,
+			o.created_by as createdBy,
+			o.updated_by as updatedBy,
+			o.del_flag as delFlag,
+			o.sort as sort
+		FROM hotpot_organization o
+		INNER JOIN
+			hotpot_role_user ru
+		ON
+			o.id = ru.party_id
+		AND
+			ru.role_id = #{roleId}
+		WHERE
+			o.del_flag = '0'
+		order by o.sort asc
+	</select>
+	
+	<delete id="deleteRoleFunc">
+		delete from hotpot_role_function
+		where role_id = #{role_id}
+	</delete>
+	
+	<insert id="saveRoleFunc" parameterType="map">
+		insert into hotpot_role_function
+		(function_id, role_id, created_at, created_by)
+		values
+		(#{functionId}, #{roleId}, #{createdAt}, #{createdBy})
+	</insert>
+	
+	<insert id="saveRoleParty" parameterType="map">
+		insert into hotpot_role_user
+		(role_id, party_id, created_at, created_by)
+		values
+		(#{roleId}, #{partyId}, #{createdAt}, #{createdBy})
+	</insert>
+	
+	<delete id="deleteRoleParty" parameterType="map">
+		delete from hotpot_role_user
+		where role_id = #{roleId}
+		<if test="partyId != null and partyId != ''">
+			and party_id= #{partyId}
+		</if>
+	</delete>
+	
+	<resultMap id="BaseResultMap" type="${packageName}.security.entity.HotpotRolePO">
+	  <id column="id" jdbcType="VARCHAR" property="id" />
+	  <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+	  <result column="description" jdbcType="VARCHAR" property="description" />
+	  <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+	  <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+	  <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+	  <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+	  <result column="del_flag" jdbcType="VARCHAR" property="delFlag" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+	   id, role_name, description, created_at, updated_at, created_by, updated_by, del_flag
+	</sql>
+	
+	<select id="searchRole" resultMap="BaseResultMap">
+		select 
+	    	<include refid="Base_Column_List" />
+	    from hotpot_role
+	    where
+	    	1 = 1
+			and del_flag = '0'
+		<if test="_parameter != null and _parameter != ''">
+			and ${_parameter }
+		</if>
+	</select>
+	
+	<insert id="insertRole" parameterType="${packageName}.security.entity.HotpotRolePO">
+    insert into hotpot_role (id, role_name, description, 
+      created_at, updated_at, created_by, 
+      updated_by, del_flag)
+    values (#{id,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{updatedBy,jdbcType=VARCHAR}, #{delFlag,jdbcType=VARCHAR})
+  </insert>
+  
+   <update id="updateRole" parameterType="${packageName}.security.entity.HotpotRolePO">
+    update hotpot_role
+    <set>
+      <if test="roleName != null">
+        role_name = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="delFlag != null">
+        del_flag = #{delFlag,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <delete id="deleteRole" parameterType="java.lang.String">
+    delete from hotpot_role
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+</mapper>
+]]>
+  </content>
+</template>

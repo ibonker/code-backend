@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>initsql</name>
+  <filePath>src/main/java/${packageName}/security/</filePath>
+  <fileName>initsql.sql</fileName>
+  <content><![CDATA[
+
+]]>
+  </content>
+</template>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>UserServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>UserServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
+import ${packageName}.security.dao.OrgPOMapper;
+import ${packageName}.security.dao.UserPOMapper;
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.entity.HotpotOrganizationPO;
+import ${packageName}.security.entity.HotpotUserPO;
+import ${packageName}.security.service.IUserService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+@Service
+public class UserServiceImpl implements IUserService {
+  
+  @Autowired
+  private UserPOMapper userDao;
+  
+  @Autowired
+  private OrgPOMapper orgDao;
+
+  @Override
+  public List<HotpotFunctionPO> selectFuncByPartyIdList(UserInfo user) {
+    // 添加用户id
+    List<String> partyIdList = new ArrayList<>();
+    partyIdList.add(user.getId());
+    
+    // 添加用户所有组织id
+    Set<HotpotOrganizationPO> orgs = getUserAllOrgs(user);
+    List<String> orgIds = orgs.stream().map((item) -> {
+      return item.getId();
+    }).collect(Collectors.toList());
+    partyIdList.addAll(orgIds);
+    
+    return userDao.selectFunctionByPartyIdList(partyIdList);
+  }
+
+  @Override
+  public Set<HotpotOrganizationPO> getUserAllOrgs(UserInfo user) {
+    
+    List<HotpotOrganizationPO> list = orgDao.selectAllOrg();
+    Set<HotpotOrganizationPO> orgIdList = new LinkedHashSet<>();
+    if (list != null && list.size() > 0) {
+      getAllOrgParent(user.getOrgId(), list, orgIdList);
+    }
+    return orgIdList;
+  }
+  
+  private void getAllOrgParent(String orgId, List<HotpotOrganizationPO> data, Set<HotpotOrganizationPO> result){
+    for (HotpotOrganizationPO org : data) {
+      if (orgId.equals(org.getId())) {
+        result.add(org);
+        getAllOrgParent(org.getParentId(), data, result);
+        break;
+      }
+    }
+  }
+
+  /**
+   * 通过参数获取数据
+   * 
+   * @param _parameter
+   * @return
+   */
+  @Override
+  public ResultPageDTO<HotpotUserSeniorDTO> getHotpotUserSeniorListByRelation1(PageDTO page) {
+    ResultPageDTO<HotpotUserSeniorDTO> result = new ResultPageDTO<>();
+    
+    // 参数
+    String _parameter = MybatisFilterUtils.transSearchForMybatisSenoir(page);
+    
+    // 分页
+    PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
+    PageInfo<HotpotUserSeniorDTO> list = new PageInfo<>(userDao.findHotpotUserSeniorByRelation1(_parameter));
+    
+    result.setData(list.getList());
+    result.setPageNumber(list.getPageNum());
+    result.setPageSize(list.getPageSize());
+    result.setTotalElements(list.getTotal());
+    
+    return result;
+  }
+
+  @Override
+  public HotpotUserSeniorDTO getMyUserInfo(String id) {
+    return userDao.selectById(id);
+  }
+
+  @Override
+  public int updatePassword(HotpotUserSeniorDTO hotpotUserSeniorDTO) {
+    return userDao.updatePassword(hotpotUserSeniorDTO);
+  }
+
+  @Override
+  public int createUser(HotpotUserPO hotpotUserPO) {
+    HotpotUserPO user = userDao.findByUsername(hotpotUserPO.getUserName());
+    if (user != null) {
+      return 0;
+    }
+    hotpotUserPO.preInsert();
+    return userDao.insertUser(hotpotUserPO);
+  }
+
+  @Override
+  public void deleteUser(String id) {
+    userDao.deleteUser(id);
+  }
+
+  @Override
+  public int updateUser(String id, HotpotUserPO hotpotUserPO) {
+    HotpotUserPO ouser = userDao.findById(id);
+    // 登录名不变
+    if (ouser.getUserName().equals(hotpotUserPO.getUserName())) {
+      hotpotUserPO.setId(id);
+      return userDao.updateUser(hotpotUserPO);
+    // 修改了登录名
+    } else {
+      // 登录名是否重复
+      HotpotUserPO user = userDao.findByUsername(hotpotUserPO.getUserName());
+      if (user != null) {
+        return 0;
+      }
+      hotpotUserPO.setId(id);
+      return userDao.updateUser(hotpotUserPO);
+    }
+  }
+
+}
+]]>
+  </content>
+</template>

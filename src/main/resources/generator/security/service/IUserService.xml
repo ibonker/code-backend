@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>IUserService</name>
+  <filePath>src/main/java/${packageName}/security/service</filePath>
+  <fileName>IUserService.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service;
+
+import java.util.List;
+import java.util.Set;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.entity.HotpotOrganizationPO;
+import ${packageName}.security.entity.HotpotUserPO;
+
+public interface IUserService {
+  
+  /**
+   * 用户获取对应菜单
+   * @param user
+   * @return
+   */
+  public List<HotpotFunctionPO> selectFuncByPartyIdList(UserInfo user);
+  
+  /**
+   * 获取用户所有组织id
+   * @param user
+   * @return
+   */
+  public Set<HotpotOrganizationPO> getUserAllOrgs(UserInfo user);
+  
+  /**
+   * 通过参数获取数据
+   * 
+   * @param _parameter
+   * @return
+   */
+  public ResultPageDTO<HotpotUserSeniorDTO> getHotpotUserSeniorListByRelation1(PageDTO page);
+  
+  /**
+   * 获取用户信息
+   * @param id
+   * @return
+   */
+  public HotpotUserSeniorDTO getMyUserInfo(String id);
+  
+  /**
+   * 修改密码
+   * @param hotpotUserPO
+   */
+  public int updatePassword(HotpotUserSeniorDTO hotpotUserSeniorDTO);
+  
+  /**
+   * 创建用户
+   * @param hotpotUserPO
+   */
+  public int createUser(HotpotUserPO hotpotUserPO);
+  
+  /**
+   * 更新用户
+   * @param hotpotUserPO
+   */
+  public int updateUser(String id,HotpotUserPO hotpotUserPO);
+  
+  /**
+   * 删除用户
+   * @param id
+   */
+  public void deleteUser(String id);
+  
+}
+
+]]>
+  </content>
+</template>

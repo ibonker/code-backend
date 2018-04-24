@@ -466,14 +466,16 @@ public class ProjectServiceImpl implements IProjectService {
       // 查询对应数据源下的所有表
       for (TablePO table : datasource.getTableMaps().values()) {
         // 生成实体文件代码
-        generateService.generateEntityFiles(version, datasource.getPackageName(), project.getName(),
-            project.getPackages().toLowerCase(), table,
-            Lists.newArrayList(table.getColumnMaps().values()));
-        // 生成高级查询代码
-        this.generateSeniorSearchCode(version, project, alltablemap, datasource, table);
-        // TODO 判断mybatis和jpa 生成Jpa Repository
-        // generateService.generateRepository(datasource.getPackageName(), project.getName(),
-        // project.getPackages().toLowerCase(), table.getName());
+        if (!Constants.TABLE_NOENTITY.contains(table.getName().toLowerCase())) {
+          generateService.generateEntityFiles(version, datasource.getPackageName(), project.getName(),
+              project.getPackages().toLowerCase(), table,
+              Lists.newArrayList(table.getColumnMaps().values()));
+          // 生成高级查询代码
+          this.generateSeniorSearchCode(version, project, alltablemap, datasource, table);
+          // TODO 判断mybatis和jpa 生成Jpa Repository
+          // generateService.generateRepository(datasource.getPackageName(), project.getName(),
+          // project.getPackages().toLowerCase(), table.getName());
+        }
       }
     }
 

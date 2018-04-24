@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>OrgServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>OrgServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.alibaba.druid.util.StringUtils;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import ${packageName}.security.dao.OrgPOMapper;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotOrganizationPO;
+import ${packageName}.security.entity.HotpotUserPO;
+import ${packageName}.security.service.IOrgService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+@Service
+public class OrgServiceImpl implements IOrgService {
+
+  @Autowired
+  private OrgPOMapper orgDao;
+
+  @Override
+  public ResultPageDTO<HotpotOrganizationPO> orgList(PageDTO page) {
+
+    ResultPageDTO<HotpotOrganizationPO> result = new ResultPageDTO<>();
+
+    // 参数
+    PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
+    PageInfo<HotpotOrganizationPO> list = new PageInfo<>(orgDao.selectAllOrg());
+
+    result.setData(list.getList());
+    result.setPageNumber(list.getPageNum());
+    result.setPageSize(list.getPageSize());
+    result.setTotalElements(list.getTotal());
+
+    return result;
+  }
+
+  @Override
+  @Transactional
+  public void saveOrg(HotpotOrganizationPO organizationPO) {
+    organizationPO.preInsert();
+    if (orgDao.saveOrg(organizationPO) > 0) {
+      organizationPO.setOrgFullId(organizationPO.getOrgFullId().concat((!StringUtils.isEmpty(organizationPO.getOrgFullId())? "/": "") + organizationPO.getId()));
+      orgDao.updateOrg(organizationPO);
+    }
+  }
+
+  @Override
+  @Transactional
+  public void updateOrg(String id, HotpotOrganizationPO organizationPO, UserInfo user) {
+    List<HotpotOrganizationPO> list = orgDao.searchOrg(organizationPO);
+    for (HotpotOrganizationPO org: list) {
+      if (org.getId().equals(organizationPO.getId())) {
+        organizationPO.setUpdatedAt(new Date());
+        organizationPO.setUpdatedBy(user.getUsername());
+        orgDao.updateOrg(organizationPO);
+      } else {
+        List<String> ids = Arrays.asList(org.getOrgFullId().split("/"));
+        int index = ids.indexOf(organizationPO.getId());
+        
+        if (index > -1) {
+          List<String> names = Arrays.asList(org.getOrgFullName().split("/"));
+          String result = "";
+          for (int i = 0; i < names.size(); i++) {
+            result = result + (i != index? names.get(i) : organizationPO.getOrgName()) + (i != names.size()-1?"/": "");
+          }
+          org.setOrgFullName(result);
+          orgDao.updateOrg(org);
+        }
+      }
+    }
+  }
+
+  @Override
+  public int delete(String id) {
+    List<HotpotUserPO> userList = orgDao.selectOrgUser(id);
+    if (userList != null && userList.size() > 0) {
+      return -1;
+    }
+    return orgDao.deleteOrg(id);
+  }
+
+}
+
+]]>
+  </content>
+</template>

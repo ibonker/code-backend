@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HotpotUserPOMapper</name>
+  <filePath>src/main/resources/mappings/security</filePath>
+  <fileName>HotpotUserPOMapper.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.security.dao.UserPOMapper">
+	<select id="selectByUserName" resultMap="HotpotUserSeniorResultMap">
+		select
+		hotpotUser.id as _hotpot_user_id,
+		hotpotUser.user_name as _hotpot_user_user_name,
+		hotpotUser.name as _hotpot_user_name,
+		hotpotUser.password as _hotpot_user_password,
+		hotpotUser.org_id as _hotpot_user_org_id,
+		hotpotUser.created_at as _hotpot_user_created_at,
+		hotpotUser.updated_at as _hotpot_user_updated_at,
+		hotpotUser.del_flag as _hotpot_user_del_flag,
+		hotpotOrganization.id as _hotpot_organization_id,
+		hotpotOrganization.org_full_id as _hotpot_organization_org_full_id,
+		hotpotOrganization.org_name as _hotpot_organization_org_name,
+		hotpotOrganization.org_full_name as _hotpot_organization_org_full_name,
+		hotpotOrganization.parent_id as _hotpot_organization_parent_id,
+		hotpotOrganization.description as _hotpot_organization_description,
+		hotpotOrganization.created_at as _hotpot_organization_created_at,
+		hotpotOrganization.updated_at as _hotpot_organization_updated_at,
+		hotpotOrganization.created_by as _hotpot_organization_created_by,
+		hotpotOrganization.updated_by as _hotpot_organization_updated_by,
+		hotpotOrganization.del_flag as _hotpot_organization_del_flag,
+		hotpotOrganization.sort as _hotpot_organization_sort
+		from
+		hotpot_user hotpotUser
+		left join
+		hotpot_organization hotpotOrganization
+		on
+		hotpotUser.org_id = hotpotOrganization.id
+		where
+		hotpotUser.user_name = #{userName}
+		and hotpotUser.del_flag = '0'
+		and hotpotOrganization.del_flag = '0'
+	</select>
+
+	<select id="selectById" resultMap="HotpotUserSeniorResultMap">
+		select
+		hotpotUser.id as _hotpot_user_id,
+		hotpotUser.user_name as _hotpot_user_user_name,
+		hotpotUser.name as _hotpot_user_name,
+		hotpotUser.password as _hotpot_user_password,
+		hotpotUser.org_id as _hotpot_user_org_id,
+		hotpotUser.created_at as _hotpot_user_created_at,
+		hotpotUser.updated_at as _hotpot_user_updated_at,
+		hotpotUser.del_flag as _hotpot_user_del_flag,
+		hotpotOrganization.id as _hotpot_organization_id,
+		hotpotOrganization.org_full_id as _hotpot_organization_org_full_id,
+		hotpotOrganization.org_name as _hotpot_organization_org_name,
+		hotpotOrganization.org_full_name as _hotpot_organization_org_full_name,
+		hotpotOrganization.parent_id as _hotpot_organization_parent_id,
+		hotpotOrganization.description as _hotpot_organization_description,
+		hotpotOrganization.created_at as _hotpot_organization_created_at,
+		hotpotOrganization.updated_at as _hotpot_organization_updated_at,
+		hotpotOrganization.created_by as _hotpot_organization_created_by,
+		hotpotOrganization.updated_by as _hotpot_organization_updated_by,
+		hotpotOrganization.del_flag as _hotpot_organization_del_flag,
+		hotpotOrganization.sort as _hotpot_organization_sort
+		from
+		hotpot_user hotpotUser
+		left join
+		hotpot_organization hotpotOrganization
+		on
+		hotpotUser.org_id = hotpotOrganization.id
+		where
+		hotpotUser.id = #{id}
+		and hotpotUser.del_flag = '0'
+		and hotpotOrganization.del_flag = '0'
+	</select>
+
+	<update id="updatePassword" parameterType="${packageName}.security.dto.HotpotUserSeniorDTO">
+		update hotpot_user
+		set
+		password = #{newPassword}
+		where id = #{hotpotUser.id}
+		and password =
+		#{hotpotUser.password}
+	</update>
+
+	<resultMap type="${packageName}.security.dto.HotpotUserSeniorDTO"
+		id="HotpotUserSeniorResultMap">
+		<association property="hotpotUser" javaType="${packageName}.security.entity.HotpotUserPO">
+			<id property="id" column="_hotpot_user_id" />
+			<result property="userName" column="_hotpot_user_user_name" />
+			<result property="name" column="_hotpot_user_name" />
+			<result property="password" column="_hotpot_user_password" />
+			<result property="orgId" column="_hotpot_user_org_id" />
+			<result property="createdAt" column="_hotpot_user_created_at" />
+			<result property="updatedAt" column="_hotpot_user_updated_at" />
+			<result property="delFlag" column="_hotpot_user_del_flag" />
+		</association>
+		<association property="hotpotOrganization" javaType="${packageName}.security.entity.HotpotOrganizationPO">
+			<id property="id" column="_hotpot_organization_id" />
+			<result property="orgFullId" column="_hotpot_organization_org_full_id" />
+			<result property="orgName" column="_hotpot_organization_org_name" />
+			<result property="orgFullName" column="_hotpot_organization_org_full_name" />
+			<result property="parentId" column="_hotpot_organization_parent_id" />
+			<result property="description" column="_hotpot_organization_description" />
+			<result property="createdAt" column="_hotpot_organization_created_at" />
+			<result property="updatedAt" column="_hotpot_organization_updated_at" />
+			<result property="createdBy" column="_hotpot_organization_created_by" />
+			<result property="updatedBy" column="_hotpot_organization_updated_by" />
+			<result property="delFlag" column="_hotpot_organization_del_flag" />
+			<result property="sort" column="_hotpot_organization_sort" />
+		</association>
+	</resultMap>
+
+	<select id="findHotpotUserSeniorByRelation1" resultMap="HotpotUserSeniorResultMap">
+		select
+		hotpotUser.id as _hotpot_user_id,
+		hotpotUser.user_name as _hotpot_user_user_name,
+		hotpotUser.name as _hotpot_user_name,
+		hotpotUser.password as _hotpot_user_password,
+		hotpotUser.org_id as _hotpot_user_org_id,
+		hotpotUser.created_at as _hotpot_user_created_at,
+		hotpotUser.updated_at as _hotpot_user_updated_at,
+		hotpotUser.del_flag as _hotpot_user_del_flag,
+		hotpotOrganization.id as _hotpot_organization_id,
+		hotpotOrganization.org_full_id as _hotpot_organization_org_full_id,
+		hotpotOrganization.org_name as _hotpot_organization_org_name,
+		hotpotOrganization.org_full_name as _hotpot_organization_org_full_name,
+		hotpotOrganization.parent_id as _hotpot_organization_parent_id,
+		hotpotOrganization.description as _hotpot_organization_description,
+		hotpotOrganization.created_at as _hotpot_organization_created_at,
+		hotpotOrganization.updated_at as _hotpot_organization_updated_at,
+		hotpotOrganization.created_by as _hotpot_organization_created_by,
+		hotpotOrganization.updated_by as _hotpot_organization_updated_by,
+		hotpotOrganization.del_flag as _hotpot_organization_del_flag,
+		hotpotOrganization.sort as _hotpot_organization_sort
+		from
+		hotpot_user hotpotUser
+		left join
+		hotpot_organization hotpotOrganization
+		on
+		hotpotUser.org_id = hotpotOrganization.id
+		where
+		1 = 1
+		and hotpotUser.del_flag = '0'
+		and hotpotOrganization.del_flag = '0'
+		<if test="_parameter != null and _parameter != ''">
+			and ${_parameter }
+		</if>
+	</select>
+
+	<select id="selectFunctionByPartyIdList" parameterType="java.util.List"
+		resultType="${packageName}.security.entity.HotpotFunctionPO">
+		SELECT
+		f.id as id,
+		f.function_name as functionName,
+		f.code as code,
+		f.url as url,
+		f.is_menu as isMenu,
+		f.description as description,
+		f.enabled as enabled,
+		f.parent_id as parentId,
+		f.level as level,
+		f.image1_id as image1Id,
+		f.image2_id as image2Id,
+		f.created_at as createdAt,
+		f.updated_at as updatedAt,
+		f.created_by as createdBy,
+		f.updated_by as updatedBy
+		FROM
+		hotpot_function f
+		INNER JOIN (
+		SELECT DISTINCT
+		(rf.function_id)
+		FROM
+		hotpot_role_function rf
+		INNER JOIN (
+		SELECT
+		ru.*
+		FROM
+		hotpot_role_user ru
+		INNER JOIN
+		hotpot_role r
+		ON
+		ru.role_id = r.id
+		AND r.del_flag = '0'
+		WHERE
+		ru.party_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+		) ru ON ru.role_id = rf.role_id
+		) r ON r.function_id = f.id
+		WHERE
+			f.enabled = 'Y'
+	</select>
+
+	<insert id="insertUser" parameterType="${packageName}.security.entity.HotpotUserPO">
+		insert into hotpot_user (id, user_name, name,
+		password, org_id, created_at,
+		updated_at, del_flag)
+		values (#{id,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR},
+		#{password,jdbcType=VARCHAR}, #{orgId,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
+		#{updatedAt,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=VARCHAR})
+	</insert>
+
+	<delete id="deleteUser" parameterType="java.lang.String">
+		delete from hotpot_user
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+	
+	<select id="findByUsername" resultType="${packageName}.security.entity.HotpotUserPO">
+		select
+			id as id,
+			user_name as userName,
+			name as name,
+			org_id as orgId,
+			created_at as createdAt,
+			updated_at as updatedAt,
+			del_flag as delFlag
+		from 
+			hotpot_user
+		where
+			user_name = #{userName}
+			and del_flag = '0'
+	</select>
+	
+	<select id="findById" resultType="${packageName}.security.entity.HotpotUserPO">
+		select
+			id as id,
+			user_name as userName,
+			name as name,
+			org_id as orgId,
+			created_at as createdAt,
+			updated_at as updatedAt,
+			del_flag as delFlag
+		from 
+			hotpot_user
+		where
+			id = #{id}
+			and del_flag = '0'
+	</select>
+
+	<update id="updateUser" parameterType="${packageName}.security.entity.HotpotUserPO">
+		update hotpot_user
+		<set>
+			<if test="userName != null and userName != ''">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				password = #{password,jdbcType=VARCHAR},
+			</if>
+			<if test="orgId != null">
+				org_id = #{orgId,jdbcType=VARCHAR},
+			</if>
+			<if test="createdAt != null">
+				created_at = #{createdAt,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatedAt != null">
+				updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+			</if>
+			<if test="delFlag != null">
+				del_flag = #{delFlag,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>
+]]>
+  </content>
+</template>

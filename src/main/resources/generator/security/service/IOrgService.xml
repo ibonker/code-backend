@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>IFuncService</name>
+  <filePath>src/main/java/${packageName}/security/service</filePath>
+  <fileName>IFuncService.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotOrganizationPO;
+
+public interface IOrgService {
+
+  /**
+   * 通过参数获取数据
+   * 
+   * @param _parameter
+   * @return
+   */
+  public ResultPageDTO<HotpotOrganizationPO> orgList(PageDTO page);
+  
+  public void saveOrg(HotpotOrganizationPO organizationPO);
+  
+  public void updateOrg(String id, HotpotOrganizationPO organizationPO, UserInfo user);
+  
+  public int delete(String id);
+}
+]]>
+  </content>
+</template>

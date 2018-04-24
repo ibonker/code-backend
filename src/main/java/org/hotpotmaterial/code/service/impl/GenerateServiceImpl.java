@@ -25,6 +25,7 @@ import org.hotpotmaterial.code.common.Constants;
 import org.hotpotmaterial.code.common.ParamerConstant;
 import org.hotpotmaterial.code.common.component.Dictionary;
 import org.hotpotmaterial.code.common.component.Excel;
+import org.hotpotmaterial.code.common.component.Security;
 import org.hotpotmaterial.code.common.component.UiConfig;
 import org.hotpotmaterial.code.common.template.AdviceFile;
 import org.hotpotmaterial.code.common.template.ConfigFile;
@@ -36,6 +37,7 @@ import org.hotpotmaterial.code.common.template.ExcelFile;
 import org.hotpotmaterial.code.common.template.GeneratorConfigFile;
 import org.hotpotmaterial.code.common.template.JPAFile;
 import org.hotpotmaterial.code.common.template.MvcFile;
+import org.hotpotmaterial.code.common.template.SecurityFile;
 import org.hotpotmaterial.code.common.template.ServiceFile;
 import org.hotpotmaterial.code.common.template.ServiceImplFile;
 import org.hotpotmaterial.code.common.template.UiCode;
@@ -240,6 +242,13 @@ public class GenerateServiceImpl implements IGenerateService {
       for (DictFile dictFile : DictFile.values()) {
         this.generateToFile(pathPostfix, null,
             GeneratorUtils.fileToObject(dictFile.getPath(), Template.class), model, true);
+      }
+    }
+    if (components.contains(Security.enablesecurity.toString())) {
+      // 生成本地权限模块文件
+      for (SecurityFile secFile : SecurityFile.values()) {
+        this.generateToFile(pathPostfix, null,
+            GeneratorUtils.fileToObject(secFile.getPath(), Template.class), model, true);
       }
     }
   }

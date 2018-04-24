@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HotpotOrgUserPO</name>
+  <filePath>src/main/java/${packageName}/security/entity</filePath>
+  <fileName>HotpotOrgUserPO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import ${packageName}.common.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * @author TitanCode2
+ * 实体
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Table(name = "hotpot_org_user")
+public class HotpotOrgUserPO extends  BaseEntity {
+
+  private static final long serialVersionUID = 1L;
+
+  @NotNull
+  @Size(max = 36)
+  @Column(name = "org_id")
+  @JsonProperty(value = "orgId")
+  @JsonPropertyDescription("")
+  private String orgId;
+  
+  @NotNull
+  @Size(max = 36)
+  @Column(name = "user_id")
+  @JsonProperty(value = "userId")
+  @JsonPropertyDescription("")
+  private String userId;
+  
+  
+  @Size(max = 255)
+  @Column(name = "created_by")
+  @JsonProperty(value = "createdBy")
+  @JsonPropertyDescription("")
+  private String createdBy;
+  
+}
+]]>
+  </content>
+</template>

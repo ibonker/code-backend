@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>UserDetailsServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>UserDetailsServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import ${packageName}.security.dao.UserPOMapper;
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
+import ${packageName}.security.dto.UserInfo;
+
+
+public class UserDetailsServiceImpl implements UserDetailsService {
+  
+  @Autowired
+  private UserPOMapper hotpotUserPOMapper;
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    
+    HotpotUserSeniorDTO hotpotUser = hotpotUserPOMapper.selectByUserName(username);
+    if (hotpotUser == null) {
+      throw new UsernameNotFoundException("用户未找到, 请重新登陆");
+    }
+    return new UserInfo(hotpotUser, new ArrayList<>());
+  }
+
+}
+]]>
+  </content>
+</template>

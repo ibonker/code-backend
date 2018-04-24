@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HotpotFuncPOMapper</name>
+  <filePath>src/main/resources/mappings/security</filePath>
+  <fileName>HotpotFuncPOMapper.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.security.dao.FuncPOMapper">
+  <resultMap id="BaseResultMap" type="${packageName}.security.entity.HotpotFunctionPO">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="function_name" jdbcType="VARCHAR" property="functionName" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="is_menu" jdbcType="VARCHAR" property="isMenu" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="enabled" jdbcType="VARCHAR" property="enabled" />
+    <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
+    <result column="level" jdbcType="INTEGER" property="level" />
+    <result column="image1_id" jdbcType="VARCHAR" property="image1Id" />
+    <result column="image2_id" jdbcType="VARCHAR" property="image2Id" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, function_name, code, url, is_menu, description, enabled, parent_id, level, image1_id, 
+    image2_id, created_at, updated_at, created_by, updated_by
+  </sql>
+  
+  <select id="getAllFunc" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from hotpot_function
+  </select>
+  
+  <select id="getAllChildren" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from hotpot_function
+    where
+    	parent_id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.String">
+    delete from hotpot_function
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="${packageName}.security.entity.HotpotFunctionPO">
+    insert into hotpot_function (id, function_name, code, 
+      url, is_menu, description, 
+      enabled, parent_id, level, 
+      image1_id, image2_id, created_at, 
+      updated_at, created_by, updated_by
+      )
+    values (#{id,jdbcType=VARCHAR}, #{functionName,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{url,jdbcType=VARCHAR}, #{isMenu,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{enabled,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, 
+      #{image1Id,jdbcType=VARCHAR}, #{image2Id,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, 
+      #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <update id="update" parameterType="${packageName}.security.entity.HotpotFunctionPO">
+    update hotpot_function
+    <set>
+      <if test="functionName != null">
+        function_name = #{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="isMenu != null">
+        is_menu = #{isMenu,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null">
+        enabled = #{enabled,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="image1Id != null">
+        image1_id = #{image1Id,jdbcType=VARCHAR},
+      </if>
+      <if test="image2Id != null">
+        image2_id = #{image2Id,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+</mapper>
+]]>
+  </content>
+</template>

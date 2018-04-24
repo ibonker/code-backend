@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>RoleServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>RoleServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
+import ${packageName}.security.dao.RolePOMapper;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.entity.HotpotOrganizationPO;
+import ${packageName}.security.entity.HotpotRolePO;
+import ${packageName}.security.entity.HotpotUserPO;
+import ${packageName}.security.service.IRoleService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+@Service
+public class RoleServiceImpl implements IRoleService {
+  
+  @Autowired
+  private RolePOMapper roleDao;
+
+  @Override
+  public List<HotpotFunctionPO> selectFuncByRoleId(String roleId) {
+    return roleDao.selectFunctionByRoleId(roleId);
+  }
+  
+  @Override
+  public List<HotpotUserPO> getUsersByRoleId(String roleId) {
+    return roleDao.selectUsersByRoleId(roleId);
+  }
+
+  @Override
+  public List<HotpotOrganizationPO> getOrgsByRoleId(String roleId) {
+    return roleDao.selectOrgsByRoleId(roleId);
+  }
+
+  @Override
+  @Transactional
+  public void saveRoleFuncs(String roleId, List<String> functionIds, UserInfo user) {
+    if (roleDao.deleteRoleFunc(roleId) >= 0) {
+      Date date = new Date();
+      functionIds.stream().forEach((item) -> {
+        Map<String, Object> param = new HashMap<>();
+        param.put("functionId", item);
+        param.put("roleId", roleId);
+        param.put("createdBy", user.getUsername());
+        param.put("createdAt", date);
+        roleDao.saveRoleFunc(param);
+      });
+    }
+  }
+
+  @Override
+  @Transactional
+  public void saveRolePartys(String roleId, List<String> partyIds, UserInfo user) {
+    Date date = new Date();
+    partyIds.stream().forEach((item) -> {
+      Map<String, Object> param = new HashMap<>();
+      param.put("roleId", roleId);
+      param.put("partyId", item);
+      param.put("createdBy", user.getUsername());
+      param.put("createdAt", date);
+      roleDao.saveRoleParty(param);
+    });
+  }
+
+  @Override
+  @Transactional
+  public void deleteRoleParty(String roleId, List<String> partyIds) {
+    partyIds.stream().forEach((item) -> {
+      Map<String, Object> param = new HashMap<>();
+      param.put("roleId", roleId);
+      param.put("partyId", item);
+      roleDao.deleteRoleParty(param);
+    });
+  }
+
+  //分页查询
+  @Override
+  public ResultPageDTO<HotpotRolePO> getHotpotRoleList(PageDTO page) {
+
+    ResultPageDTO<HotpotRolePO> result = new ResultPageDTO<HotpotRolePO>();
+    
+    String _parameter = MybatisFilterUtils.transSearchForMybatisSenoir(page);
+
+    // 分页
+    PageHelper.startPage(page.getPageParms().getPageIndex(), page.getPageParms().getPageSize());
+    PageInfo<HotpotRolePO> list = new PageInfo<>(roleDao.searchRole(_parameter));
+
+    result.setData(list.getList());
+    result.setPageNumber(list.getPageNum());
+    result.setPageSize(list.getPageSize());
+    result.setTotalElements(list.getTotal());
+    return result;
+  }
+
+  @Override
+  public int saveRole(HotpotRolePO hotpotRolePO, UserInfo user) {
+    hotpotRolePO.preInsert();
+    hotpotRolePO.setCreatedBy(user.getUsername());
+    return roleDao.insertRole(hotpotRolePO);
+  }
+
+  @Override
+  public int updateRole(String id, HotpotRolePO hotpotRolePO, UserInfo user) {
+    hotpotRolePO.setId(id);
+    hotpotRolePO.preUpdate();
+    hotpotRolePO.setUpdatedBy(user.getUsername());
+    
+    return roleDao.updateRole(hotpotRolePO);
+  }
+
+  @Override
+  @Transactional
+  public int deleteRole(String id) {
+    roleDao.deleteRole(id);
+    roleDao.deleteRoleFunc(id);
+    
+    Map<String, Object> param = new HashMap<>();
+    param.put("roleId", id);
+    roleDao.deleteRoleParty(param);
+    return 1;
+  }
+
+}
+]]>
+  </content>
+</template>

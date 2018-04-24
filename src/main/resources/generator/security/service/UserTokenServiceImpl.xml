@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>UserTokenServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>UserTokenServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.service.IUserTokenService;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+@Service
+public class UserTokenServiceImpl implements IUserTokenService{
+
+  private Map<String, Object> userCache = new HashMap<>();
+
+  public void put(String token, UserInfo user) {
+    userCache.put(token, user);
+  }
+
+  public UserInfo getUser(String token) {
+    return (UserInfo) userCache.get(token);
+  }
+
+  public String createToken(UserInfo user) {
+    return Jwts.builder().setSubject(user.getUsername())
+        .signWith(SignatureAlgorithm.HS512, "hot".getBytes())
+        .setExpiration(new Date(System.currentTimeMillis() + 60 * 60 * 24 * 1000)).compact();
+  }
+
+  @Override
+  public void deleteToken(String token) {
+    userCache.remove(token);
+  }
+}
+]]>
+  </content>
+</template>
