@@ -10,9 +10,11 @@
 
 下载源代码运行`gradle build -x test`
 
-在项目根目录下找到`build/libs/hotpotmaterial-code2-0.0.1-SNAPSHOT`
+在项目根目录下找到`build/libs/hotpotmaterial-code2-0.0.1-SNAPSHOT.jar`
 
-运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT`
+运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT.jar --DB_URL=localhost:3306 --DB_USER=root --DB_PWD=123456 --GEN_ROOT_PATH=/home`
+
+程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`GEN_ROOT_PATH`生成代码根目录
 
 访问`http://localhost:8080/swagger-ui.html`看项目是否启动成功
 
