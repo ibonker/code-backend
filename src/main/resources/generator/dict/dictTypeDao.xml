@@ -14,8 +14,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import ${packageName}.entity.${datasourceName}.DictValuePO;
-import ${packageName}.entity.${datasourceName}.DictValuePOExample;
+import ${packageName}.entity.${datasourceName}.DictTypePO;
+import ${packageName}.entity.${datasourceName}.DictTypePOExample;
 import ${packageName}.entity.${datasourceName}.DictValuePO;
 
 /**

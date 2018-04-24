@@ -16,7 +16,7 @@ import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Collection;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Filter;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Operator;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
-import org.hotpotmaterial.anywhere.common.mvc.page.rest.ResultPageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
 import ${packageName}.common.Constants;
 import ${packageName}.dto.dict.ResultDictDTO;
@@ -86,8 +86,9 @@ public class DictServiceImpl implements IDictService {
             Constants.DATA_IS_NORMAL);
       }
       // 更新属性
-      dictType.updateAttrs(updateDictType);
-      dictType.preInsert();
+      dictType.setCode(updateDictType.getCode());
+      dictType.setName(updateDictType.getName());
+      dictType.preUpdate();
       // 更新数据库
       dictTypeMapper.updateDictType(dictType);
       // 获取内存数据,设置版本
@@ -106,8 +107,10 @@ public class DictServiceImpl implements IDictService {
     DictValuePO dictValue = this.findDictValue(dictValueId);
     if (dictValue != null) {
       // 更新属性
-      dictValue.updateAttrs(updateDictValue);
-      dictValue.preInsert();
+      dictValue.setName(updateDictValue.getName());
+      dictValue.setValue(updateDictValue.getValue());
+      dictValue.setSort(updateDictValue.getSort());
+      dictValue.preUpdate();
       // 更新数据库
       dictValueMapper.updateDictValue(dictValue);
       // 获取内存数据，设置版本

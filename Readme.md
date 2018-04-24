@@ -16,7 +16,7 @@
 
 程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`GEN_ROOT_PATH`生成代码根目录
 
-访问`http://localhost:8080/swagger-ui.html`看项目是否启动成功
+访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
 
 后端服务启动成功过后，请查看[前端服务](https://github.com/hotpotmaterial/code-frontend)启动
 

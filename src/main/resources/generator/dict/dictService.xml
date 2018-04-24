@@ -6,7 +6,7 @@
 	<content><![CDATA[
 package ${packageName}.service.dict;
 
-import org.hotpotmaterial.anywhere.common.mvc.rest.basic.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import ${packageName}.dto.dict.ResultDictDTO;
 import ${packageName}.entity.${datasourceName}.DictTypePO;

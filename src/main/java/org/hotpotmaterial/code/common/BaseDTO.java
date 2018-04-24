@@ -14,10 +14,10 @@ import com.google.common.collect.Lists;
 public enum BaseDTO {
 
   ResultDTO("org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO", "返回值基类"), ResultPageDTO(
-      "org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultPageDTO",
+      "org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO",
       "分页返回值基类(泛型)"), PageDTO("org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO",
           "分页查询参数类"), ResultJsonSchemaDTO(
-              "org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultJsonSchemaDTO",
+              "org.hotpotmaterial.anywhere.common.mvc.rest.json.ResultJsonSchemaDTO",
               "json schema返回值基类");
 
   // 包名

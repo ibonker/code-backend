@@ -18,6 +18,10 @@ public enum SecurityFile {
   RolePOMapper("security/dao/RolePOMapper.xml"),
   UserPOMapper("security/dao/UserPOMapper.xml"),
   CurrentUserDTO("security/dto/CurrentUserDTO.xml"),
+  HotpotFuncPOMapper("security/mapping/HotpotFuncPOMapper.xml"),
+  HotpotOrgPOMapper("security/mapping/HotpotOrgPOMapper.xml"),
+  HotpotRolePOMapper("security/mapping/HotpotRolePOMapper.xml"),
+  HotpotUserPOMapper("security/mapping/HotpotUserPOMapper.xml"),
   HotpotUserSeniorDTO("security/dto/HotpotUserSeniorDTO.xml"),
   LoginResponseDTO("security/dto/LoginResponseDTO.xml"),
   ResultOfHotpotOrganizationDTO("security/dto/ResultOfHotpotOrganizationDTO.xml"),
@@ -45,7 +49,9 @@ public enum SecurityFile {
   RoleServiceImpl("security/service/RoleServiceImpl.xml"),
   UserDetailsServiceImpl("security/service/UserDetailsServiceImpl.xml"),
   UserServiceImpl("security/service/UserServiceImpl.xml"),
-  UserTokenServiceImpl("security/service/UserTokenServiceImpl.xml");
+  UserTokenServiceImpl("security/service/UserTokenServiceImpl.xml"),
+  initsql("security/initsql.xml"),
+  WebSecurityConfig("security/WebSecurityConfig.xml");
   
   private String path;
   

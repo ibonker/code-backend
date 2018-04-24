@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
   <name>dictController</name>
-  <filePath>src/main/java/${packageName}/${moduleName}/controller/uiconfig</filePath>
+  <filePath>src/main/java/${packageName}/${moduleName}/controller/dict</filePath>
   <fileName>DictApiController.java</fileName>
   <content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.dict;
@@ -13,8 +13,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.http.MediaType;
 
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
+import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
 import ${packageName}.common.RestStatus;
 import ${packageName}.dto.dict.ResultDictDTO;
