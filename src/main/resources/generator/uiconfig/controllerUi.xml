@@ -34,7 +34,7 @@ import io.swagger.annotations.ApiParam;
  */
 @Controller
 @Api(value = "UiConfig", description = "the UiConfig API")
-@RequestMapping(value = "${mainpath}/api/common")
+@RequestMapping(value = "/api/ui")
 public class UIConfigController {
 
   @Autowired

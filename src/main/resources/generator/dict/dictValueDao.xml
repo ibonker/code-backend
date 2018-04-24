@@ -28,40 +28,40 @@ public interface DictValueMapper{
    * @param delFlag
    * @return
    */
-  @Select("SELECT * FROM dict_value WHERE dict_code = ${r'#'}{arg0} AND del_flag = ${r'#'}{arg1}")
+  @Select("SELECT * FROM dict_value WHERE dict_code = #{code} AND del_flag = #{delFlag}")
   @Results({
     @Result(property = "dictCode", column = "dict_code")
   })
-  List<DictValuePO> getAll(String code,String delFlag);
+  List<DictValuePO> getAll(@Param("code") String code, @Param("delFlag") String delFlag);
   
   /**
    * 根据id查询DictValue
    * @param id
    * @return
    */
-  @Select("SELECT * FROM dict_value WHERE del_flag = ${r'#'}{arg1} AND id = ${r'#'}{arg0}")
+  @Select("SELECT * FROM dict_value WHERE del_flag = #{delFlag} AND id = #{id}")
   @Results({
     @Result(property = "createdBy", column = "created_by"),
     @Result(property = "updatedBy", column = "updated_by"),
     @Result(property = "dictCode", column = "dict_code")
   })
-  DictValuePO findDictValue(String id, String delFlag);
+  DictValuePO findDictValue(@Param("id") String id, @Param("delFlag") String delFlag);
   
   /**
    * 根据DictType删除DictValue
    * @param id
    * @param delFlag
    */
-  @Update("UPDATE dict_value SET del_flag = ${r'#'}{arg1} WHERE dict_code = ${r'#'}{arg0}")
-  void deleteDictValues(String code, String delFlag);
+  @Update("UPDATE dict_value SET del_flag = #{delFlag} WHERE dict_code = #{code}")
+  void deleteDictValues(@Param("code") String code, @Param("delFlag") String delFlag);
   
   /**
    * 更新DictValue
    * @param dictValue
    */
-  @Update("UPDATE dict_value SET name = ${r'#'}{name}, value = ${r'#'}{value}, "
-      + "sort = ${r'#'}{sort}, dict_code = ${r'#'}{dictCode}, created_by = ${r'#'}{createdBy}, updated_by =${r'#'}{updatedBy}, "
-      + "created_at = ${r'#'}{createdAt}, updated_at = ${r'#'}{updatedAt} WHERE id = ${r'#'}{id}")
+  @Update("UPDATE dict_value SET name = #{name}, value = #{value}, "
+      + "sort = #{sort}, dict_code = #{dictCode}, created_by = #{createdBy}, updated_by =#{updatedBy}, "
+      + "created_at = #{createdAt}, updated_at = #{updatedAt} WHERE id = #{id}")
   void updateDictValue(DictValuePO dictValue);
   
   /**
@@ -70,7 +70,7 @@ public interface DictValueMapper{
    */
   @Insert("INSERT INTO dict_value(id,name,value,sort,dict_code,created_by,updated_by,created_at,updated_at,del_flag) "
       + "VALUES "
-      + "(${r'#'}{id},${r'#'}{name},${r'#'}{value},${r'#'}{sort},${r'#'}{dictCode},${r'#'}{createdBy},${r'#'}{updatedBy},${r'#'}{createdAt},${r'#'}{updatedAt},${r'#'}{delFlag})")
+      + "(#{id},#{name},#{value},#{sort},#{dictCode},#{createdBy},#{updatedBy},#{createdAt},#{updatedAt},#{delFlag})")
   void insertDictValue(DictValuePO dictValue);
   
   /**
@@ -78,8 +78,8 @@ public interface DictValueMapper{
    * @param id
    * @param delFlag
    */
-  @Update("UPDATE dict_value SET del_flag = ${r'#'}{arg1} WHERE id = ${r'#'}{arg0}")
-  void deleteDictValue(String id, String delFlag);
+  @Update("UPDATE dict_value SET del_flag = #{delFlag} WHERE id = #{id}")
+  void deleteDictValue(@Param("id") String id, @Param("delFlag") String delFlag);
   
   /**
    * 分页查询
@@ -93,10 +93,9 @@ public interface DictValueMapper{
    * @param code
    * @param delFlag
    */
-  @Update("UPDATE dict_value SET dict_code = ${r'#'}{arg0} WHERE dict_code = ${r'#'}{arg1} AND del_flag = ${r'#'}{arg2} ")
-  void updateDictValues(String newCode, String oldCode, String delFlag);
+  @Update("UPDATE dict_value SET dict_code = #{newCode} WHERE dict_code = #{oldCode} AND del_flag = #{delFlag} ")
+  void updateDictValues(@Param("newCode") String newCode, @Param("oldCode") String oldCode, @Param("delFlag") String delFlag);
 }
-
 	]]>
 	</content>
 </template>

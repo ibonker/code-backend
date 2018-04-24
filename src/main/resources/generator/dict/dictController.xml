@@ -39,7 +39,7 @@ import io.swagger.annotations.ApiParam;
  */
 @Controller
 @Api(value = "Dict", description = "the Dict API")
-@RequestMapping(value = "/dict/api/v1")
+@RequestMapping(value = "/api/dict")
 public class DictApiController{
 
   /**

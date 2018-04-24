@@ -36,21 +36,21 @@ public interface DictTypeMapper{
     @Result(property = "createdAt", column = "created_at"),
     @Result(property = "updatedAt", column = "updated_at")
   })
-  List<DictTypePO> getAll(String delFlag);
+  List<DictTypePO> getAll(@Param("delFlag") String delFlag);
   
   /**
    * 根据id查询DictType
    * @param id
    * @return
    */
-  @Select("SELECT * FROM dict_type WHERE del_flag = ${r'#'}{arg1} AND id = ${r'#'}{arg0}")
+  @Select("SELECT * FROM dict_type WHERE del_flag = ${r'#'}{delFlag} AND id = ${r'#'}{id}")
   @Results({
     @Result(property = "createdBy", column = "created_by"),
     @Result(property = "updatedBy", column = "updated_by"),
     @Result(property = "createdAt", column = "created_at"),
     @Result(property = "updatedAt", column = "updated_at")
   })
-  DictTypePO findDictType(String id, String delFlag);
+  DictTypePO findDictType(@Param("id") String id, @Param("delFlag") String delFlag);
   
   /**
    * 根据id删除DictType
@@ -58,14 +58,14 @@ public interface DictTypeMapper{
    * @param delFlag
    * @return
    */
-  @Update("UPDATE dict_type SET del_flag = ${r'#'}{arg1} WHERE id = ${r'#'}{arg0}")
-  void deleteDictType(String id, String delFlag);
+  @Update("UPDATE dict_type SET del_flag = ${r'#'}{delFlag} WHERE id = ${r'#'}{id}")
+  void deleteDictType(@Param("id") String id, @Param("delFlag") String delFlag);
   
   /**
    * 更新dictType
    * @param dictType
    */
-  @Update("UPDATE dict_type SET code = ${r'#'}{code}, name = ${r'#'}{name}, created_by = ${r'#'}{createdBy}, "
+  @Update("UPDATE dict_type SET code = #{code}, name = ${r'#'}{name}, created_by = ${r'#'}{createdBy}, "
       + "updated_by = ${r'#'}{updatedBy}, updated_at = ${r'#'}{updatedAt}, created_at = ${r'#'}{createdAt} WHERE id = ${r'#'}{id}")
   void updateDictType(DictTypePO dictType);
   
@@ -89,8 +89,8 @@ public interface DictTypeMapper{
    * @param code
    * @return
    */
-  @Select("SELECT id FROM dict_type WHERE code = ${r'#'}{arg0} AND del_flag = ${r'#'}{arg1}")
-  String selectByCode(String code, String delFlag);
+  @Select("SELECT id FROM dict_type WHERE code = ${r'#'}{code} AND del_flag = ${r'#'}{delFlag}")
+  String selectByCode(@Param("code") String code, @Param("delFlag") String delFlag);
   
   /**
    * 根据code查询DictValues
@@ -98,8 +98,8 @@ public interface DictTypeMapper{
    * @param delFlag
    * @return
    */
-  @Select("SELECT * FROM dict_value WHERE dict_code = ${r'#'}{arg0} AND del_flag = ${r'#'}{arg1}")
-  List<DictValuePO> findDictValueByCode(String code, String delFlag);
+  @Select("SELECT * FROM dict_value WHERE dict_code = ${r'#'}{code} AND del_flag = ${r'#'}{delFlag}")
+  List<DictValuePO> findDictValueByCode(@Param("code") String code, @Param("delFlag") String delFlag);
 }
 	]]>
 	</content>
