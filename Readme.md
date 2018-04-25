@@ -12,9 +12,11 @@
 
 在项目根目录下找到`build/libs/hotpotmaterial-code2-0.0.1-SNAPSHOT.jar`
 
-运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT.jar --DB_URL=localhost:3306 --DB_USER=root --DB_PWD=123456 --GEN_ROOT_PATH=/home`
+创建数据库并初始化表，初始化表的DDL在[init.sql](./init.sql)
 
-程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`GEN_ROOT_PATH`生成代码根目录
+运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT.jar --DB_URL=localhost:3306 --DB_USER=root --DB_PWD=123456 --GEN_ROOT_PATH=/home --DB_NAME=new_titancode_test`
+
+程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`DB_NAME`为你的数据库名称，`GEN_ROOT_PATH`生成代码根目录
 
 访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
 
