@@ -32,18 +32,18 @@
             <foreach collection="criteria.criteria" item="criterion">
               <choose>
                 <when test="criterion.noValue">
-                  and ${criterion.condition}
+                  and ${r'$'}{criterion.condition}
                 </when>
                 <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
+                  and ${r'$'}{criterion.condition} ${r'#'}{criterion.value}
                 </when>
                 <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                  and ${r'$'}{criterion.condition} ${r'#'}{criterion.value} and ${r'#'}{criterion.secondValue}
                 </when>
                 <when test="criterion.listValue">
-                  and ${criterion.condition}
+                  and ${r'$'}{criterion.condition}
                   <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
+                    ${r'#'}{listItem}
                   </foreach>
                 </when>
               </choose>
@@ -69,12 +69,12 @@
     <include refid="Base_Column_List" />
     from hotpot_function
     where
-    	parent_id = #{id,jdbcType=VARCHAR}
+    	parent_id = ${r'#'}{id,jdbcType=VARCHAR}
   </select>
   
   <delete id="delete" parameterType="java.lang.String">
     delete from hotpot_function
-    where id = #{id,jdbcType=VARCHAR}
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
   </delete>
   
   <insert id="insert" parameterType="${packageName}.security.entity.HotpotFunctionPO">
@@ -84,11 +84,11 @@
       image1_id, image2_id, created_at, 
       updated_at, created_by, updated_by
       )
-    values (#{id,jdbcType=VARCHAR}, #{functionName,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
-      #{url,jdbcType=VARCHAR}, #{isMenu,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
-      #{enabled,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, 
-      #{image1Id,jdbcType=VARCHAR}, #{image2Id,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, 
-      #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}
+    values (${r'#'}{id,jdbcType=VARCHAR}, ${r'#'}{functionName,jdbcType=VARCHAR}, ${r'#'}{code,jdbcType=VARCHAR}, 
+      ${r'#'}{url,jdbcType=VARCHAR}, ${r'#'}{isMenu,jdbcType=VARCHAR}, ${r'#'}{description,jdbcType=VARCHAR}, 
+      ${r'#'}{enabled,jdbcType=VARCHAR}, ${r'#'}{parentId,jdbcType=VARCHAR}, ${r'#'}{level,jdbcType=INTEGER}, 
+      ${r'#'}{image1Id,jdbcType=VARCHAR}, ${r'#'}{image2Id,jdbcType=VARCHAR}, ${r'#'}{createdAt,jdbcType=TIMESTAMP}, 
+      ${r'#'}{updatedAt,jdbcType=TIMESTAMP}, ${r'#'}{createdBy,jdbcType=VARCHAR}, ${r'#'}{updatedBy,jdbcType=VARCHAR}
       )
   </insert>
   
@@ -96,49 +96,49 @@
     update hotpot_function
     <set>
       <if test="functionName != null">
-        function_name = #{functionName,jdbcType=VARCHAR},
+        function_name = ${r'#'}{functionName,jdbcType=VARCHAR},
       </if>
       <if test="code != null">
-        code = #{code,jdbcType=VARCHAR},
+        code = ${r'#'}{code,jdbcType=VARCHAR},
       </if>
       <if test="url != null">
-        url = #{url,jdbcType=VARCHAR},
+        url = ${r'#'}{url,jdbcType=VARCHAR},
       </if>
       <if test="isMenu != null">
-        is_menu = #{isMenu,jdbcType=VARCHAR},
+        is_menu = ${r'#'}{isMenu,jdbcType=VARCHAR},
       </if>
       <if test="description != null">
-        description = #{description,jdbcType=VARCHAR},
+        description = ${r'#'}{description,jdbcType=VARCHAR},
       </if>
       <if test="enabled != null">
-        enabled = #{enabled,jdbcType=VARCHAR},
+        enabled = ${r'#'}{enabled,jdbcType=VARCHAR},
       </if>
       <if test="parentId != null">
-        parent_id = #{parentId,jdbcType=VARCHAR},
+        parent_id = ${r'#'}{parentId,jdbcType=VARCHAR},
       </if>
       <if test="level != null">
-        level = #{level,jdbcType=INTEGER},
+        level = ${r'#'}{level,jdbcType=INTEGER},
       </if>
       <if test="image1Id != null">
-        image1_id = #{image1Id,jdbcType=VARCHAR},
+        image1_id = ${r'#'}{image1Id,jdbcType=VARCHAR},
       </if>
       <if test="image2Id != null">
-        image2_id = #{image2Id,jdbcType=VARCHAR},
+        image2_id = ${r'#'}{image2Id,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
-        created_at = #{createdAt,jdbcType=TIMESTAMP},
+        created_at = ${r'#'}{createdAt,jdbcType=TIMESTAMP},
       </if>
       <if test="updatedAt != null">
-        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+        updated_at = ${r'#'}{updatedAt,jdbcType=TIMESTAMP},
       </if>
       <if test="createdBy != null">
-        created_by = #{createdBy,jdbcType=VARCHAR},
+        created_by = ${r'#'}{createdBy,jdbcType=VARCHAR},
       </if>
       <if test="updatedBy != null">
-        updated_by = #{updatedBy,jdbcType=VARCHAR},
+        updated_by = ${r'#'}{updatedBy,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=VARCHAR}
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
   </update>
   
 </mapper>

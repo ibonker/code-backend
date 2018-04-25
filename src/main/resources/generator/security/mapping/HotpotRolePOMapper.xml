@@ -37,7 +37,7 @@
 			FROM
 				hotpot_role_function rf
 			WHERE
-				rf.role_id = #{roleId}
+				rf.role_id = ${r'#'}{roleId}
 		) rf ON f.id = rf.function_id
 	</select>
 	
@@ -57,7 +57,7 @@
 			hotpot_user u
 		LEFT JOIN hotpot_organization o ON o.id = u.org_id
 		INNER JOIN hotpot_role_user ru ON u.id = ru.party_id
-		AND ru.role_id = #{roleId}
+		AND ru.role_id = ${r'#'}{roleId}
 		WHERE
 			u.del_flag = '0'
 		ORDER BY
@@ -84,7 +84,7 @@
 		ON
 			o.id = ru.party_id
 		AND
-			ru.role_id = #{roleId}
+			ru.role_id = ${r'#'}{roleId}
 		WHERE
 			o.del_flag = '0'
 		order by o.sort asc
@@ -92,28 +92,28 @@
 	
 	<delete id="deleteRoleFunc">
 		delete from hotpot_role_function
-		where role_id = #{role_id}
+		where role_id = ${r'#'}{role_id}
 	</delete>
 	
 	<insert id="saveRoleFunc" parameterType="map">
 		insert into hotpot_role_function
 		(function_id, role_id, created_at, created_by)
 		values
-		(#{functionId}, #{roleId}, #{createdAt}, #{createdBy})
+		(${r'#'}{functionId}, ${r'#'}{roleId}, ${r'#'}{createdAt}, ${r'#'}{createdBy})
 	</insert>
 	
 	<insert id="saveRoleParty" parameterType="map">
 		insert into hotpot_role_user
 		(role_id, party_id, created_at, created_by)
 		values
-		(#{roleId}, #{partyId}, #{createdAt}, #{createdBy})
+		(${r'#'}{roleId}, ${r'#'}{partyId}, ${r'#'}{createdAt}, ${r'#'}{createdBy})
 	</insert>
 	
 	<delete id="deleteRoleParty" parameterType="map">
 		delete from hotpot_role_user
-		where role_id = #{roleId}
+		where role_id = ${r'#'}{roleId}
 		<if test="partyId != null and partyId != ''">
-			and party_id= #{partyId}
+			and party_id= ${r'#'}{partyId}
 		</if>
 	</delete>
 	
@@ -140,7 +140,7 @@
 	    	1 = 1
 			and del_flag = '0'
 		<if test="_parameter != null and _parameter != ''">
-			and ${_parameter }
+			and ${r'$'}{_parameter }
 		</if>
 	</select>
 	
@@ -148,42 +148,42 @@
     insert into hotpot_role (id, role_name, description, 
       created_at, updated_at, created_by, 
       updated_by, del_flag)
-    values (#{id,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
-      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
-      #{updatedBy,jdbcType=VARCHAR}, #{delFlag,jdbcType=VARCHAR})
+    values (${r'#'}{id,jdbcType=VARCHAR}, ${r'#'}{roleName,jdbcType=VARCHAR}, ${r'#'}{description,jdbcType=VARCHAR}, 
+      ${r'#'}{createdAt,jdbcType=TIMESTAMP}, ${r'#'}{updatedAt,jdbcType=TIMESTAMP}, ${r'#'}{createdBy,jdbcType=VARCHAR}, 
+      ${r'#'}{updatedBy,jdbcType=VARCHAR}, ${r'#'}{delFlag,jdbcType=VARCHAR})
   </insert>
   
    <update id="updateRole" parameterType="${packageName}.security.entity.HotpotRolePO">
     update hotpot_role
     <set>
       <if test="roleName != null">
-        role_name = #{roleName,jdbcType=VARCHAR},
+        role_name = ${r'#'}{roleName,jdbcType=VARCHAR},
       </if>
       <if test="description != null">
-        description = #{description,jdbcType=VARCHAR},
+        description = ${r'#'}{description,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
-        created_at = #{createdAt,jdbcType=TIMESTAMP},
+        created_at = ${r'#'}{createdAt,jdbcType=TIMESTAMP},
       </if>
       <if test="updatedAt != null">
-        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+        updated_at = ${r'#'}{updatedAt,jdbcType=TIMESTAMP},
       </if>
       <if test="createdBy != null">
-        created_by = #{createdBy,jdbcType=VARCHAR},
+        created_by = ${r'#'}{createdBy,jdbcType=VARCHAR},
       </if>
       <if test="updatedBy != null">
-        updated_by = #{updatedBy,jdbcType=VARCHAR},
+        updated_by = ${r'#'}{updatedBy,jdbcType=VARCHAR},
       </if>
       <if test="delFlag != null">
-        del_flag = #{delFlag,jdbcType=VARCHAR},
+        del_flag = ${r'#'}{delFlag,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=VARCHAR}
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
   </update>
   
   <delete id="deleteRole" parameterType="java.lang.String">
     delete from hotpot_role
-    where id = #{id,jdbcType=VARCHAR}
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
   </delete>
 </mapper>
 ]]>

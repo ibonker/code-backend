@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
   <name>initsql</name>
-  <filePath>>src/main/resources</filePath>
+  <filePath>src/main/resources</filePath>
   <fileName>initsql.sql</fileName>
   <content><![CDATA[
 SET FOREIGN_KEY_CHECKS=0;

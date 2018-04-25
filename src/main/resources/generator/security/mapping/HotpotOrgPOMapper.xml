@@ -45,7 +45,7 @@
 		from hotpot_organization
 		where del_flag = '0'
 		<if test="id != null and id != ''">
-			and org_full_id like CONCAT('%',#{id},'%')
+			and org_full_id like CONCAT('%',${r'#'}{id},'%')
 		</if>
 	</select>
 
@@ -58,16 +58,16 @@
 		updated_by,
 		del_flag, sort
 		)
-		values (#{id,jdbcType=VARCHAR},
-		#{orgFullId,jdbcType=VARCHAR},
-		#{orgName,jdbcType=VARCHAR},
-		#{orgFullName,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR},
-		#{description,jdbcType=VARCHAR},
-		#{createdAt,jdbcType=TIMESTAMP},
-		#{updatedAt,jdbcType=TIMESTAMP},
-		#{createdBy,jdbcType=VARCHAR},
-		#{updatedBy,jdbcType=VARCHAR}, #{delFlag,jdbcType=VARCHAR},
-		#{sort,jdbcType=INTEGER}
+		values (${r'#'}{id,jdbcType=VARCHAR},
+		${r'#'}{orgFullId,jdbcType=VARCHAR},
+		${r'#'}{orgName,jdbcType=VARCHAR},
+		${r'#'}{orgFullName,jdbcType=VARCHAR}, ${r'#'}{parentId,jdbcType=VARCHAR},
+		${r'#'}{description,jdbcType=VARCHAR},
+		${r'#'}{createdAt,jdbcType=TIMESTAMP},
+		${r'#'}{updatedAt,jdbcType=TIMESTAMP},
+		${r'#'}{createdBy,jdbcType=VARCHAR},
+		${r'#'}{updatedBy,jdbcType=VARCHAR}, ${r'#'}{delFlag,jdbcType=VARCHAR},
+		${r'#'}{sort,jdbcType=INTEGER}
 		)
 	</insert>
 
@@ -75,46 +75,46 @@
 		update hotpot_organization
     <set>
       <if test="orgFullId != null">
-        org_full_id = #{orgFullId,jdbcType=VARCHAR},
+        org_full_id = ${r'#'}{orgFullId,jdbcType=VARCHAR},
       </if>
       <if test="orgName != null">
-        org_name = #{orgName,jdbcType=VARCHAR},
+        org_name = ${r'#'}{orgName,jdbcType=VARCHAR},
       </if>
       <if test="orgFullName != null">
-        org_full_name = #{orgFullName,jdbcType=VARCHAR},
+        org_full_name = ${r'#'}{orgFullName,jdbcType=VARCHAR},
       </if>
       <if test="parentId != null">
-        parent_id = #{parentId,jdbcType=VARCHAR},
+        parent_id = ${r'#'}{parentId,jdbcType=VARCHAR},
       </if>
       <if test="description != null">
-        description = #{description,jdbcType=VARCHAR},
+        description = ${r'#'}{description,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
-        created_at = #{createdAt,jdbcType=TIMESTAMP},
+        created_at = ${r'#'}{createdAt,jdbcType=TIMESTAMP},
       </if>
       <if test="updatedAt != null">
-        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+        updated_at = ${r'#'}{updatedAt,jdbcType=TIMESTAMP},
       </if>
       <if test="createdBy != null">
-        created_by = #{createdBy,jdbcType=VARCHAR},
+        created_by = ${r'#'}{createdBy,jdbcType=VARCHAR},
       </if>
       <if test="updatedBy != null">
-        updated_by = #{updatedBy,jdbcType=VARCHAR},
+        updated_by = ${r'#'}{updatedBy,jdbcType=VARCHAR},
       </if>
       <if test="delFlag != null">
-        del_flag = #{delFlag,jdbcType=VARCHAR},
+        del_flag = ${r'#'}{delFlag,jdbcType=VARCHAR},
       </if>
       <if test="sort != null">
-        sort = #{sort,jdbcType=INTEGER},
+        sort = ${r'#'}{sort,jdbcType=INTEGER},
       </if>
     </set>
-    where id = #{id,jdbcType=VARCHAR}
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
 	</update>
 
 	<delete id="deleteOrg" parameterType="java.lang.String">
 		delete from
 		hotpot_organization
-		where id = #{id,jdbcType=VARCHAR}
+		where id = ${r'#'}{id,jdbcType=VARCHAR}
 	</delete>
 	
 	<select id="selectOrgUser" parameterType="java.lang.String"  resultType="${packageName}.security.entity.HotpotUserPO">
@@ -128,7 +128,7 @@
 			del_flag as delFlag
 		from hotpot_user
 		where
-			org_id = #{orgId}
+			org_id = ${r'#'}{orgId}
 	</select>
 </mapper>
 ]]>

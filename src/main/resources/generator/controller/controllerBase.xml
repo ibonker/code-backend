@@ -5,13 +5,30 @@
   <fileName>BaseController.java</fileName>
   <content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base;
+<#if components?seq_contains("enablesecurity")>
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.hotpot.demo.exception.CodeCommonException;
+import com.hotpot.demo.security.dto.UserInfo;
+</#if>
 /**
  * 控制器基础类，一些基础的方法可以写在此处供控制器子类调用
  * @author Hotpotmaterial-Code2
  */
 public class BaseController {
-
+  <#if components?seq_contains("enablesecurity")>
+  public UserInfo getUser() {   
+    SecurityContext ctx = SecurityContextHolder.getContext();
+    Authentication auth = ctx.getAuthentication();
+    try {
+      return (UserInfo) auth.getPrincipal();
+    } catch (Exception e) {
+      throw new CodeCommonException("401", "获取登录用户信息错误!");
+    }
+  }
+  </#if>
 }
 ]]>
   </content>

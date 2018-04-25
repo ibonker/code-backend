@@ -48,8 +48,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile "org.springframework.boot:spring-boot-starter-aop"
 	compile "org.springframework.boot:spring-boot-starter-actuator"
-	<#if components?seq_contains("localsecurity")>
-	compile "org.springframework.boot:spring-boot-starter-actuator"
+	<#if components?seq_contains("enablesecurity")>
+	compile "org.springframework.boot:spring-boot-starter-security"
 	compile "io.jsonwebtoken:jjwt:${r'$'}{jwt_version}"
 	</#if>
     compile "org.mybatis.spring.boot:mybatis-spring-boot-starter:${r'$'}{mybatis_spring_version}"

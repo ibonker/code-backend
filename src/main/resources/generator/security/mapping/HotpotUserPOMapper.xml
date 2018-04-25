@@ -36,7 +36,7 @@
 		on
 		hotpotUser.org_id = hotpotOrganization.id
 		where
-		hotpotUser.user_name = #{userName}
+		hotpotUser.user_name = ${r'#'}{userName}
 		and hotpotUser.del_flag = '0'
 		and hotpotOrganization.del_flag = '0'
 	</select>
@@ -70,7 +70,7 @@
 		on
 		hotpotUser.org_id = hotpotOrganization.id
 		where
-		hotpotUser.id = #{id}
+		hotpotUser.id = ${r'#'}{id}
 		and hotpotUser.del_flag = '0'
 		and hotpotOrganization.del_flag = '0'
 	</select>
@@ -78,10 +78,10 @@
 	<update id="updatePassword" parameterType="${packageName}.security.dto.HotpotUserSeniorDTO">
 		update hotpot_user
 		set
-		password = #{newPassword}
-		where id = #{hotpotUser.id}
+		password = ${r'#'}{newPassword}
+		where id = ${r'#'}{hotpotUser.id}
 		and password =
-		#{hotpotUser.password}
+		${r'#'}{hotpotUser.password}
 	</update>
 
 	<resultMap type="${packageName}.security.dto.HotpotUserSeniorDTO"
@@ -145,7 +145,7 @@
 		and hotpotUser.del_flag = '0'
 		and hotpotOrganization.del_flag = '0'
 		<if test="_parameter != null and _parameter != ''">
-			and ${_parameter }
+			and ${r'$'}{_parameter }
 		</if>
 	</select>
 
@@ -188,7 +188,7 @@
 		ru.party_id in
 		<foreach collection="list" item="item" open="(" separator=","
 			close=")">
-			#{item}
+			${r'#'}{item}
 		</foreach>
 		) ru ON ru.role_id = rf.role_id
 		) r ON r.function_id = f.id
@@ -200,15 +200,15 @@
 		insert into hotpot_user (id, user_name, name,
 		password, org_id, created_at,
 		updated_at, del_flag)
-		values (#{id,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR},
-		#{name,jdbcType=VARCHAR},
-		#{password,jdbcType=VARCHAR}, #{orgId,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
-		#{updatedAt,jdbcType=TIMESTAMP}, #{delFlag,jdbcType=VARCHAR})
+		values (${r'#'}{id,jdbcType=VARCHAR}, ${r'#'}{userName,jdbcType=VARCHAR},
+		${r'#'}{name,jdbcType=VARCHAR},
+		${r'#'}{password,jdbcType=VARCHAR}, ${r'#'}{orgId,jdbcType=VARCHAR}, ${r'#'}{createdAt,jdbcType=TIMESTAMP},
+		${r'#'}{updatedAt,jdbcType=TIMESTAMP}, ${r'#'}{delFlag,jdbcType=VARCHAR})
 	</insert>
 
 	<delete id="deleteUser" parameterType="java.lang.String">
 		delete from hotpot_user
-		where id = #{id,jdbcType=VARCHAR}
+		where id = ${r'#'}{id,jdbcType=VARCHAR}
 	</delete>
 	
 	<select id="findByUsername" resultType="${packageName}.security.entity.HotpotUserPO">
@@ -223,7 +223,7 @@
 		from 
 			hotpot_user
 		where
-			user_name = #{userName}
+			user_name = ${r'#'}{userName}
 			and del_flag = '0'
 	</select>
 	
@@ -239,7 +239,7 @@
 		from 
 			hotpot_user
 		where
-			id = #{id}
+			id = ${r'#'}{id}
 			and del_flag = '0'
 	</select>
 
@@ -247,28 +247,28 @@
 		update hotpot_user
 		<set>
 			<if test="userName != null and userName != ''">
-				user_name = #{userName,jdbcType=VARCHAR},
+				user_name = ${r'#'}{userName,jdbcType=VARCHAR},
 			</if>
 			<if test="name != null">
-				name = #{name,jdbcType=VARCHAR},
+				name = ${r'#'}{name,jdbcType=VARCHAR},
 			</if>
 			<if test="password != null">
-				password = #{password,jdbcType=VARCHAR},
+				password = ${r'#'}{password,jdbcType=VARCHAR},
 			</if>
 			<if test="orgId != null">
-				org_id = #{orgId,jdbcType=VARCHAR},
+				org_id = ${r'#'}{orgId,jdbcType=VARCHAR},
 			</if>
 			<if test="createdAt != null">
-				created_at = #{createdAt,jdbcType=TIMESTAMP},
+				created_at = ${r'#'}{createdAt,jdbcType=TIMESTAMP},
 			</if>
 			<if test="updatedAt != null">
-				updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+				updated_at = ${r'#'}{updatedAt,jdbcType=TIMESTAMP},
 			</if>
 			<if test="delFlag != null">
-				del_flag = #{delFlag,jdbcType=VARCHAR},
+				del_flag = ${r'#'}{delFlag,jdbcType=VARCHAR},
 			</if>
 		</set>
-		where id = #{id,jdbcType=VARCHAR}
+		where id = ${r'#'}{id,jdbcType=VARCHAR}
 	</update>
 </mapper>
 ]]>

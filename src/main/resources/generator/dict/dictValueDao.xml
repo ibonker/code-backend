@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -28,7 +29,7 @@ public interface DictValueMapper{
    * @param delFlag
    * @return
    */
-  @Select("SELECT * FROM dict_value WHERE dict_code = #{code} AND del_flag = #{delFlag}")
+  @Select("SELECT * FROM dict_value WHERE dict_code = ${r'#'}{code} AND del_flag = ${r'#'}{delFlag}")
   @Results({
     @Result(property = "dictCode", column = "dict_code")
   })
@@ -39,7 +40,7 @@ public interface DictValueMapper{
    * @param id
    * @return
    */
-  @Select("SELECT * FROM dict_value WHERE del_flag = #{delFlag} AND id = #{id}")
+  @Select("SELECT * FROM dict_value WHERE del_flag = ${r'#'}{delFlag} AND id = ${r'#'}{id}")
   @Results({
     @Result(property = "createdBy", column = "created_by"),
     @Result(property = "updatedBy", column = "updated_by"),
@@ -52,16 +53,16 @@ public interface DictValueMapper{
    * @param id
    * @param delFlag
    */
-  @Update("UPDATE dict_value SET del_flag = #{delFlag} WHERE dict_code = #{code}")
+  @Update("UPDATE dict_value SET del_flag = ${r'#'}{delFlag} WHERE dict_code = ${r'#'}{code}")
   void deleteDictValues(@Param("code") String code, @Param("delFlag") String delFlag);
   
   /**
    * 更新DictValue
    * @param dictValue
    */
-  @Update("UPDATE dict_value SET name = #{name}, value = #{value}, "
-      + "sort = #{sort}, dict_code = #{dictCode}, created_by = #{createdBy}, updated_by =#{updatedBy}, "
-      + "created_at = #{createdAt}, updated_at = #{updatedAt} WHERE id = #{id}")
+  @Update("UPDATE dict_value SET name = ${r'#'}{name}, value = ${r'#'}{value}, "
+      + "sort = ${r'#'}{sort}, dict_code = ${r'#'}{dictCode}, created_by = ${r'#'}{createdBy}, updated_by =${r'#'}{updatedBy}, "
+      + "created_at = ${r'#'}{createdAt}, updated_at = ${r'#'}{updatedAt} WHERE id = ${r'#'}{id}")
   void updateDictValue(DictValuePO dictValue);
   
   /**
@@ -70,7 +71,7 @@ public interface DictValueMapper{
    */
   @Insert("INSERT INTO dict_value(id,name,value,sort,dict_code,created_by,updated_by,created_at,updated_at,del_flag) "
       + "VALUES "
-      + "(#{id},#{name},#{value},#{sort},#{dictCode},#{createdBy},#{updatedBy},#{createdAt},#{updatedAt},#{delFlag})")
+      + "(${r'#'}{id},${r'#'}{name},${r'#'}{value},${r'#'}{sort},${r'#'}{dictCode},${r'#'}{createdBy},${r'#'}{updatedBy},${r'#'}{createdAt},${r'#'}{updatedAt},${r'#'}{delFlag})")
   void insertDictValue(DictValuePO dictValue);
   
   /**
@@ -78,7 +79,7 @@ public interface DictValueMapper{
    * @param id
    * @param delFlag
    */
-  @Update("UPDATE dict_value SET del_flag = #{delFlag} WHERE id = #{id}")
+  @Update("UPDATE dict_value SET del_flag = ${r'#'}{delFlag} WHERE id = ${r'#'}{id}")
   void deleteDictValue(@Param("id") String id, @Param("delFlag") String delFlag);
   
   /**
@@ -93,7 +94,7 @@ public interface DictValueMapper{
    * @param code
    * @param delFlag
    */
-  @Update("UPDATE dict_value SET dict_code = #{newCode} WHERE dict_code = #{oldCode} AND del_flag = #{delFlag} ")
+  @Update("UPDATE dict_value SET dict_code = ${r'#'}{newCode} WHERE dict_code = ${r'#'}{oldCode} AND del_flag = ${r'#'}{delFlag} ")
   void updateDictValues(@Param("newCode") String newCode, @Param("oldCode") String oldCode, @Param("delFlag") String delFlag);
 }
 	]]>

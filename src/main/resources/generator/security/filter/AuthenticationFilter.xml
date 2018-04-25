@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
-  <name>AuthenLogoutFilter</name>
+  <name>AuthenticationFilter</name>
   <filePath>src/main/java/${packageName}/security/filter</filePath>
-  <fileName>AuthenLogoutFilter.java</fileName>
+  <fileName>AuthenticationFilter.java</fileName>
   <content><![CDATA[
 package ${packageName}.security.filter;
 

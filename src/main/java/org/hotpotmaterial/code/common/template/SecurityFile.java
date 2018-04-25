@@ -40,7 +40,7 @@ public enum SecurityFile {
   LoginFilter("security/filter/LoginFilter.xml"),
   UnauthorizedEntryPoint("security/filter/UnauthorizedEntryPoint.xml"),
   IFuncService("security/service/IFuncService.xml"),
-  IOrgService("security/service/UnauthorizedEntryPoint.xml"),
+  IOrgService("security/service/IOrgService.xml"),
   IRoleService("security/service/IRoleService.xml"),
   IUserService("security/service/IUserService.xml"),
   IUserTokenService("security/service/IUserTokenService.xml"),

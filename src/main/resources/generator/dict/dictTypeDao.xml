@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Param;
 
 import ${packageName}.entity.${datasourceName}.DictTypePO;
 import ${packageName}.entity.${datasourceName}.DictTypePOExample;
@@ -65,7 +66,7 @@ public interface DictTypeMapper{
    * 更新dictType
    * @param dictType
    */
-  @Update("UPDATE dict_type SET code = #{code}, name = ${r'#'}{name}, created_by = ${r'#'}{createdBy}, "
+  @Update("UPDATE dict_type SET code = ${r'#'}{code}, name = ${r'#'}{name}, created_by = ${r'#'}{createdBy}, "
       + "updated_by = ${r'#'}{updatedBy}, updated_at = ${r'#'}{updatedAt}, created_at = ${r'#'}{createdAt} WHERE id = ${r'#'}{id}")
   void updateDictType(DictTypePO dictType);
   
