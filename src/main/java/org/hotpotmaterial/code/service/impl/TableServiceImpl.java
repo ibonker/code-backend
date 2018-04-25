@@ -178,9 +178,11 @@ public class TableServiceImpl implements ITableService {
     this.saveNewTables(newTables);
     // 新建实体
     for (TablePO table : newTables) {
-      transobjService.createAutoCrudDTO(datasource.getProjectId(), table.getId(), table.getName(),
-          datasource.getPackageName(),
-          datasource.getPackageName().concat(".").concat(table.getClassName()));
+      if (!Constants.TABLE_NOENTITY.contains(table.getName().toLowerCase())) {
+        transobjService.createAutoCrudDTO(datasource.getProjectId(), table.getId(), table.getName(),
+            datasource.getPackageName(),
+            datasource.getPackageName().concat(".").concat(table.getClassName()));
+      }
     }
     // 删除 表
     this.deleteNotExistTables(notExistTables);

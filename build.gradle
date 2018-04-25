@@ -64,7 +64,6 @@ dependencies {
 	
 	compile "com.alibaba:druid-spring-boot-starter:1.1.9"
     compile "mysql:mysql-connector-java:5.1.43"
-    compile "com.oracle:ojdbc14:10.2.0.4.0"
     compile "com.github.pagehelper:pagehelper:5.0.0"
     compile "org.hibernate:hibernate-java8:5.0.11.Final"
     compile "org.projectlombok:lombok:1.16.16"

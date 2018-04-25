@@ -494,7 +494,6 @@ public class ProjectServiceImpl implements IProjectService {
           seniorName = table.getName().toLowerCase().concat("_senior");
         }
       }
-      // 生成DTO文件代码
       generateService.generateDTOFiles(version, project.getName(),
           project.getPackages().toLowerCase(), transferObj, transferObjFileds, relations,
           seniorName);

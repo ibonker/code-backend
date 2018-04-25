@@ -23,5 +23,5 @@ generate:
   rootPath: ${GEN_ROOT_PATH:./code-gen/}
   projectPath: ${generate.rootPath}codedir/
   projectZipPath: ${generate.rootPath}codedir/zip/
-  projectUiPath: ${generate.rootPath}ui-code/mould/
+  projectUiPath: ${generate.rootPath}ui-code/
   projectUiTempPath: ${generate.rootPath}ui-code-temp/
