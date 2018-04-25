@@ -27,7 +27,6 @@ import org.hotpotmaterial.code.common.BaseDTO;
 import org.hotpotmaterial.code.common.BaseType;
 import org.hotpotmaterial.code.common.Constants;
 import org.hotpotmaterial.code.common.PredictUtils;
-import org.hotpotmaterial.code.common.component.Consul;
 import org.hotpotmaterial.code.common.component.Dictionary;
 import org.hotpotmaterial.code.common.component.Excel;
 import org.hotpotmaterial.code.common.component.Security;
@@ -751,13 +750,6 @@ public class ProjectServiceImpl implements IProjectService {
         () -> Security.getTypeCname(), (List<Component> components) -> {
           for (Security security : Security.values()) {
             components.add(new Component(security.name(), security.getCname()));
-          }
-        }));
-    // consul组件
-    categories.add(this.getComponentCategory(() -> Consul.isMultiSelect(),
-        () -> Consul.getTypeCname(), (List<Component> components) -> {
-          for (Consul consul : Consul.values()) {
-            components.add(new Component(consul.name(), consul.getCname()));
           }
         }));
     // dictionary组件
