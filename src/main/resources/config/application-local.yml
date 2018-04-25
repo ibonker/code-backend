@@ -1,15 +1,11 @@
 spring:
   profiles: local
-  redis:
-    database: 0
-    host: 10.64.13.80
-    port: 6379
   datasource:
     druid:
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://${DB_URL}/${DB_NAME}?useUnicode=true&characterEncoding=utf-8
-      username: ${DB_USER}
-      password: ${DB_PWD}
+      url: jdbc:mysql://192.168.0.105/hotpot-code?useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: 123456
       type: com.alibaba.druid.pool.DruidDataSource
       filters: stat,wall
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
