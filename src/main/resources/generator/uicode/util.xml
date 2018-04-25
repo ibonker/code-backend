@@ -8,7 +8,7 @@ import axios from 'axios';
 import env from '../config/env';
 let util = {
     appName: '${projectDescription}',
-    baseUrl: '${projectTitle}'
+    baseUrl: '/' + '${projectTitle}'
 };
 let devUrl =  'http://127.0.0.1:8080';
 let testUrl = 'http://127.0.0.1:8080';
@@ -23,7 +23,7 @@ const ajaxUrl = env === 'development' ? devUrl : env === 'production' ? proUrl :
 
 util.ajax = axios.create({
     baseURL: ajaxUrl,
-    timeout: 3000000
+    timeout: 300000
 });
 
 util.url = ajaxUrl;
