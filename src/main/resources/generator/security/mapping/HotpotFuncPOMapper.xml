@@ -62,6 +62,8 @@
     select 
     <include refid="Base_Column_List" />
     from hotpot_function
+    ORDER BY
+		code
   </select>
   
   <select id="getAllChildren" resultMap="BaseResultMap">
@@ -70,6 +72,8 @@
     from hotpot_function
     where
     	parent_id = ${r'#'}{id,jdbcType=VARCHAR}
+    ORDER BY
+		code
   </select>
   
   <delete id="delete" parameterType="java.lang.String">
