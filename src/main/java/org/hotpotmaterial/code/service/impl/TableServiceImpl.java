@@ -14,18 +14,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.alibaba.druid.util.StringUtils;
 import org.hotpotmaterial.anywhere.common.datasource.annotation.ChangeDatasource;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.Filter;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
@@ -62,7 +52,22 @@ import org.hotpotmaterial.code.service.IDatasourceService;
 import org.hotpotmaterial.code.service.IProjectService;
 import org.hotpotmaterial.code.service.ITableService;
 import org.hotpotmaterial.code.service.ITransferObjService;
+import org.hotpotmaterial.code.utils.DatasourceInitUtils;
 import org.hotpotmaterial.code.utils.GeneratorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.alibaba.druid.util.StringUtils;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -115,12 +120,22 @@ public class TableServiceImpl implements ITableService {
 
   @Autowired
   private TableSeniorColumnRepository tableSeniorColumnRepository;
-  
+
   @Autowired
   private GenerateProperties genProperties;
-  
+
+  @Autowired
+  private DataSourceProperties properties;
+
+  @Autowired
+  private ApplicationContext applicationContext;
+
+  @Value("${spring.datasource.security}")
+  private String securitySchema;
+
   /**
    * 根据id查找
+   * 
    * @param id
    * @return
    */
@@ -339,10 +354,12 @@ public class TableServiceImpl implements ITableService {
         relation.setMasterTableName(table.getName());
         relation.setMasterClassName(className);
         TablePO slaveTable = tableRepository.findOne(relation.getSlaveTableId());
-        TransferObjPO slavedto = transobjService.findTransferObjByTableId(relation.getSlaveTableId());
+        TransferObjPO slavedto =
+            transobjService.findTransferObjByTableId(relation.getSlaveTableId());
         relation.setSlaveTableName(slaveTable.getName());
-        relation.setSlaveClassName(slavedto.getPackageName().concat(".").concat(slaveTable.getClassName()));
-        
+        relation.setSlaveClassName(
+            slavedto.getPackageName().concat(".").concat(slaveTable.getClassName()));
+
         apiobjService.createAutoCruApiForRelation(firstApibase.getId(), relation,
             showdto.getPackageName().concat(".").concat(slavedto.getName()),
             datasource.getName().toLowerCase(), dbcount);
@@ -412,7 +429,7 @@ public class TableServiceImpl implements ITableService {
    * 下载单表相关文件
    */
   @Override
-  public String generateTableCodes(String tableId) throws FileNotFoundException{
+  public String generateTableCodes(String tableId) throws FileNotFoundException {
     // 通过tableId 获取 table对象
     TablePO table = tableRepository.findOne(tableId);
     // 获得数据源
@@ -422,7 +439,7 @@ public class TableServiceImpl implements ITableService {
     // 生成未压缩的项目文件并返回下载url
     return projectService.generateCodeFilesUnzip(table, project, datasource);
   }
-  
+
   /**
    * 下载文件
    */
@@ -643,9 +660,9 @@ public class TableServiceImpl implements ITableService {
             tableSeniorColumnRepository.findBySeniorSlaveIdOrderByCreatedAtAsc(ssp.getId());
         for (int i = 0; i < cpList.size(); i++) {
           TableSeniorColumnPO po = cpList.get(i);
-          sql += "&nbsp;&nbsp;" + (i==0?"":"and  ") + "<b>"  + tsr.getMasterTableName() + "." + po.getMasterColumnName()
-              + "</b>" + po.getOperate() + "<b>" + ssp.getSlaveTableName() + "."
-              + po.getSlaveColumnName() + "</b><br>";
+          sql += "&nbsp;&nbsp;" + (i == 0 ? "" : "and  ") + "<b>" + tsr.getMasterTableName() + "."
+              + po.getMasterColumnName() + "</b>" + po.getOperate() + "<b>"
+              + ssp.getSlaveTableName() + "." + po.getSlaveColumnName() + "</b><br>";
         }
       }
       tsr.setSql(sql);
@@ -717,7 +734,7 @@ public class TableServiceImpl implements ITableService {
    */
   @Override
   public Boolean isDictionary(String tableId) {
-    //是否启用字典表
+    // 是否启用字典表
     Boolean dictFlag = false;
     // 获取表信息
     TablePO table = tableRepository.findOne(tableId);
@@ -725,45 +742,58 @@ public class TableServiceImpl implements ITableService {
     DatasourcePO datasource = datasourceService.findById(table.getDatasourceId());
     // 获取项目的信息
     ProjectPO project = projectRepo.findOne(datasource.getProjectId());
-    //判断是否启用字符串
-    for (String str : project.getComponents().split(",")){
-      if(Dictionary.dictionary.toString().equals(str)){
+    // 判断是否启用字符串
+    for (String str : project.getComponents().split(",")) {
+      if (Dictionary.dictionary.toString().equals(str)) {
         dictFlag = true;
-        break; 
-      }else{
+        break;
+      } else {
         dictFlag = false;
       }
     }
     return dictFlag;
   }
-  
+
   /**
    * 创建uiconfig表
+   * 
    * @param datasource
    */
   @Override
   @ChangeDatasource
-  public void createUiConfig(DatasourcePO datasource){
+  public void createUiConfig(DatasourcePO datasource) {
     databaseDao.createUiConfig(datasource.getDbtype());
   }
-  
+
   /**
    * 创建dictType表
+   * 
    * @param datasource
    */
   @Override
   @ChangeDatasource
-  public void creatDictType(DatasourcePO datasource){
+  public void creatDictType(DatasourcePO datasource) {
     databaseDao.creatDictType(datasource.getDbtype());
   }
-  
+
   /**
    * 创建dictValue表
+   * 
    * @param datasource
    */
   @Override
   @ChangeDatasource
-  public void creatDictValue(DatasourcePO datasource){
+  public void creatDictValue(DatasourcePO datasource) {
     databaseDao.creatDictValue(datasource.getDbtype());
+  }
+
+  @Override
+  @ChangeDatasource
+  public void createSecurity(DatasourcePO datasource) {
+    DataSource dynamicDB = (DataSource) this.applicationContext.getBean("dynamicDataSource");
+    List<String> schemas = Lists.newArrayList();
+    schemas.add(securitySchema);
+    DatasourceInitUtils.runSchemaScripts("spring.datasource.security", schemas, "security", dynamicDB,
+        properties, applicationContext);
   }
 }

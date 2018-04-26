@@ -848,6 +848,14 @@ public class ProjectServiceImpl implements IProjectService {
         break;
       }
     }
+    // 判断是否启用前权限组件表
+    Boolean securityenableFlag = false;
+    for (String compoent : project.getComponents().split(",")) {
+      if (Security.enablesecurity.toString().equals(compoent)) {
+        securityenableFlag = true;
+        break;
+      }
+    }
     // 获取数据源列表
     List<DatasourcePO> datasources = datasourceService.findByProjectId(project.getId());
     // 默认第一个数据库添加
@@ -863,6 +871,9 @@ public class ProjectServiceImpl implements IProjectService {
       }
       if (uienableFlag && !keyTables.contains(Constants.Table_UICONFIG)) {
         tableService.createUiConfig(datasources.get(0));
+      }
+      if (securityenableFlag && !keyTables.contains(Constants.TABLE_NOENTITY)) {
+        tableService.createSecurity(datasources.get(0));
       }
     }
 

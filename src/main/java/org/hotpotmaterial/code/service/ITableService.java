@@ -218,6 +218,12 @@ public interface ITableService {
    * @param datasource
    */
   public void createUiConfig(DatasourcePO datasource);
+  
+  /**
+   * 创建security相关表
+   * @param datasource
+   */
+  public void createSecurity(DatasourcePO datasource);
 
   /**
    * 创建dictType

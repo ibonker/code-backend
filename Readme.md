@@ -4,23 +4,54 @@
 
 该代码生成器旨在为团队提供快速的前后端代码，后端代码基于Spring Boot + Spring Security + Mybatis，前端代码基于Spring Boot + Spring Security
 
-## 如何搭建
+## 特性
+
+1. 提供一体化基于Spring Boot的后端框架
+2. 提供一体化的基于iview + vue的前段框架
+3. 提供权限管理组件
+4. 提供字典表组件
+5. 提供单表代码下载
+6. 提供界面化配置接口和非表实体 
+7. 提供前端配置方式的单表和简单多表关联的增删改查功能
+8. 提供单表的Excel导入导出功能
+9. 页面配置，数据持久化于数据库，方便团队持续使用
+10. 支持Mysql和Oracle使用
+
+## 如何运行
+
+#### 使用源码
 
 该项目使用`Gradle`进行构建后端服务，需要先配置`Gradle`环境:
 
-下载源代码运行`gradle build -x test`
+1. 下载源代码运行`gradle build -x test`
 
-在项目根目录下找到`build/libs/hotpotmaterial-code2-0.0.1-SNAPSHOT.jar`
+2. 在项目根目录下找到`build/libs/hotpotmaterial-code2-0.0.1-SNAPSHOT.jar`
 
-创建数据库并初始化表，初始化表的DDL在[init.sql](./init.sql)
+3. 创建数据库(代码生成器自己使用的数据库)，数据库DDL在[init.sql](./init.sql)，项目本身在运行时会自动执行DDL，不需要手动执行
 
-运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT.jar --DB_URL=localhost:3306 --DB_USER=root --DB_PWD=123456 --GEN_ROOT_PATH=/home --DB_NAME=new_titancode_test`
+4. 运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT.jar --DB_URL=localhost:3306 --DB_USER=root --DB_PWD=123456 --GEN_ROOT_PATH=/home --DB_NAME=new_titancode_test`
 
 程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`DB_NAME`为你的数据库名称，`GEN_ROOT_PATH`生成代码根目录
 
-访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
+5. 生成前端代码需要在`${GEN_ROOT_PATH}`目录下创建`ui-code`和`ui-code-temp`两个目录，`${GEN_ROOT_PATH}`的默认值为当前jar包运行目录。[需要生成的前端代码](https://github.com/hotpotmaterial/code-vue-ui)需要全部现在下来放置到`ui-code`目录下
 
-后端服务启动成功过后，请查看[前端服务](https://github.com/hotpotmaterial/code-frontend)启动
+6. 访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
+
+7. 后端服务启动成功过后，请查看[前端服务](https://github.com/hotpotmaterial/code-frontend)启动
+
+#### 下载jar包
+
+1. 创建数据库(代码生成器自己使用的数据库)
+
+2. 下载[项目jar包](https://github.com/hotpotmaterial/code-backend/releases)，该jar包包含了前端静态资源，不需要另行启动前端服务
+
+3. 添加参数运行jar包
+
+4. 访问`http://localhost:8085`看项目是否启动成功
+
+#### 使用docker
+
+请静候佳音~~
 
 ## 如何使用代码生成器
 
