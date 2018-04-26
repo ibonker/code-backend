@@ -6,9 +6,9 @@
     <content><![CDATA[
 aliyun_repo = http://maven.aliyun.com/nexus/content/groups/public
 
-hotpotmaterial_common_version = 0.0.2
+hotpotmaterial_common_version = 0.0.3
 
-hotpotmaterial_jsonmeta_version = 0.0.1
+hotpotmaterial_jsonmeta_version = 0.0.3
 
 spring_boot_version = 1.5.4.RELEASE
 

@@ -10,8 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.hotpot.demo.exception.CodeCommonException;
-import com.hotpot.demo.security.dto.UserInfo;
+import ${packageName}.exception.CodeCommonException;
+import ${packageName}.security.dto.UserInfo;
 </#if>
 /**
  * 控制器基础类，一些基础的方法可以写在此处供控制器子类调用

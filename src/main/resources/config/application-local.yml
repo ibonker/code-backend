@@ -5,6 +5,7 @@ spring:
     host: 10.64.13.80
     port: 6379
   datasource:
+    schema: classpath:schema.sql
     druid:
       driverClassName: com.mysql.jdbc.Driver
       url: jdbc:mysql://${DB_URL}/${DB_NAME}?useUnicode=true&characterEncoding=utf-8
@@ -14,7 +15,10 @@ spring:
       filters: stat,wall
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   jpa:
+    generate-ddl: false
     show-sql: true
+    hibernate: 
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
