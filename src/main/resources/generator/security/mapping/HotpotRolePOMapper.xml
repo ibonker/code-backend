@@ -39,6 +39,8 @@
 			WHERE
 				rf.role_id = ${r'#'}{roleId}
 		) rf ON f.id = rf.function_id
+		order by
+			f.code
 	</select>
 	
 	<select id="selectUsersByRoleId" resultType="${packageName}.security.entity.HotpotUserPO">

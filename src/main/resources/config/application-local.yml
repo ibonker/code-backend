@@ -1,9 +1,5 @@
 spring:
   profiles: local
-  redis:
-    database: 0
-    host: 10.64.13.80
-    port: 6379
   datasource:
     schema: classpath:schema.sql
     druid:
