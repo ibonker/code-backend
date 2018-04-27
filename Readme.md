@@ -1,11 +1,11 @@
 ﻿# Hotpotmaterial Code - Restful风格的项目代码生成器
 
-Hotpotmaterial Code代码生成器旨在为团队提供快速的前后端代码，后端代码基于Spring Boot + Spring Security + Mybatis，前端代码基于Spring Boot + Spring Security
+Hotpotmaterial Code代码生成器旨在为团队提供快速的前后端代码，后端代码基于Spring Boot + Spring Security + Mybatis，前端代码基于Vue + IView
 
 ## 特性
 
 1. 提供一体化基于Spring Boot的后端框架
-2. 提供一体化的基于iview + vue的前段框架
+2. 提供一体化的基于Vue + IView的前段框架
 3. 提供权限管理组件
 4. 提供字典表组件
 5. 提供单表代码下载
