@@ -4,6 +4,7 @@ built
 build
 /.gradle/
 lib
+hs_err_pid10512.log
 bin
 .git
 .settings
