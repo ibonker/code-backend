@@ -1,21 +1,19 @@
-﻿# Hotpotmaterial Code - Restful风格的项目代码生成器
+﻿# Hotpotmaterial Code - Restful风格的项目快速开发平台
 
-## 说明
-
-该代码生成器旨在为团队提供快速的前后端代码，后端代码基于Spring Boot + Spring Security + Mybatis，前端代码基于Spring Boot + Spring Security
+Hotpotmaterial Code快速开发平台旨在为团队提供一体化的前后端代码，后端代码基于Spring Boot + Spring Security + Mybatis，前端代码基于Vue + IView
 
 ## 特性
 
 1. 提供一体化基于Spring Boot的后端框架
-2. 提供一体化的基于iview + vue的前段框架
+2. 提供一体化的基于Vue + IView的前段框架
 3. 提供权限管理组件
 4. 提供字典表组件
 5. 提供单表代码下载
 6. 提供界面化配置接口和非表实体 
 7. 提供前端配置方式的单表和简单多表关联的增删改查功能
 8. 提供单表的Excel导入导出功能
-9. 页面配置，数据持久化于数据库，方便团队持续使用
-10. 支持Mysql和Oracle使用
+9. 界面化配置需要生成的代码，并将数据持久化于数据库（当前只支持Mysql），方便团队持续使用
+10. 生成代码支持Mysql和Oracle
 
 ## 如何运行
 
@@ -33,7 +31,7 @@
 
 程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`DB_NAME`为你的数据库名称，`GEN_ROOT_PATH`生成代码根目录
 
-5. 生成前端代码需要在`${GEN_ROOT_PATH}`目录下创建`ui-code`和`ui-code-temp`两个目录，`${GEN_ROOT_PATH}`的默认值为当前jar包运行目录。[需要生成的前端代码](https://github.com/hotpotmaterial/code-vue-ui)需要全部现在下来放置到`ui-code`目录下
+5. 生成前端代码需要在`${GEN_ROOT_PATH}`目录下创建`ui-code`和`ui-code-temp`两个目录，`${GEN_ROOT_PATH}`的默认值为当前jar包运行目录下的`code-gen`目录。[需要生成的前端代码](https://github.com/hotpotmaterial/code-vue-ui)需要全部放置于`ui-code`目录下
 
 6. 访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
 
@@ -55,7 +53,7 @@
 
 ## 已知Bug，将在下个版本修复
 
-1. 安全管理组件无法初始化数据库表，现在只提供了Mysql的初始化脚本
+1. 只提供了Mysql的安全管理组件初始化脚本
 
 ## 接下来应该要做的事情
 
@@ -63,7 +61,7 @@
 2. 添加自定义模板功能
 3. 添加代码预览功能
 
-更多需求请在Issue中提出，我们将根据需求持续改进我们的版本
+更多需求欢迎在Issue中提出，我们将根据需求持续改进我们的版本
 
 ## 如何使用代码生成器
 
