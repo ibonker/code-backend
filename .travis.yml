@@ -8,7 +8,7 @@ services:
   
 
 script:
-  - gradle build sonarqube -Dsonar.organization=$SONAR_ORG -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+  - gradle build -x test sonarqube -Dsonar.organization=$SONAR_ORG -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
   
 after_success:
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
