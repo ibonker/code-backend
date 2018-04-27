@@ -1,7 +1,9 @@
 FROM openjdk:8-alpine
 
-COPY . /usr/src/hotpot_codeG
+ADD build/libs/hotpotmaterial-code2-0.0.1-SNAPSHOT.jar app.jar
 
-WORKDIR /usr/src/hotpot_codeG
+RUN sh -c 'touch /app.jar'
 
-CMD ["sh", "start.sh"]
+EXPOSE 8080
+
+ENTRYPOINT [ "sh", "-c", "java -jar /app.jar" ]
