@@ -31,17 +31,17 @@ Hotpotmaterial Code快速开发平台旨在为团队提供一体化的前后端�
 
 程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`DB_NAME`为你的数据库名称，`GEN_ROOT_PATH`生成代码根目录
 
-5. 生成前端代码需要在`${GEN_ROOT_PATH}`目录下创建`ui-code`和`ui-code-temp`两个目录，`${GEN_ROOT_PATH}`的默认值为当前jar包运行目录下的`code-gen`目录。[需要生成的前端代码](https://github.com/hotpotmaterial/code-vue-ui)需要全部放置于`ui-code`目录下
+5. 生成前端代码需要在`${GEN_ROOT_PATH}`目录下创建`ui-code`和`ui-code-temp`两个目录，`${GEN_ROOT_PATH}`的默认值为当前jar包运行目录下的`code-gen`目录。[需要生成的前端代码](https://github.com/hotpot-team/code-vue-ui)需要全部放置于`ui-code`目录下
 
 6. 访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
 
-7. 后端服务启动成功过后，请查看[前端服务](https://github.com/hotpotmaterial/code-frontend)启动
+7. 后端服务启动成功过后，请查看[前端服务](https://github.com/hotpot-team/code-frontend)启动
 
 #### 下载jar包
 
 1. 创建数据库(代码生成器自己使用的数据库)
 
-2. 下载[项目jar包](https://github.com/hotpotmaterial/code-backend/releases)，该jar包包含了前端静态资源，不需要另行启动前端服务
+2. 下载[项目jar包](https://github.com/hotpot-team/code-backend/releases)，该jar包包含了前端静态资源，不需要另行启动前端服务
 
 3. 添加参数运行jar包
 
