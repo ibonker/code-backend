@@ -17,6 +17,21 @@ Hotpotmaterial Code快速开发平台旨在为团队提供一体化的前后端�
 
 ## 如何运行
 
+#### Docker使用
+ 1. docker run -d -p 3306:3306 --name db -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
+ 
+ 2. 导入初始SQL
+
+ 3. docker run -d -p 8085:8085 --name hotpot-code --link db:db hotpotmaterial/hotpot-code
+```
+ DB_URL=db
+ DB_NAME=hotpot-code
+ DB_USER=root 
+ DB_PWD=123456
+```
+ 4. docker run -d -p 80:80 --name ui --link hotpot-code:server hotpotmaterial/hotpot-code-ui
+ 
+
 #### 使用源码
 
 该项目使用`Gradle`进行构建后端服务，需要先配置`Gradle`环境:
