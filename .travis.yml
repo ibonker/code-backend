@@ -12,5 +12,5 @@ script:
   
 after_success:
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
-  - docker build -t $DOCKER_USER/code .
-  - docker push $DOCKER_USER/code
+  - docker build -t $DOCKER_USER/hotpot-code .
+  - docker push $DOCKER_USER/hotpot-code
