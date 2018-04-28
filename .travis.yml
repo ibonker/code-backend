@@ -5,7 +5,6 @@ jdk: oraclejdk8
 
 services:
   - docker
-  
 
 script:
   - gradle build -x test sonarqube -Dsonar.organization=$SONAR_ORG -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
