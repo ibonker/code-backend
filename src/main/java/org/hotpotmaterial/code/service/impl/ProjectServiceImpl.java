@@ -4,6 +4,7 @@
 package org.hotpotmaterial.code.service.impl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -681,9 +682,12 @@ public class ProjectServiceImpl implements IProjectService {
             attrs.add(slaveAttr);
             tableNames.add(slave.getSlaveTableId());
           }
-          if (!relationTableNames.contains(slave.getSlaveTableId())) {
-            // 获取从表用于关联关系sql
-            List<ColumnPO> slavecolumns = Lists.newArrayList(slaveTable.getColumnMaps().values());
+          if (!relationTableNames.contains(slave.getSlaveTableId()) && slaveTable != null) {
+        	// 获取从表用于关联关系sql
+			List<ColumnPO> slavecolumns = new ArrayList<>();
+			if (slaveTable.getColumnMaps() != null) {
+				slavecolumns = Lists.newArrayList(slaveTable.getColumnMaps().values());
+			}
             // 排序
             slavecolumns.sort((ColumnPO a, ColumnPO b) -> Integer.valueOf(a.getSortWeight())
                 .compareTo(Integer.valueOf(b.getSortWeight())));
@@ -872,7 +876,7 @@ public class ProjectServiceImpl implements IProjectService {
       if (uienableFlag && !keyTables.contains(Constants.Table_UICONFIG)) {
         tableService.createUiConfig(datasources.get(0));
       }
-      if (securityenableFlag && !keyTables.contains(Constants.TABLE_NOENTITY)) {
+      if (securityenableFlag && !keyTables.containsAll(Constants.TABLE_NOENTITY)) {
         tableService.createSecurity(datasources.get(0));
       }
     }
