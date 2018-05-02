@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ${packageName}.security.dto.LoginResponseDTO;
 import ${packageName}.security.service.IUserTokenService;
 
 public class AuthenLogoutFilter implements LogoutHandler {
@@ -32,6 +34,28 @@ public class AuthenLogoutFilter implements LogoutHandler {
     
     //清空SecurityContext
     SecurityContextHolder.clearContext();
+    
+    response.setContentType("application/json;charset=UTF-8");
+    response.setStatus(HttpServletResponse.SC_OK);
+    
+    LoginResponseDTO result = new LoginResponseDTO();
+    result.setSuccess(true);
+    result.setStatus(HttpServletResponse.SC_OK);
+    PrintWriter out = null;
+    //转JSON
+    ObjectMapper mapper = new ObjectMapper();
+    //将RESULT对象转为JSON字符串
+    try {
+      String resultJson = mapper.writeValueAsString(result);
+      out = response.getWriter();
+      out.append(resultJson);
+    } catch (IOException e) {
+    } finally {
+      if (out != null) {
+        //关闭WRITER
+        out.close();
+      }
+    }
     
   }
 
