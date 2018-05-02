@@ -19,11 +19,11 @@ import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import org.hotpotmaterial.anywhere.common.utils.MybatisFilterUtils;
 import ${packageName}.security.dao.RolePOMapper;
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
 import ${packageName}.security.dto.UserInfo;
 import ${packageName}.security.entity.HotpotFunctionPO;
 import ${packageName}.security.entity.HotpotOrganizationPO;
 import ${packageName}.security.entity.HotpotRolePO;
-import ${packageName}.security.entity.HotpotUserPO;
 import ${packageName}.security.service.IRoleService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -40,7 +40,7 @@ public class RoleServiceImpl implements IRoleService {
   }
   
   @Override
-  public List<HotpotUserPO> getUsersByRoleId(String roleId) {
+  public List<HotpotUserSeniorDTO> getUsersByRoleId(String roleId) {
     return roleDao.selectUsersByRoleId(roleId);
   }
 

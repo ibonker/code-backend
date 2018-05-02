@@ -25,10 +25,10 @@ import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
 import ${packageName}.common.RestStatus;
 import ${packageName}.controller.base.BaseController;
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
 import ${packageName}.security.entity.HotpotFunctionPO;
 import ${packageName}.security.entity.HotpotOrganizationPO;
 import ${packageName}.security.entity.HotpotRolePO;
-import ${packageName}.security.entity.HotpotUserPO;
 import ${packageName}.security.service.IRoleService;
 
 @Controller
@@ -88,7 +88,7 @@ public class HtRoleController extends BaseController{
    */
   @GetMapping("/{roleId}/users")
   @ResponseBody
-  public List<HotpotUserPO> roleUsers(@PathVariable String roleId) {
+  public List<HotpotUserSeniorDTO> roleUsers(@PathVariable String roleId) {
     return roleService.getUsersByRoleId(roleId);
   }
   

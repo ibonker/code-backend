@@ -9,6 +9,7 @@ package ${packageName}.security.dao;
 import java.util.List;
 import java.util.Map;
 
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
 import ${packageName}.security.entity.HotpotFunctionPO;
 import ${packageName}.security.entity.HotpotOrganizationPO;
 import ${packageName}.security.entity.HotpotRolePO;
@@ -18,7 +19,7 @@ public interface RolePOMapper {
   
    List<HotpotFunctionPO> selectFunctionByRoleId(String roleId);
   
-   List<HotpotUserPO> selectUsersByRoleId(String roleId);
+   List<HotpotUserSeniorDTO> selectUsersByRoleId(String roleId);
   
    List<HotpotOrganizationPO> selectOrgsByRoleId(String roleId);
   

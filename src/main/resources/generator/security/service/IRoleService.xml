@@ -10,11 +10,12 @@ import java.util.List;
 
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+
+import ${packageName}.security.dto.HotpotUserSeniorDTO;
 import ${packageName}.security.dto.UserInfo;
 import ${packageName}.security.entity.HotpotFunctionPO;
 import ${packageName}.security.entity.HotpotOrganizationPO;
 import ${packageName}.security.entity.HotpotRolePO;
-import ${packageName}.security.entity.HotpotUserPO;
 
   
 public interface IRoleService {
@@ -30,7 +31,7 @@ public interface IRoleService {
    * @param roleId
    * @return
    */
-  public List<HotpotUserPO> getUsersByRoleId(String roleId);
+  public List<HotpotUserSeniorDTO> getUsersByRoleId(String roleId);
   
   /**
    * 获取角色所含公司
