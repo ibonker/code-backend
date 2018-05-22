@@ -6,17 +6,18 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.hotpotmaterial.anywhere.common.datasource.DBContextHolder;
 import org.hotpotmaterial.anywhere.common.springsupport.SpringContextHolder;
 import org.hotpotmaterial.code.datasource.DynamicLoadDatasource;
 import org.hotpotmaterial.code.entity.DatasourcePO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * ClassName: DatasourceChangeAspect <br/>
@@ -68,6 +69,12 @@ public class DatasourceChangeAspect {
     // 切换回默认数据源
     DBContextHolder.clear();
     lock.unlock();
+  }
+  
+  @AfterThrowing(pointcut="changeDatasource()", throwing="e")
+  public void handleThrowing(Exception e){
+    log.error(e.getMessage());
+    this.afterChangeDb();
   }
 
   /**
