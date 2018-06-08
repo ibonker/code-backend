@@ -52,11 +52,6 @@ logging:
     org.hotpotmaterial.anywhere: DEBUG
 excel:
   importPath: ./importExcel/
-<#if components?seq_contains("ressecurity")>
-res:
-  center:
-    server: cmpdev.changan.com
-</#if>
 </#if>
 ]]>
     </content>
