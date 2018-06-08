@@ -18,18 +18,22 @@ Hotpotmaterial Code快速开发平台旨在为团队提供一体化的前后端�
 ## 如何运行
 
 #### Docker使用
- 1. docker run -d -p 3306:3306 --name db -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
+1. docker pull hotpotmaterial/hotpot-code
  
- 2. 导入初始SQL
+2. docker run -d -p 3306:3306 --name db -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
+ 
+3. 导入初始SQL
 
- 3. docker run -d -p 8085:8085 --name hotpot-code --link db:db hotpotmaterial/hotpot-code
+4. docker run -d -p 8085:8085 --name hotpot-code --link db:db hotpotmaterial/hotpot-code
 ```
  DB_URL=db
  DB_NAME=hotpot-code
  DB_USER=root 
  DB_PWD=123456
 ```
- 4. docker run -d -p 80:80 --name ui --link hotpot-code:server hotpotmaterial/hotpot-code-ui
+5. docker pull hotpotmaterial/hotpot-code-ui
+
+6. docker run -d -p 80:80 --name ui --link hotpot-code:server hotpotmaterial/hotpot-code-ui
  
 
 #### 使用源码
@@ -42,15 +46,17 @@ Hotpotmaterial Code快速开发平台旨在为团队提供一体化的前后端�
 
 3. 创建数据库(代码生成器自己使用的数据库)，数据库DDL在[init.sql](./init.sql)，项目本身在运行时会自动执行DDL，不需要手动执行
 
-4. 运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT.jar --DB_URL=localhost:3306 --DB_USER=root --DB_PWD=123456 --GEN_ROOT_PATH=/home --DB_NAME=new_titancode_test`
+4. 下载[mybatis-genlib](https://github.com/hotpot-team/mybatis-genlib)下的文件到jar包运行目录下的mybatis-genlibs文件夹，请手动创建mybatis-genlibs文件夹
+
+5. 运行该jar包`java -jar hotpotmaterial-code2-0.0.1-SNAPSHOT.jar --DB_URL=localhost:3306 --DB_USER=root --DB_PWD=123456 --GEN_ROOT_PATH=/home --DB_NAME=new_titancode_test`
 
 程序参数：`DB_URL`为你的数据库地址，`DB_USER`为你的数据库用户名，`DB_PWD`为你的数据库密码，`DB_NAME`为你的数据库名称，`GEN_ROOT_PATH`生成代码根目录
 
-5. 生成前端代码需要在`${GEN_ROOT_PATH}`目录下创建`ui-code`和`ui-code-temp`两个目录，`${GEN_ROOT_PATH}`的默认值为当前jar包运行目录下的`code-gen`目录。[需要生成的前端代码](https://github.com/hotpot-team/code-vue-ui)需要全部放置于`ui-code`目录下
+6. 生成前端代码需要在`${GEN_ROOT_PATH}`目录下创建`ui-code`和`ui-code-temp`两个目录，`${GEN_ROOT_PATH}`的默认值为当前jar包运行目录下的`code-gen`目录。[需要生成的前端代码](https://github.com/hotpot-team/code-vue-ui)需要全部放置于`ui-code`目录下
 
-6. 访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
+7. 访问`http://localhost:8085/swagger-ui.html`看项目是否启动成功
 
-7. 后端服务启动成功过后，请查看[前端服务](https://github.com/hotpot-team/code-frontend)启动
+8. 后端服务启动成功过后，请查看[前端服务](https://github.com/hotpot-team/code-frontend)启动
 
 #### 下载jar包
 
