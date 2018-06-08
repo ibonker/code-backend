@@ -22,7 +22,7 @@ Hotpotmaterial Code快速开发平台旨在为团队提供一体化的前后端�
  
 2. docker run -d -p 3306:3306 --name db -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
  
-3. 导入初始SQL
+3. 导入初始SQL[init.sql](./init.sql)
 
 4. docker run -d -p 8085:8085 --name hotpot-code --link db:db hotpotmaterial/hotpot-code
 ```
