@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
-  <name>ExcelImportDTO</name>org.hotpotmaterial.demo.dto.excel.ExcelImportDTO
+  <name>ExcelImportDTO</name>
   <filePath>src/main/java/${packageName}/dto/excel/</filePath>
   <fileName>ExcelImportDTO.java</fileName>
   <content><![CDATA[

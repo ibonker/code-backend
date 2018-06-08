@@ -16,7 +16,6 @@
 			f.is_menu as isMenu,
 			f.description as description,
 			f.parent_id	as parentId,
-			f.level as level,
 			f.image1_id as image1Id,
 			f.image2_id as image2Id,
 			f.created_at as createdAt,
@@ -46,43 +45,43 @@
 	<resultMap type="${packageName}.security.dto.HotpotUserSeniorDTO"
 		id="HotpotUserSeniorResultMap">
 		<association property="hotpotUser" javaType="${packageName}.security.entity.HotpotUserPO">
-			<id property="id" column="_hotpot_user_id" />
-			<result property="userName" column="_hotpot_user_user_name" />
-			<result property="name" column="_hotpot_user_name" />
-			<result property="password" column="_hotpot_user_password" />
-			<result property="orgId" column="_hotpot_user_org_id" />
-			<result property="createdAt" column="_hotpot_user_created_at" />
-			<result property="updatedAt" column="_hotpot_user_updated_at" />
-			<result property="delFlag" column="_hotpot_user_del_flag" />
+			<id property="id" column="t1_id" />
+			<result property="userName" column="t1_user_name" />
+			<result property="name" column="t1_name" />
+			<result property="password" column="t1_password" />
+			<result property="orgId" column="t1_org_id" />
+			<result property="createdAt" column="t1_created_at" />
+			<result property="updatedAt" column="t1_updated_at" />
+			<result property="delFlag" column="t1_del_flag" />
 		</association>
 		<association property="hotpotOrganization" javaType="${packageName}.security.entity.HotpotOrganizationPO">
-			<id property="id" column="_hotpot_organization_id" />
-			<result property="orgFullId" column="_hotpot_organization_org_full_id" />
-			<result property="orgName" column="_hotpot_organization_org_name" />
-			<result property="orgFullName" column="_hotpot_organization_org_full_name" />
-			<result property="parentId" column="_hotpot_organization_parent_id" />
-			<result property="description" column="_hotpot_organization_description" />
-			<result property="createdAt" column="_hotpot_organization_created_at" />
-			<result property="updatedAt" column="_hotpot_organization_updated_at" />
-			<result property="createdBy" column="_hotpot_organization_created_by" />
-			<result property="updatedBy" column="_hotpot_organization_updated_by" />
-			<result property="delFlag" column="_hotpot_organization_del_flag" />
-			<result property="sort" column="_hotpot_organization_sort" />
+			<id property="id" column="t2_id" />
+			<result property="orgFullId" column="t2_org_full_id" />
+			<result property="orgName" column="t2_org_name" />
+			<result property="orgFullName" column="t2_org_full_name" />
+			<result property="parentId" column="t2_parent_id" />
+			<result property="description" column="t2_description" />
+			<result property="createdAt" column="t2_created_at" />
+			<result property="updatedAt" column="t2_updated_at" />
+			<result property="createdBy" column="t2_created_by" />
+			<result property="updatedBy" column="t2_updated_by" />
+			<result property="delFlag" column="t2_del_flag" />
+			<result property="sort" column="t2_sort" />
 		</association>
 	</resultMap>
 	
 	<select id="selectUsersByRoleId" resultMap="HotpotUserSeniorResultMap">
 		SELECT
-			u.id AS _hotpot_user_id,
-			u.user_name AS _hotpot_user_user_name,
-			u.`name` AS _hotpot_user_name,
-			u.org_id AS _hotpot_user_org_id,
-			o.org_name AS _hotpot_organization_org_name,
-			o.org_full_id as _hotpot_organization_org_full_id,
-			o.org_full_name as _hotpot_organization_org_full_name,
-			u.created_at AS _hotpot_user_created_at,
-			u.updated_at AS _hotpot_user_updated_at,
-			u.del_flag AS _hotpot_user_del_flag
+			u.id AS t1_id,
+			u.user_name AS t1_user_name,
+			u.name AS t1_name,
+			u.org_id AS t1_org_id,
+			o.org_name AS t2_org_name,
+			o.org_full_id as t2_org_full_id,
+			o.org_full_name as t2_org_full_name,
+			u.created_at AS t1_created_at,
+			u.updated_at AS t1_updated_at,
+			u.del_flag AS t1_del_flag
 		FROM
 			hotpot_user u
 		LEFT JOIN hotpot_organization o ON o.id = u.org_id
@@ -123,6 +122,11 @@
 	<delete id="deleteRoleFunc">
 		delete from hotpot_role_function
 		where role_id = ${r'#'}{role_id}
+	</delete>
+	
+	<delete id="deleteRoleFuncByFuncId">
+		delete from hotpot_role_function
+		where function_id = ${r'#'}{function_id}
 	</delete>
 	
 	<insert id="saveRoleFunc" parameterType="map">

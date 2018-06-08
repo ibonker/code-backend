@@ -8,13 +8,15 @@ package ${packageName}.security.service;
 
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
+
+import ${packageName}.security.dto.UserInfo;
 import ${packageName}.security.entity.HotpotFunctionPO;
 
 public interface IFuncService {
   
   public ResultPageDTO<HotpotFunctionPO> getHotpotFunctionList(PageDTO page);
   
-  public int saveFunc(HotpotFunctionPO hotpotFunctionPO);
+  public int saveFunc(HotpotFunctionPO hotpotFunctionPO, UserInfo user);
   
   public int updateFunc(String id, HotpotFunctionPO hotpotFunction);
   

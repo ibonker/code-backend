@@ -61,11 +61,13 @@ public class OrgServiceImpl implements IOrgService {
   @Override
   @Transactional
   public void updateOrg(String id, HotpotOrganizationPO organizationPO, UserInfo user) {
-    List<HotpotOrganizationPO> list = orgDao.searchOrg(organizationPO);
+    List<HotpotOrganizationPO> list = orgDao.searchOrg("%".concat(organizationPO.getId()).concat("%"));
     for (HotpotOrganizationPO org: list) {
       if (org.getId().equals(organizationPO.getId())) {
         organizationPO.setUpdatedAt(new Date());
         organizationPO.setUpdatedBy(user.getUsername());
+        int index = org.getOrgFullName().lastIndexOf("/");
+        organizationPO.setOrgFullName(org.getOrgFullName().substring(0, index + 1) + organizationPO.getOrgName());
         orgDao.updateOrg(organizationPO);
       } else {
         List<String> ids = Arrays.asList(org.getOrgFullId().split("/"));

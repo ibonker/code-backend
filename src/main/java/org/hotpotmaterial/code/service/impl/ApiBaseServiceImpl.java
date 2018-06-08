@@ -98,7 +98,7 @@ public class ApiBaseServiceImpl implements IApiBaseService {
   @Override
   public List<ApiBasePO> findAllApiBase(String projectId) {
     // 返回查询结果
-    return apiBaseRepo.findByProjectIdAndDelFlagOrderByVersionName(projectId,
+    return apiBaseRepo.findByProjectIdAndDelFlagOrderByCreatedAt(projectId,
         Constants.DATA_IS_NORMAL);
   }
 

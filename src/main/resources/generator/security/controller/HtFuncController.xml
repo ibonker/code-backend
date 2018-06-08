@@ -32,6 +32,11 @@ public class HtFuncController extends BaseController{
   @Autowired
   private IFuncService funcService;
   
+  /**
+   * 获取所有菜单
+   * @param searchParams
+   * @return
+   */
   @PostMapping("/funcs")
   @ResponseBody
   public ResponseEntity<ResultDTO> list(@RequestBody PageDTO searchParams){
@@ -40,14 +45,25 @@ public class HtFuncController extends BaseController{
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
   
+  /**
+   * 新增菜单
+   * @param hotpotFunctionPO
+   * @return
+   */
   @PostMapping("/func")
   @ResponseBody
   public ResponseEntity<ResultDTO> saveFunc(@RequestBody HotpotFunctionPO hotpotFunctionPO){
-    funcService.saveFunc(hotpotFunctionPO);
+    funcService.saveFunc(hotpotFunctionPO, getUser());
     return new ResponseEntity<ResultDTO>(new ResultDTO().message(RestStatus.RESULT_SUCCESS.message())
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
   
+  /**
+   * 更新菜单
+   * @param id
+   * @param hotpotFunctionPO
+   * @return
+   */
   @PutMapping("/func/{id}")
   @ResponseBody
   public ResponseEntity<ResultDTO> updateFunc(@PathVariable String id ,@RequestBody HotpotFunctionPO hotpotFunctionPO){
@@ -56,6 +72,11 @@ public class HtFuncController extends BaseController{
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
   
+  /**
+   * 删除菜单
+   * @param id
+   * @return
+   */
   @DeleteMapping("/func/{id}")
   @ResponseBody
   public ResponseEntity<ResultDTO> saveOrg(@PathVariable String id){

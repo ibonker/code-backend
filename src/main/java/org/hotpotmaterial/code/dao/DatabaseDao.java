@@ -3,8 +3,6 @@ package org.hotpotmaterial.code.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-
-import org.hotpotmaterial.anywhere.common.persistence.mybatis.annotation.MyBatisDao;
 import org.hotpotmaterial.anywhere.common.persistence.mybatis.dao.CrudDao;
 import org.hotpotmaterial.code.entity.ColumnPO;
 import org.hotpotmaterial.code.entity.DictTypePO;
@@ -19,7 +17,6 @@ import org.hotpotmaterial.code.entity.TablePO;
  * @version
  * @since JDK 1.7
  */
-@MyBatisDao
 public interface DatabaseDao extends CrudDao<ColumnPO> {
 
   /**
@@ -128,4 +125,6 @@ public interface DatabaseDao extends CrudDao<ColumnPO> {
    * 创建uiconfig表
    */
   void createUiConfig(@Param("dbName") String dbName);
+  
+  int insertResAdminUser(@Param("partyId") String partyId);
 }

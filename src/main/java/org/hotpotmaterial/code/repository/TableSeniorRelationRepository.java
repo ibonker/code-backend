@@ -23,4 +23,6 @@ public interface TableSeniorRelationRepository
    * @return
    */
   List<TableSeniorRelationPO> findByMasterTableIdOrderByCreatedAtAsc(String masterTableId);
+  
+  Long deleteByMasterTableId(String masterTableId);
 }

@@ -19,7 +19,7 @@
 		<if test="dbName == 'mysql'">
 			SELECT t.table_name AS name,t.TABLE_COMMENT AS comments
 			FROM
-			information_schema.`TABLES` t
+			information_schema.TABLES t
 			WHERE t.TABLE_SCHEMA = (select
 			database())
 			<if test="name != null and name != ''">
@@ -41,7 +41,7 @@
 		<if test="dbName == 'mysql'">
 			SELECT t.table_name AS
 			name,t.TABLE_COMMENT AS comments
-			FROM information_schema.`TABLES` t
+			FROM information_schema.TABLES t
 			WHERE t.TABLE_SCHEMA = (select
 			database())
 			AND t.TABLE_NAME= #{name}
@@ -80,7 +80,7 @@
 			c.table_name
 			AND t.COLUMN_NAME = c.column_name
 			<if test="name != null and name != ''">
-				AND t.TABLE_NAME = upper(#{name})
+				AND t.TABLE_NAME = upper(#{name,jdbcType=VARCHAR})
 			</if>
 			ORDER BY t.COLUMN_ID
 		</if>
@@ -91,11 +91,11 @@
 			comments,t.COLUMN_TYPE AS jdbcType,
 			t.CHARACTER_MAXIMUM_LENGTH as max
 			FROM
-			information_schema.`COLUMNS` t
+			information_schema.COLUMNS t
 			WHERE t.TABLE_SCHEMA = (select
 			database())
 			<if test="name != null and name != ''">
-				AND t.TABLE_NAME = #{name}
+				AND t.TABLE_NAME = #{name,jdbcType=VARCHAR}
 			</if>
 			ORDER BY t.ORDINAL_POSITION
 		</if>
@@ -115,7 +115,7 @@
 		<if test="dbName == 'mysql'">
 			SELECT lower(au.COLUMN_NAME) AS columnName
 			FROM
-			information_schema.`COLUMNS` au
+			information_schema.COLUMNS au
 			WHERE au.TABLE_SCHEMA = (select
 			database())
 			AND au.COLUMN_KEY='PRI' AND au.TABLE_NAME = #{name}
@@ -266,23 +266,44 @@
 	<update id="createUiConfig">
 		<if test="dbName == 'mysql'">
 		create table ui_config (
-		id varchar(64) not null primary key,
-		config_json mediumtext,
-		created_by varchar(64),
-		created_at datetime,
-		updated_by varchar(64),
-		updated_at datetime
+		  id varchar(64) NOT NULL primary key,
+		  json_schema_url varchar(255) ,
+		  config_name varchar(255) ,
+		  pathmag mediumtext,
+		  tab_config_data mediumtext,
+		  form_config_data mediumtext,
+		  table_mapping_name varchar(255) ,
+		  table_btn_configs mediumtext,
+		  table_row_btn_configs mediumtext,
+		  form_btn_configs mediumtext,
+		  created_at datetime ,
+		  created_by varchar(255) ,
+		  updated_at datetime ,
+		  updated_by varchar(255) 
 		)
 		</if>
 		<if test="dbName == 'oracle'">
 		create table ui_config (
-		id VARCHAR2(64) not null PRIMARY KEY,
-		config_json CLOB,
-		created_by VARCHAR2(64),
-		created_at DATE,
-		updated_by VARCHAR2(64),
-		updated_at DATE
+		  id VARCHAR2(64) NOT NULL primary key,
+		  json_schema_url VARCHAR2(255) ,
+		  config_name VARCHAR2(255) ,
+		  pathmag CLOB,
+		  tab_config_data CLOB,
+		  form_config_data CLOB,
+		  table_mapping_name VARCHAR2(255) ,
+		  table_btn_configs CLOB,
+		  table_row_btn_configs CLOB,
+		  form_btn_configs CLOB,
+		  created_at DATE ,
+		  created_by VARCHAR2(255) ,
+		  updated_at DATE ,
+		  updated_by VARCHAR2(255) 
 		)
 		</if>
 	</update>
+	
+	<insert id="insertResAdminUser" parameterType="java.lang.String">
+		INSERT INTO hotpot_role_user VALUES ('9999', #{partyId}, null, null, '0')
+	</insert>
+	
 </mapper>

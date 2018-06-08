@@ -60,7 +60,7 @@ import ${packageName}.common.BaseEntity;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan(basePackages = {"${packageName}.dao"<#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>, "org.hotpotmaterial.dict.mapper"</#if><#if components?seq_contains("enablesecurity")>, "${packageName}.security.dao"</#if>},
+@MapperScan(basePackages = {"${packageName}.dao"<#if components?seq_contains("dictionary") && !components?seq_contains("undictionary")>, "org.hotpotmaterial.dict.mapper"</#if><#if components?seq_contains("enablesecurity") || components?seq_contains("ressecurity")>, "${packageName}.security.dao"</#if>},
     sqlSessionFactoryRef = "<#if dbcount == 1>sqlSessionFactory<#else>${datasource.lowerCamelPackageName}SqlSessionFactory</#if>")
 public class ${datasource.upperCamelPackageName}DatasourceConfiguration implements TransactionManagementConfigurer {
 

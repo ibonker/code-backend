@@ -39,20 +39,32 @@ public class BaseEntity implements Serializable {
   private static final long serialVersionUID = 1L;
 
   // id
+  <#if dbtype?? && dbtype == "oracle">
+  @Column(name = "ID")
+  <#else>
   @Column(name = "id")
+  </#if>
   @JsonProperty(value = "id")
   @JsonPropertyDescription("id")
   private String id;
   
   // 创建时间
+  <#if dbtype?? && dbtype == "oracle">
+  @Column(name = "CREATED_AT", nullable = false)
+  <#else>
   @Column(name = "created_at", nullable = false)
+  </#if>
   @JsonPropertyDescription("创建时间")
   @JsonProperty(value = "createdAt", access = Access.READ_ONLY)
   @JsonFormat(pattern = Constants.DATETIME_FORMAT, timezone="GMT+8")
   protected Date createdAt;
   
   // 更新时间
+  <#if dbtype?? && dbtype == "oracle">
+  @Column(name = "UPDATED_AT", nullable = false)
+  <#else>
   @Column(name = "updated_at", nullable = false)
+  </#if>
   @JsonPropertyDescription("更新时间")
   @JsonProperty(value = "updatedAt", access = Access.READ_ONLY)
   @JsonFormat(pattern = Constants.DATETIME_FORMAT, timezone="GMT+8")

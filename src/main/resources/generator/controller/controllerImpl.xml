@@ -40,7 +40,7 @@ public class ${controllerName}ApiController extends BaseController implements ${
    * ${apiObj.summary}
    */
   @Override
-  public ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam>${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>) {
+  public ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam><#if (apiParam.formAnnotation)?? && apiParam.formAnnotation != ''>${apiParam.formAnnotation}(required = <#if apiParam.isRequired == "1">true<#else>false</#if>)</#if> ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>) {
     <#if apiObj.apiType == "general">
     return new ResponseEntity<ResultDTO>(new ${apiObj.responseObjNameNoPack}${apiObj.responseObjGenericNoPack}().message("成功").statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
     </#if>

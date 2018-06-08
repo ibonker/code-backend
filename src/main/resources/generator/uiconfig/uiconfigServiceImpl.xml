@@ -6,6 +6,8 @@
 	<content><![CDATA[
 package ${packageName}.service.uiconfig.impl;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -13,19 +15,17 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ${packageName}.service.uiconfig.IUiConfigService;
 import ${packageName}.dao.uiconfig.UiconfigMapper;
 import ${packageName}.service.uiconfig.impl.UICache;
 import ${packageName}.entity.${datasourceName}.UiConfigPO;
 
-import lombok.extern.slf4j.Slf4j;	
-	
 /**
  * 前端配置文件业务接口声明实现类（文件保存）
  * @author Hotpotmaterial-Code2
  */
 @Service("UiConfigService")
-@Slf4j
 public class UiConfigServiceImpl implements IUiConfigService {
   
   // 注入缓存bean
@@ -50,21 +50,20 @@ public class UiConfigServiceImpl implements IUiConfigService {
   // 保存数据
   @Override
   public void saveUiConfig(String data) {
+    ObjectMapper om = new ObjectMapper();
+    try {
+      UiConfigPO uipo = om.readValue(data, UiConfigPO.class);
+      if (this.findById(uipo.getId()) != null) {
+        this.updateUiConfig(uipo.getId(), uipo);
+      } else {
+        this.insertUiConfig(uipo);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     // 获取内存版本号
     int version = Integer.valueOf(uiCache.getUIMap().get("version").toString());
-    UiConfigPO configObj = this.findById("all");
-    if (null != configObj) {
-      configObj.setConfigJson(data.replace("'", "\""));
-      this.updateUiConfig(configObj.getId(), configObj);
-    } else {
-      configObj = new UiConfigPO();
-      configObj.setConfigJson(data.replace("'", "\""));
-      configObj.setId("all");
-      this.insertUiConfig(configObj);
-    }
-    // 更新内存数据
-    uiCache.saveUiMap(configObj);
-    // 更新内存版本号
+    this.initUiConfig();
     uiCache.getUIMap().put("version", version + 1);
   }
 
@@ -95,11 +94,10 @@ public class UiConfigServiceImpl implements IUiConfigService {
    */
   @PostConstruct
   public void initUiConfig() {
-    log.info(">>>>>>>> 初始化UI配置缓存 <<<<<<<<");
     // 读取数据库
-    UiConfigPO configObj = this.findById("all");
+    List<UiConfigPO> all = uiConfigPOMapper.selectAllConfig();
     // 保存到缓存
-    uiCache.saveUiMap(configObj);
+    uiCache.saveConfigToCache(all);
   }
 
 }

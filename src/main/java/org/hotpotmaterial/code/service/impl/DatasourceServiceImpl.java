@@ -103,12 +103,18 @@ public class DatasourceServiceImpl implements IDatasourceService {
     }
     datasourceRepo.save(datasources);
   }
-
+  
+  /**
+   * 获取数据库连接信息
+   */
   @Override
   public DatasourcePO findById(String datasourceId) {
     return datasourceRepo.findOne(datasourceId);
   }
-
+  
+  /**
+   * 同步生成项目数据库字段
+   */
   @Override
   public void syncTableFromOriginalDatasource(String datasourceId, String usercode) {
     // 获取datasource
@@ -122,7 +128,10 @@ public class DatasourceServiceImpl implements IDatasourceService {
     // 同步数据库表
     tableService.saveAndDelMasterTables(originTables, masterTables, datasource, project);
   }
-
+  
+  /**
+   * 获取项目数据库个数
+   */
   @Override
   public Long countByProjectId(String projectId) {
     return datasourceRepo.countByProjectId(projectId);

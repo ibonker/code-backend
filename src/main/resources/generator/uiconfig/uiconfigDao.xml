@@ -6,14 +6,21 @@
 	<content><![CDATA[
 package ${packageName}.dao.uiconfig;
 
+import java.util.List;
+
 import ${packageName}.entity.${datasourceName}.UiConfigPO;
-	
 	
 /**
  * ui配置dao
  * @author Hotpotmaterial-Code2
  */
 public interface UiconfigMapper {
+
+  /**
+   * 获取所有配置
+   * @return
+   */
+  List<UiConfigPO> selectAllConfig();
   
   /**
    * 获取ui数据

@@ -37,6 +37,7 @@ import org.hotpotmaterial.code.common.template.ExcelFile;
 import org.hotpotmaterial.code.common.template.GeneratorConfigFile;
 import org.hotpotmaterial.code.common.template.JPAFile;
 import org.hotpotmaterial.code.common.template.MvcFile;
+import org.hotpotmaterial.code.common.template.ResSecurityFile;
 import org.hotpotmaterial.code.common.template.SecurityFile;
 import org.hotpotmaterial.code.common.template.ServiceFile;
 import org.hotpotmaterial.code.common.template.ServiceImplFile;
@@ -126,7 +127,10 @@ public class GenerateServiceImpl implements IGenerateService {
       return "文件已存在：" + fileName + "<br/>";
     }
   }
-
+  
+  /**
+   * 生成前台配置文件
+   */
   @Override
   public String generateToUIFile(String basePath, Template tpl, Map<String, Object> model,
       boolean isReplaceFile) {
@@ -158,7 +162,10 @@ public class GenerateServiceImpl implements IGenerateService {
       return "文件已存在：" + fileName + "<br/>";
     }
   }
-
+  
+  /**
+   * 生成config包下的文件
+   */
   @Override
   public void generateConfigFiles(String pathPostfix, ProjectPO project,
       List<DatasourcePO> datasources, List<ApiBasePO> apiBases, ApiBasePO firstApiBase,
@@ -420,6 +427,23 @@ public class GenerateServiceImpl implements IGenerateService {
         imports.add("array");
       }
     }
+    
+    if (StringUtils.isNotEmpty(transferObj.getInheritObjName())) {
+      boolean flag = true;
+      for (BaseDTO base: BaseDTO.values()) {
+        if (base.name().equals(transferObj.getInheritObjName())) {
+          model.put("extendImport", base.getPackageName());
+          model.put("extendName", base.name());
+          flag = false;
+          break;
+        }
+      }
+      if (flag) {
+        model.put("extendImport", packageName.concat(".dto.").concat(transferObj.getInheritObjName()));
+        model.put("extendName", transferObj.getInheritObjName().substring(transferObj.getInheritObjName().lastIndexOf(".") + 1));
+      }
+    }
+    
     model.put("packageName", packageName);
     model.put("transferObj", transferObj);
     model.put("transferObjFileds", transferObjFileds);
@@ -781,12 +805,18 @@ public class GenerateServiceImpl implements IGenerateService {
    */
   @Override
   public void generateUIFiles(String projectDescription, String projectName, String projectTitle,
-      String appId) {
+      String appId, List<String> components) {
     String[] title = projectTitle.split("\\.");
     Map<String, Object> model = Maps.newHashMap();
     model.put("projectDescription", projectDescription);
     model.put("projectTitle", title[title.length - 1]);
     model.put("appId", appId);
+    
+    // 本地用户、权限
+    if (components.contains(Security.enablesecurity.toString())) {
+      model.put("security", "local");
+    }
+    
     // 生成模板文件
     this.generateToUIFile(genProperties.getProjectUiTempPath().concat(projectName),
         GeneratorUtils.fileToObject(UiCode.uiUitl.getPath(), Template.class), model, true);

@@ -9,6 +9,7 @@ package ${packageName}.security.dao;
 import java.util.List;
 
 import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.entity.HotpotRolePO;
 
 public interface FuncPOMapper {
 
@@ -21,6 +22,8 @@ public interface FuncPOMapper {
     int delete(String id);
     
     List<HotpotFunctionPO> getAllChildren(String id);
+    
+    List<HotpotRolePO> selectRoleListByFuncId(String functionId);
 
 }
 ]]>

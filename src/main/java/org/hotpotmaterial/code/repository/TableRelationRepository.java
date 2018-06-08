@@ -36,4 +36,18 @@ public interface TableRelationRepository
    * @return
    */
   Long deleteByMasterTableIdAndSlaveTableId(String masterTableId, String slaveTableId);
+  
+  /**
+   * 根据masterTableId删除
+   * @param masterTableId
+   * @return
+   */
+  Long deleteByMasterTableId(String masterTableId);
+  
+  /**
+   * 根据SlaveTableId删除
+   * @param masterTableId
+   * @return
+   */
+  Long deleteBySlaveTableId(String slaveTableId);
 }

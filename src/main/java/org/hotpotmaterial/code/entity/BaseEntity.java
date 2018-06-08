@@ -5,6 +5,7 @@ package org.hotpotmaterial.code.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -13,10 +14,11 @@ import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+import org.hotpotmaterial.anywhere.common.utils.IdGen;
+import org.hotpotmaterial.code.common.Constants;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import org.hotpotmaterial.code.common.Constants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -69,30 +71,31 @@ public class BaseEntity implements Serializable {
   /**
    * 插入之前执行方法，需要手动调用
    */
-//  public void preInsert() {
-//    // 不限制ID为UUID，调用setIsNewRecord()使用自定义ID
-//    if (this.isNew()) {
-//      setId(IdGen.uuid());
-//    }
-//    this.updatedAt = LocalDateTime.now();
-//    this.createdAt = this.updatedAt;
-//  }
+  public void preInsert() {
+    // 不限制ID为UUID,可以使用其他规则
+    if (this.isNew()) {
+      setId(IdGen.uuid());
+    }
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = this.createdAt;
+  }
 
   /**
    * 更新之前执行方法，需要手动调用
    */
-//  public void preUpdate() {
-//    this.updatedAt = LocalDateTime.now();
-//  }
+  public void preUpdate() {
+    this.updatedAt = LocalDateTime.now();
+  }
 
   /**
-   * 判断是否新数据
+   * 判断是否新增
    * 
    * @return
    */
-  @JsonIgnore
+  @JsonIgnore 
   public boolean isNew() {
     return StringUtils.isEmpty(getId());
   }
+
 
 }

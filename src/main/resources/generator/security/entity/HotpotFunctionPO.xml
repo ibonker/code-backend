@@ -72,11 +72,6 @@ public class HotpotFunctionPO extends BaseEntity {
   @JsonPropertyDescription("")
   private String parentId;
   
-  @Column(name = "level")
-  @JsonProperty(value = "level")
-  @JsonPropertyDescription("")
-  private Integer level;
-  
   @Size(max = 255)
   @Column(name = "image1_id")
   @JsonProperty(value = "image1Id")

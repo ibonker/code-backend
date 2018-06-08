@@ -9,26 +9,26 @@
 <mapper namespace="${packageName}.security.dao.UserPOMapper">
 	<select id="selectByUserName" resultMap="HotpotUserSeniorResultMap">
 		select
-		hotpotUser.id as _hotpot_user_id,
-		hotpotUser.user_name as _hotpot_user_user_name,
-		hotpotUser.name as _hotpot_user_name,
-		hotpotUser.password as _hotpot_user_password,
-		hotpotUser.org_id as _hotpot_user_org_id,
-		hotpotUser.created_at as _hotpot_user_created_at,
-		hotpotUser.updated_at as _hotpot_user_updated_at,
-		hotpotUser.del_flag as _hotpot_user_del_flag,
-		hotpotOrganization.id as _hotpot_organization_id,
-		hotpotOrganization.org_full_id as _hotpot_organization_org_full_id,
-		hotpotOrganization.org_name as _hotpot_organization_org_name,
-		hotpotOrganization.org_full_name as _hotpot_organization_org_full_name,
-		hotpotOrganization.parent_id as _hotpot_organization_parent_id,
-		hotpotOrganization.description as _hotpot_organization_description,
-		hotpotOrganization.created_at as _hotpot_organization_created_at,
-		hotpotOrganization.updated_at as _hotpot_organization_updated_at,
-		hotpotOrganization.created_by as _hotpot_organization_created_by,
-		hotpotOrganization.updated_by as _hotpot_organization_updated_by,
-		hotpotOrganization.del_flag as _hotpot_organization_del_flag,
-		hotpotOrganization.sort as _hotpot_organization_sort
+		hotpotUser.id as t1_id,
+		hotpotUser.user_name as t1_user_name,
+		hotpotUser.name as t1_name,
+		hotpotUser.password as t1_password,
+		hotpotUser.org_id as t1_org_id,
+		hotpotUser.created_at as t1_created_at,
+		hotpotUser.updated_at as t1_updated_at,
+		hotpotUser.del_flag as t1_del_flag,
+		hotpotOrganization.id as t2_id,
+		hotpotOrganization.org_full_id as t2_org_full_id,
+		hotpotOrganization.org_name as t2_org_name,
+		hotpotOrganization.org_full_name as t2_org_full_name,
+		hotpotOrganization.parent_id as t2_parent_id,
+		hotpotOrganization.description as t2_description,
+		hotpotOrganization.created_at as t2_created_at,
+		hotpotOrganization.updated_at as t2_updated_at,
+		hotpotOrganization.created_by as t2_created_by,
+		hotpotOrganization.updated_by as t2_updated_by,
+		hotpotOrganization.del_flag as t2_del_flag,
+		hotpotOrganization.sort as t2_sort
 		from
 		hotpot_user hotpotUser
 		left join
@@ -43,26 +43,26 @@
 
 	<select id="selectById" resultMap="HotpotUserSeniorResultMap">
 		select
-		hotpotUser.id as _hotpot_user_id,
-		hotpotUser.user_name as _hotpot_user_user_name,
-		hotpotUser.name as _hotpot_user_name,
-		hotpotUser.password as _hotpot_user_password,
-		hotpotUser.org_id as _hotpot_user_org_id,
-		hotpotUser.created_at as _hotpot_user_created_at,
-		hotpotUser.updated_at as _hotpot_user_updated_at,
-		hotpotUser.del_flag as _hotpot_user_del_flag,
-		hotpotOrganization.id as _hotpot_organization_id,
-		hotpotOrganization.org_full_id as _hotpot_organization_org_full_id,
-		hotpotOrganization.org_name as _hotpot_organization_org_name,
-		hotpotOrganization.org_full_name as _hotpot_organization_org_full_name,
-		hotpotOrganization.parent_id as _hotpot_organization_parent_id,
-		hotpotOrganization.description as _hotpot_organization_description,
-		hotpotOrganization.created_at as _hotpot_organization_created_at,
-		hotpotOrganization.updated_at as _hotpot_organization_updated_at,
-		hotpotOrganization.created_by as _hotpot_organization_created_by,
-		hotpotOrganization.updated_by as _hotpot_organization_updated_by,
-		hotpotOrganization.del_flag as _hotpot_organization_del_flag,
-		hotpotOrganization.sort as _hotpot_organization_sort
+		hotpotUser.id as t1_id,
+		hotpotUser.user_name as t1_user_name,
+		hotpotUser.name as t1_name,
+		hotpotUser.password as t1_password,
+		hotpotUser.org_id as t1_org_id,
+		hotpotUser.created_at as t1_created_at,
+		hotpotUser.updated_at as t1_updated_at,
+		hotpotUser.del_flag as t1_del_flag,
+		hotpotOrganization.id as t2_id,
+		hotpotOrganization.org_full_id as t2_org_full_id,
+		hotpotOrganization.org_name as t2_org_name,
+		hotpotOrganization.org_full_name as t2_org_full_name,
+		hotpotOrganization.parent_id as t2_parent_id,
+		hotpotOrganization.description as t2_description,
+		hotpotOrganization.created_at as t2_created_at,
+		hotpotOrganization.updated_at as t2_updated_at,
+		hotpotOrganization.created_by as t2_created_by,
+		hotpotOrganization.updated_by as t2_updated_by,
+		hotpotOrganization.del_flag as t2_del_flag,
+		hotpotOrganization.sort as t2_sort
 		from
 		hotpot_user hotpotUser
 		left join
@@ -87,53 +87,53 @@
 	<resultMap type="${packageName}.security.dto.HotpotUserSeniorDTO"
 		id="HotpotUserSeniorResultMap">
 		<association property="hotpotUser" javaType="${packageName}.security.entity.HotpotUserPO">
-			<id property="id" column="_hotpot_user_id" />
-			<result property="userName" column="_hotpot_user_user_name" />
-			<result property="name" column="_hotpot_user_name" />
-			<result property="password" column="_hotpot_user_password" />
-			<result property="orgId" column="_hotpot_user_org_id" />
-			<result property="createdAt" column="_hotpot_user_created_at" />
-			<result property="updatedAt" column="_hotpot_user_updated_at" />
-			<result property="delFlag" column="_hotpot_user_del_flag" />
+			<id property="id" column="t1_id" />
+			<result property="userName" column="t1_user_name" />
+			<result property="name" column="t1_name" />
+			<result property="password" column="t1_password" />
+			<result property="orgId" column="t1_org_id" />
+			<result property="createdAt" column="t1_created_at" />
+			<result property="updatedAt" column="t1_updated_at" />
+			<result property="delFlag" column="t1_del_flag" />
 		</association>
 		<association property="hotpotOrganization" javaType="${packageName}.security.entity.HotpotOrganizationPO">
-			<id property="id" column="_hotpot_organization_id" />
-			<result property="orgFullId" column="_hotpot_organization_org_full_id" />
-			<result property="orgName" column="_hotpot_organization_org_name" />
-			<result property="orgFullName" column="_hotpot_organization_org_full_name" />
-			<result property="parentId" column="_hotpot_organization_parent_id" />
-			<result property="description" column="_hotpot_organization_description" />
-			<result property="createdAt" column="_hotpot_organization_created_at" />
-			<result property="updatedAt" column="_hotpot_organization_updated_at" />
-			<result property="createdBy" column="_hotpot_organization_created_by" />
-			<result property="updatedBy" column="_hotpot_organization_updated_by" />
-			<result property="delFlag" column="_hotpot_organization_del_flag" />
-			<result property="sort" column="_hotpot_organization_sort" />
+			<id property="id" column="t2_id" />
+			<result property="orgFullId" column="t2_org_full_id" />
+			<result property="orgName" column="t2_org_name" />
+			<result property="orgFullName" column="t2_org_full_name" />
+			<result property="parentId" column="t2_parent_id" />
+			<result property="description" column="t2_description" />
+			<result property="createdAt" column="t2_created_at" />
+			<result property="updatedAt" column="t2_updated_at" />
+			<result property="createdBy" column="t2_created_by" />
+			<result property="updatedBy" column="t2_updated_by" />
+			<result property="delFlag" column="t2_del_flag" />
+			<result property="sort" column="t2_sort" />
 		</association>
 	</resultMap>
 
 	<select id="findHotpotUserSeniorByRelation1" resultMap="HotpotUserSeniorResultMap">
 		select
-		hotpotUser.id as _hotpot_user_id,
-		hotpotUser.user_name as _hotpot_user_user_name,
-		hotpotUser.name as _hotpot_user_name,
-		hotpotUser.password as _hotpot_user_password,
-		hotpotUser.org_id as _hotpot_user_org_id,
-		hotpotUser.created_at as _hotpot_user_created_at,
-		hotpotUser.updated_at as _hotpot_user_updated_at,
-		hotpotUser.del_flag as _hotpot_user_del_flag,
-		hotpotOrganization.id as _hotpot_organization_id,
-		hotpotOrganization.org_full_id as _hotpot_organization_org_full_id,
-		hotpotOrganization.org_name as _hotpot_organization_org_name,
-		hotpotOrganization.org_full_name as _hotpot_organization_org_full_name,
-		hotpotOrganization.parent_id as _hotpot_organization_parent_id,
-		hotpotOrganization.description as _hotpot_organization_description,
-		hotpotOrganization.created_at as _hotpot_organization_created_at,
-		hotpotOrganization.updated_at as _hotpot_organization_updated_at,
-		hotpotOrganization.created_by as _hotpot_organization_created_by,
-		hotpotOrganization.updated_by as _hotpot_organization_updated_by,
-		hotpotOrganization.del_flag as _hotpot_organization_del_flag,
-		hotpotOrganization.sort as _hotpot_organization_sort
+		hotpotUser.id as t1_id,
+		hotpotUser.user_name as t1_user_name,
+		hotpotUser.name as t1_name,
+		hotpotUser.password as t1_password,
+		hotpotUser.org_id as t1_org_id,
+		hotpotUser.created_at as t1_created_at,
+		hotpotUser.updated_at as t1_updated_at,
+		hotpotUser.del_flag as t1_del_flag,
+		hotpotOrganization.id as t2_id,
+		hotpotOrganization.org_full_id as t2_org_full_id,
+		hotpotOrganization.org_name as t2_org_name,
+		hotpotOrganization.org_full_name as t2_org_full_name,
+		hotpotOrganization.parent_id as t2_parent_id,
+		hotpotOrganization.description as t2_description,
+		hotpotOrganization.created_at as t2_created_at,
+		hotpotOrganization.updated_at as t2_updated_at,
+		hotpotOrganization.created_by as t2_created_by,
+		hotpotOrganization.updated_by as t2_updated_by,
+		hotpotOrganization.del_flag as t2_del_flag,
+		hotpotOrganization.sort as t2_sort
 		from
 		hotpot_user hotpotUser
 		left join
@@ -160,7 +160,6 @@
 		f.description as description,
 		f.enabled as enabled,
 		f.parent_id as parentId,
-		f.level as level,
 		f.image1_id as image1Id,
 		f.image2_id as image2Id,
 		f.created_at as createdAt,

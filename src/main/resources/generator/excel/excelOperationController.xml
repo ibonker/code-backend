@@ -61,7 +61,6 @@ public class ExcelOperationController implements ExcelOperationApi {
    */
   @Override
   public ResponseEntity<byte[]> excelExportPost(@RequestBody ExcelDTO excelDTO) throws IOException {
-    excelDTO.getPageDTO().getCollection().put("del_flag", 0);
     // 数据  
     byte[] bytes = excelOperationService.exportExcel(excelDTO);
     // 添加头信息

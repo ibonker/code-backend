@@ -25,6 +25,8 @@ public interface RolePOMapper {
   
    int deleteRoleFunc(String roleId);
    
+   int deleteRoleFuncByFuncId(String functionId);
+   
    int saveRoleFunc(Map<String, Object> param);
    
    int saveRoleParty(Map<String, Object> param);

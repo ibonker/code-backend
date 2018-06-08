@@ -224,6 +224,12 @@ public interface ITableService {
    * @param datasource
    */
   public void createSecurity(DatasourcePO datasource);
+  
+  /**
+   * 创建ressecurity相关表
+   * @param datasource
+   */
+  public void createResSecurity(DatasourcePO datasource, ProjectPO project);
 
   /**
    * 创建dictType

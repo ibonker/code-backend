@@ -38,6 +38,11 @@ public class HtRoleController extends BaseController{
   @Autowired
   private IRoleService roleService;
   
+  /**
+   * 查询所有角色
+   * @param searchParams
+   * @return
+   */  
   @PostMapping("/roles")
   @ResponseBody
   public ResponseEntity<ResultDTO> roles(@RequestBody PageDTO searchParams){
@@ -46,6 +51,11 @@ public class HtRoleController extends BaseController{
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
   
+  /**
+   * 新增角色
+   * @param hotpotRolePO
+   * @return
+   */  
   @PostMapping("/role")
   @ResponseBody
   public ResponseEntity<ResultDTO> saveRole(@RequestBody HotpotRolePO hotpotRolePO){
@@ -54,6 +64,12 @@ public class HtRoleController extends BaseController{
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
   
+  /**
+   * 更新角色
+   * @param id
+   * @param hotpotRolePO
+   * @return
+   */  
   @PutMapping("/role/{id}")
   @ResponseBody
   public ResponseEntity<ResultDTO> updateRole(@PathVariable String id, @RequestBody HotpotRolePO hotpotRolePO){
@@ -62,6 +78,11 @@ public class HtRoleController extends BaseController{
         .statusCode(RestStatus.RESULT_SUCCESS.code()), HttpStatus.OK);
   }
   
+  /**
+   * 删除角色
+   * @param id
+   * @return
+   */  
   @DeleteMapping("role/{id}")
   @ResponseBody
   public ResponseEntity<ResultDTO> deleteRole(@PathVariable String id){

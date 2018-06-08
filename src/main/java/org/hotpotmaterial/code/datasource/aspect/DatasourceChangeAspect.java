@@ -10,14 +10,14 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.hotpotmaterial.anywhere.common.datasource.DBContextHolder;
-import org.hotpotmaterial.anywhere.common.springsupport.SpringContextHolder;
-import org.hotpotmaterial.code.datasource.DynamicLoadDatasource;
-import org.hotpotmaterial.code.entity.DatasourcePO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.hotpotmaterial.anywhere.common.datasource.DBContextHolder;
+import org.hotpotmaterial.anywhere.common.springsupport.SpringContextHolder;
+import org.hotpotmaterial.code.datasource.DynamicLoadDatasource;
+import org.hotpotmaterial.code.entity.DatasourcePO;
 
 /**
  * ClassName: DatasourceChangeAspect <br/>
@@ -52,13 +52,17 @@ public class DatasourceChangeAspect {
    * @throws SQLException
    */
   @Before("changeDatasource()")
-  public void before(JoinPoint joinPoint) throws SQLException {
+  public void before(JoinPoint joinPoint) {
 
     // 通过切点获取切点方法中的DatasourceDto参数
     DatasourcePO datasource = (DatasourcePO) joinPoint.getArgs()[0];
     // 动态配置加载数据源
     lock.lock();
-    connectDB(datasource);
+    try {
+      connectDB(datasource);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
 
   /**

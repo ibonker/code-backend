@@ -6,32 +6,21 @@
 	<content><![CDATA[
 package ${packageName}.service.uiconfig.impl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ${packageName}.common.RestStatus;
-import ${packageName}.exception.CodeCommonException;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hotpotmaterial.anywhere.common.utils.StringUtils;
 import ${packageName}.entity.${servuceModuleName}.UiConfigPO;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 前端配置文件缓存
  * @author Hotpotmaterial-Code2
  */
 @Service
-@Slf4j
 public class UICache {
 
   //初始化版本号
@@ -40,30 +29,13 @@ public class UICache {
   //构建缓存容器
   private Map <String, Object> UIMap = new HashMap<>();
   
-  public void saveUiMap(UiConfigPO configObj) {
-    String configStr = "";
-    if (configObj != null) {
-      configStr = configObj.getConfigJson();
-      // 读取json
-      if (StringUtils.isNotBlank(configStr)) {
-        // 解析文件内容到json node
-        ObjectMapper mapper = new ObjectMapper();
-        JsonFactory factory = mapper.getFactory();
-        JsonParser parser;
-        JsonNode actualObj = null;
-        try {
-          // 解析
-          parser = factory.createParser(configStr);
-          // 读取数据到JsonNode
-          actualObj = mapper.readTree(parser);
-        } catch (IOException e) {
-          // 抛出异常
-          throw new CodeCommonException(RestStatus.RESULT_SYSTEM_ERROR.code(),
-              RestStatus.RESULT_SYSTEM_ERROR.message(), e);
-        }
-        // 放入缓存中
-        UIMap.put("actualObj", actualObj);
-      }
+  public void saveConfigToCache(List<UiConfigPO> all){
+    Map<String, UiConfigPO> map = new HashMap<>();
+    if (all != null && all.size()>0) {
+      all.stream().forEach((item)->{
+        map.put(item.getId(), item);
+      });
+      UIMap.put("actualObj", map);
     }
     UIMap.put("version", version);
   }

@@ -4,6 +4,14 @@
 package org.hotpotmaterial.code.service.impl;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -37,6 +45,7 @@ import org.hotpotmaterial.code.dto.Component;
 import org.hotpotmaterial.code.dto.ComponentCategory;
 import org.hotpotmaterial.code.dto.PackObj;
 import org.hotpotmaterial.code.dto.RefObjDTO;
+import org.hotpotmaterial.code.dto.ResultOfPreviewDTO;
 import org.hotpotmaterial.code.dto.SeniorDtoAttribute;
 import org.hotpotmaterial.code.dto.SeniorDtoRelation;
 import org.hotpotmaterial.code.dto.SimpleDataObj;
@@ -507,6 +516,12 @@ public class ProjectServiceImpl implements IProjectService {
       List<ApiObjPO> apiobjs = apiObjService.findAllApiObj(apibase.getId());
       Map<String, List<ApiObjPO>> controllerMap = Maps.newHashMap();
       for (ApiObjPO apiobj : apiobjs) {
+        
+        // 当未选中excel时 排除 api
+        if (!components.contains(Excel.excelEnabled.toString()) && "excel.ResultOfExcelReportDTO".equals(apiobj.getResponseObjName())) {
+          break;
+        }
+        
         // 获取api param
         List<ApiParamPO> apiparams = apiParamService.findAllApiParamOrderBySort(apiobj.getId());
         apiobj.setApiParams(apiparams);
@@ -733,6 +748,48 @@ public class ProjectServiceImpl implements IProjectService {
     // 删除生成的未压缩文件及文件夹
     FileUtil.delete(new File(projectPath));
   }
+  
+  
+  /**
+   * 预览生成代码
+   * @param projectName
+   * @return
+   */
+  private Map<String, String> previewCode(String projectName) {
+    String projectPath = GeneratorUtils.getProjectPath(genProperties.getProjectPath(), projectName);
+    String formatPaht = new File(projectPath).getPath();
+    Map<String, String> map = new LinkedHashMap<>();
+    try {
+      Files.walkFileTree(Paths.get(projectPath), new FileVisitor<Path>() {
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+            throws IOException {
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          String key = file.toFile().getPath().replace(formatPaht, "");
+          String value = new String(Files.readAllBytes(file), Charset.forName("UTF-8"));
+          map.put(key, value);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return map;
+  }
 
   /**
    * 下载文件
@@ -744,7 +801,10 @@ public class ProjectServiceImpl implements IProjectService {
 
     return new File(projectZipPath);
   }
-
+  
+  /**
+   * 获取插件
+   */
   @Override
   public List<ComponentCategory> getComponents() {
     List<ComponentCategory> categories = Lists.newArrayList();
@@ -809,7 +869,7 @@ public class ProjectServiceImpl implements IProjectService {
         genProperties.getProjectUiTempPath().concat(project.getName()), true);
     // 生成util文件
     generateService.generateUIFiles(project.getDescription(), project.getName(),
-        project.getPackages(), project.getAppId());
+        project.getPackages(), project.getAppId(), project.getComponentList());
     String projectZipPath = zipUicode(project.getName());
     return new File(projectZipPath);
   }
@@ -852,14 +912,6 @@ public class ProjectServiceImpl implements IProjectService {
         break;
       }
     }
-    // 判断是否启用前权限组件表
-    Boolean securityenableFlag = false;
-    for (String compoent : project.getComponents().split(",")) {
-      if (Security.enablesecurity.toString().equals(compoent)) {
-        securityenableFlag = true;
-        break;
-      }
-    }
     // 获取数据源列表
     List<DatasourcePO> datasources = datasourceService.findByProjectId(project.getId());
     // 默认第一个数据库添加
@@ -876,8 +928,14 @@ public class ProjectServiceImpl implements IProjectService {
       if (uienableFlag && !keyTables.contains(Constants.Table_UICONFIG)) {
         tableService.createUiConfig(datasources.get(0));
       }
-      if (securityenableFlag && !keyTables.containsAll(Constants.TABLE_NOENTITY)) {
-        tableService.createSecurity(datasources.get(0));
+      for (String compoent : project.getComponents().split(",")) {
+        // 生成本地用户、权限
+        if (Security.enablesecurity.toString().equals(compoent)) {
+          if (!keyTables.containsAll(Constants.TABLE_NOENTITY)) {
+            tableService.createSecurity(datasources.get(0));
+          }
+          break;
+        }
       }
     }
 
@@ -940,6 +998,21 @@ public class ProjectServiceImpl implements IProjectService {
    */
   public String generateCodeFilesUnzip(TablePO mainTable, ProjectPO project,
       DatasourcePO datasource) {
+    String version = generateCode(mainTable, project, datasource);
+    String dirname = project.getName().concat("_").concat(version);
+    // 打包代码
+    this.zipcode(dirname);
+    return "/codegen/api/v1/tables/" + dirname + "/download";
+  }
+  
+  /**
+   * 生成代码
+   * @param mainTable
+   * @param project
+   * @param datasource
+   * @return
+   */
+  private String generateCode(TablePO mainTable, ProjectPO project, DatasourcePO datasource) {
     // 获取组件
     List<String> components = Lists.newArrayList();
     components.addAll(Arrays.asList(project.getComponents().split(",")));
@@ -1046,6 +1119,12 @@ public class ProjectServiceImpl implements IProjectService {
     List<ApiObjPO> apiobjs = apiObjService.findAllApiObjByTableId(mainTable.getId());
     Map<String, Map<String, List<ApiObjPO>>> controllerMap = Maps.newHashMap();
     for (ApiObjPO apiobj : apiobjs) {
+      
+      // 当未选中excel时 排除 api
+      if (!components.contains(Excel.excelEnabled.toString()) && "excel.ResultOfExcelReportDTO".equals(apiobj.getResponseObjName())) {
+        break;
+      }
+      
       // 获取api param
       List<ApiParamPO> apiparams = apiParamService.findAllApiParamOrderBySort(apiobj.getId());
       apiobj.setApiParams(apiparams);
@@ -1121,12 +1200,24 @@ public class ProjectServiceImpl implements IProjectService {
             entry2.getKey(), entry2.getValue());
       }
     }
-
+    return version;
+  }
+  
+  /**
+   * 生成代码，读取文件
+   */
+  @Override
+  public ResultOfPreviewDTO generateCodeFilesPreview(TablePO mainTable, ProjectPO project,
+      DatasourcePO datasource) {
+    // 生成代码
+    String version = generateCode(mainTable, project, datasource);
     String dirname = project.getName().concat("_").concat(version);
-
+    // 读取文件
+    Map<String, String> p = this.previewCode(dirname);
     // 打包代码
     this.zipcode(dirname);
+    String url = "/codegen/api/v1/tables/" + dirname + "/download";
 
-    return "/codegen/api/v1/tables/" + dirname + "/download";
+    return new ResultOfPreviewDTO().fileList(p, url);
   }
 }

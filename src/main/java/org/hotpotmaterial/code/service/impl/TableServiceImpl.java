@@ -132,6 +132,15 @@ public class TableServiceImpl implements ITableService {
 
   @Value("${spring.datasource.security}")
   private String securitySchema;
+  
+  @Value("${spring.datasource.resSecurity}")
+  private String resSecuritySchema;
+  
+  @Value("${spring.datasource.securityOracle}")
+  private String securitySchemaOracle;
+  
+  @Value("${spring.datasource.resSecurityOracle}")
+  private String resSecuritySchemaOracle;
 
   /**
    * 根据id查找
@@ -207,27 +216,44 @@ public class TableServiceImpl implements ITableService {
       transobjService.deleteAutoCrudDTO(table.getId());
       // 删除api
       apiobjService.deleteAutoCrudApi(table.getId());
+      // 删除关系
+      tableRelationRepository.deleteByMasterTableId(table.getId());
+      tableRelationRepository.deleteBySlaveTableId(table.getId());
+      
+      // 删除高级关联
+      seniorRelationRepository.deleteByMasterTableId(table.getId());
     }
-    // TODO 删除自动生成的字典表api
   }
-
+  
+  /**
+   * 获取所有表
+   */
   @Override
   @ChangeDatasource
   public List<TablePO> findTableListFromOriginalDatasource(DatasourcePO datasource) {
     return databaseDao.findTableList(datasource.getDbtype(), "");
   }
-
+  
+  /**
+   * 获取主数据库所有表
+   */
   @Override
   public List<TablePO> findTableListFromMasterDatasource(String datasourceId) {
     // 获取table
     return tableRepository.findByDatasourceId(datasourceId);
   }
 
+  /**
+   * 保存表属性到本地数据库
+   */
   @Override
   public void saveNewTables(List<TablePO> tables) {
     tableRepository.save(tables);
   }
-
+  
+  /**
+   * 删除不存在表
+   */
   @Override
   public void deleteNotExistTables(List<TablePO> tables) {
     tableRepository.delete(tables);
@@ -273,7 +299,10 @@ public class TableServiceImpl implements ITableService {
 
     return tableRepository.findAll(spec, pagereq);
   }
-
+  
+  /**
+   * 获取字段
+   */
   @Override
   public List<ColumnPO> findMergedColumns(String tableId) {
     // 主数据库获取配置字段
@@ -289,6 +318,9 @@ public class TableServiceImpl implements ITableService {
     return columnService.findMergedColumnsByTable(masterColumns, originColumns);
   }
 
+  /**
+   * 获取数据库对应class
+   */
   @Override
   public List<SimpleDataObj> findClassnameByDatasourceId(String datasourceId) {
     List<Object[]> results = tableRepository.findClassNameByDatasourceId(datasourceId);
@@ -313,7 +345,10 @@ public class TableServiceImpl implements ITableService {
 
     return pomaps;
   }
-
+  
+  /**
+   * 生成crud
+   */
   @Override
   @Transactional("jpaTransactionManager")
   public void activeIsAutoCrud(RequestOfTableIdsDTO tableIds, String usercode) {
@@ -368,7 +403,7 @@ public class TableServiceImpl implements ITableService {
     // 保存tables
     this.saveNewTables(tables);
   }
-
+  
   @Override
   @Transactional("jpaTransactionManager")
   public void inactiveIsAutoCrud(RequestOfTableIdsDTO tableIds) {
@@ -786,14 +821,48 @@ public class TableServiceImpl implements ITableService {
   public void creatDictValue(DatasourcePO datasource) {
     databaseDao.creatDictValue(datasource.getDbtype());
   }
-
+  
+  /**
+   * 本地用户权限创建mysql
+   */
   @Override
   @ChangeDatasource
   public void createSecurity(DatasourcePO datasource) {
     DataSource dynamicDB = (DataSource) this.applicationContext.getBean("dynamicDataSource");
     List<String> schemas = Lists.newArrayList();
-    schemas.add(securitySchema);
-    DatasourceInitUtils.runSchemaScripts("spring.datasource.security", schemas, "security", dynamicDB,
-        properties, applicationContext);
+    if (datasource.getDbtype().equals("mysql")) {
+      schemas.add(securitySchema);
+      DatasourceInitUtils.runSchemaScripts("spring.datasource.security", schemas, "security", dynamicDB,
+          properties, applicationContext);
+    } else if (datasource.getDbtype().equals("oracle")) {
+      schemas.add(securitySchemaOracle);
+      DatasourceInitUtils.runSchemaScripts("spring.datasource.security", schemas, "securityOracle", dynamicDB,
+          properties, applicationContext);
+    }
+  }
+  
+  /**
+   * 本地用户权限创建oracle
+   */
+  @Override
+  @ChangeDatasource
+  public void createResSecurity(DatasourcePO datasource, ProjectPO project) {
+    DataSource dynamicDB = (DataSource) this.applicationContext.getBean("dynamicDataSource");
+    List<String> schemas = Lists.newArrayList();
+    if (datasource.getDbtype().equals("mysql")) {
+      schemas.add(resSecuritySchema);
+      DatasourceInitUtils.runSchemaScripts("spring.datasource.security", schemas, "resSecurity", dynamicDB,
+          properties, applicationContext);
+    } else if (datasource.getDbtype().equals("oracle")) {
+      schemas.add(resSecuritySchemaOracle);
+      DatasourceInitUtils.runSchemaScripts("spring.datasource.security", schemas, "resSecurityOracle", dynamicDB,
+          properties, applicationContext);
+    }
+    
+    if (project.getUserId() != null) {
+      databaseDao.insertResAdminUser(project.getUserId());
+    } else {
+      databaseDao.insertResAdminUser("ef26e88b-a4e3-45ee-be28-d1b94031e622"); //000003 用户id
+    }
   }
 }

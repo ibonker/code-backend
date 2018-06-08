@@ -4,12 +4,14 @@
 package org.hotpotmaterial.code.config;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.hotpotmaterial.anywhere.common.datasource.DynamicDataSource;
-import org.hotpotmaterial.anywhere.common.persistence.mybatis.annotation.MyBatisDao;
 import org.hotpotmaterial.anywhere.common.persistence.mybatis.entity.BaseEntity;
 import org.hotpotmaterial.code.datasource.DynamicLoadDatasource;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -18,6 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -36,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableTransactionManagement
 @Slf4j
-@MapperScan(basePackages = {"org.hotpotmaterial.code"}, annotationClass = MyBatisDao.class)
+@MapperScan(basePackages = {"org.hotpotmaterial.code.dao", "org.hotpotmaterial.code.security.dao"},  sqlSessionFactoryRef = "sqlSessionFactory")
 public class DatasourceConfig implements TransactionManagementConfigurer {
 
   /**
@@ -92,8 +95,9 @@ public class DatasourceConfig implements TransactionManagementConfigurer {
     sessionBean.setConfiguration(new MybatisConfig().mybatisConfig());
     // 配置扫描xml文件所在的路径
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    resolver.getResources("classpath:/mappings/*.xml");
     // 以通配符的方式配置mybatis xml的扫描路径
-    sessionBean.setMapperLocations(resolver.getResources("classpath:/mappings/*.xml"));
+    sessionBean.setMapperLocations(resolver.getResources("classpath*:/mappings/**/*.xml"));
     // 返回数据库连接会话
     return sessionBean.getObject();
 

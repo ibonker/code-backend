@@ -102,4 +102,8 @@ public class Constants {
   public final static List<String> TABLE_NOENTITY =
       Arrays.asList("hotpot_function", "hotpot_organization", "hotpot_role", "hotpot_role_function",
           "hotpot_role_user", "hotpot_user");
+  // 不创建实体的表
+  public final static List<String> RES_TABLE_NOENTITY =
+      Arrays.asList("hotpot_function", "hotpot_role", "hotpot_role_function",
+          "hotpot_role_user");
 }

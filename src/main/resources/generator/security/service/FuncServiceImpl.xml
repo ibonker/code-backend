@@ -6,24 +6,33 @@
   <content><![CDATA[
 package ${packageName}.security.service.impl;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.Map;
 
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
-import ${packageName}.security.dao.FuncPOMapper;
-import ${packageName}.security.entity.HotpotFunctionPO;
-import ${packageName}.security.service.IFuncService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import ${packageName}.security.dao.FuncPOMapper;
+import ${packageName}.security.dao.RolePOMapper;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.entity.HotpotRolePO;
+import ${packageName}.security.service.IFuncService;
 
 @Service
 public class FuncServiceImpl implements IFuncService {
   
   @Autowired
   private FuncPOMapper funcDao;
+  
+  @Autowired
+  private RolePOMapper roleDao;
   
   //分页查询
   @Override
@@ -42,9 +51,20 @@ public class FuncServiceImpl implements IFuncService {
   }
 
   @Override
-  public int saveFunc(HotpotFunctionPO hotpotFunctionPO) {
+  public int saveFunc(HotpotFunctionPO hotpotFunctionPO, UserInfo user) {
     hotpotFunctionPO.preInsert();
-    return funcDao.insert(hotpotFunctionPO);
+    if (funcDao.insert(hotpotFunctionPO) > 0) {
+      List<HotpotRolePO> roleList = funcDao.selectRoleListByFuncId("11");
+      for (HotpotRolePO role : roleList) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("functionId", hotpotFunctionPO.getId());
+        param.put("roleId", role.getId());
+        param.put("createdBy", user.getUsername());
+        param.put("createdAt", new Date());
+        roleDao.saveRoleFunc(param);
+      }
+    }
+    return 1;
   }
 
   @Override
@@ -60,6 +80,7 @@ public class FuncServiceImpl implements IFuncService {
     if (children != null && children.size() > 0) {
       return 0;
     }
+    roleDao.deleteRoleFuncByFuncId(id);
     return funcDao.delete(id);
   }  
 }

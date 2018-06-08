@@ -51,7 +51,7 @@ public class DictApiController{
   /**
    * 查询DictType和DictValue
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO关联dict_value详情", notes = "实体ddemo.DictTypePO关联dict_value详情", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO关联dict_value详情", notes = "实体DictTypePO关联dict_value详情", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -64,7 +64,7 @@ public class DictApiController{
   /**
    * 新增DictType
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO新增", notes = "实体ddemo.DictTypePO新增", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO新增", notes = "实体DictTypePO新增", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -79,7 +79,7 @@ public class DictApiController{
   /**
    * 删除DictType
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO删除", notes = "实体ddemo.DictTypePO删除", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO删除", notes = "实体DictTypePO删除", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -94,7 +94,7 @@ public class DictApiController{
   /**
    * 修改DictType
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO修改", notes = "实体ddemo.DictTypePO修改", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO修改", notes = "实体DictTypePO修改", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -109,7 +109,7 @@ public class DictApiController{
   /**
    * 新增DictValue
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO关联dict_value新增", notes = "实体ddemo.DictTypePO关联dict_value新增", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO关联dict_value新增", notes = "实体DictTypePO关联dict_value新增", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -124,7 +124,7 @@ public class DictApiController{
   /**
    * 修改DictValue
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO关联dict_value修改", notes = "实体ddemo.DictTypePO关联dict_value修改", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO关联dict_value修改", notes = "实体DictTypePO关联dict_value修改", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -139,7 +139,7 @@ public class DictApiController{
   /**
    * 删除DictValue
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO关联dict_value删除", notes = "实体ddemo.DictTypePO关联dict_value删除", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO关联dict_value删除", notes = "实体DictTypePO关联dict_value删除", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -154,7 +154,7 @@ public class DictApiController{
   /**
    * 根据id查询DictType
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO详情", notes = "实体ddemo.DictTypePO详情", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO详情", notes = "实体DictTypePO详情", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -168,7 +168,7 @@ public class DictApiController{
   /**
    * 根据id查询DictValue
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO关联dict_value详情", notes = "实体ddemo.DictTypePO关联dict_value详情", response = ResultDictDTO.class)
+  @ApiOperation(value = "实体DictTypePO关联dict_value详情", notes = "实体DictTypePO关联dict_value详情", response = ResultDictDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDictDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -184,7 +184,7 @@ public class DictApiController{
    * @param searchParams
    * @return
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO分页列表", notes = "实体ddemo.DictTypePO分页列表", response = ResultPageDTO.class)
+  @ApiOperation(value = "实体DictTypePO分页列表", notes = "实体DictTypePO分页列表", response = ResultPageDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultPageDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})
@@ -197,7 +197,7 @@ public class DictApiController{
   /**
    * 分页查询DictValue
    */
-  @ApiOperation(value = "实体ddemo.DictTypePO关联dict_value分页列表", notes = "实体ddemo.DictTypePO关联dict_value分页列表", response = ResultPageDTO.class)
+  @ApiOperation(value = "实体DictTypePO关联dict_value分页列表", notes = "实体DictTypePO关联dict_value分页列表", response = ResultPageDTO.class)
   @ApiResponses(
       value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultPageDTO.class),
           @ApiResponse(code = 401, message = "返回认证错误信息")})

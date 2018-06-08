@@ -1,0 +1,6 @@
+[
+	{
+		version: '0.0.1',
+		description: ['返回登录失败明细信息', '修复自定义dto继承bug', '修复excel插件添加之后取消的bug']
+	}
+]

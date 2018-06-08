@@ -44,7 +44,7 @@ public interface ${controllerName}Api {
           @ApiResponse(code = 401, message = "返回认证错误信息")})
   @RequestMapping(value = "${apiObj.uri}", produces = <#if apiObj.produces == "application/json">MediaType.APPLICATION_JSON_UTF8_VALUE<#else>{"${apiObj.produces}"}</#if>,<#if apiObj.consumes?? && apiObj.consumes != "">consumes = {"${apiObj.consumes}"},</#if>
       method = RequestMethod.${apiObj.requestMethod})
-  ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam>@ApiParam(value = "${apiParam.name}", required = <#if apiParam.isRequired == "1">true<#else>false</#if>) ${apiParam.formAnnotation} ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
+  ResponseEntity<ResultDTO> ${apiObj.name}(<#if apiObj.apiType == "jsonschema">HttpServletRequest req<#if apiObj.apiParams?size gt 0>,</#if></#if><#list apiObj.apiParams as apiParam>@ApiParam(value = "${apiParam.name}", required = <#if apiParam.isRequired == "1">true<#else>false</#if>) <#if (apiParam.formAnnotation)?? && apiParam.formAnnotation != ''>${apiParam.formAnnotation}(required = <#if apiParam.isRequired == "1">true<#else>false</#if>)</#if> ${apiParam.paramObj} ${apiParam.name}<#if (apiParam_has_next)>, </#if></#list>);
   </#list>
   
 }

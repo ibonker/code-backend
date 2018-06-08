@@ -8,14 +8,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.data.domain.Page;
-
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.code.dto.ComponentCategory;
 import org.hotpotmaterial.code.dto.RefObjDTO;
+import org.hotpotmaterial.code.dto.ResultOfPreviewDTO;
 import org.hotpotmaterial.code.entity.DatasourcePO;
 import org.hotpotmaterial.code.entity.ProjectPO;
 import org.hotpotmaterial.code.entity.TablePO;
+import org.springframework.data.domain.Page;
 
 /**
  * @author wenxing
@@ -111,5 +111,12 @@ public interface IProjectService extends IComponentService {
    * @param projectId
    */
   public String generateCodeFilesUnzip(TablePO mainTable, ProjectPO project,
+      DatasourcePO datasource);
+  
+  /**
+   * 生成未压缩的项目文件
+   * @param projectId
+   */
+  public ResultOfPreviewDTO generateCodeFilesPreview(TablePO mainTable, ProjectPO project,
       DatasourcePO datasource);
 }

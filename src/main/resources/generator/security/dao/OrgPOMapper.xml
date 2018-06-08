@@ -21,7 +21,7 @@ public interface OrgPOMapper {
   
   int deleteOrg(String id);
   
-  List<HotpotOrganizationPO> searchOrg(HotpotOrganizationPO organizationPO);
+  List<HotpotOrganizationPO> searchOrg(String id);
   
   List<HotpotUserPO> selectOrgUser(String orgId);
   

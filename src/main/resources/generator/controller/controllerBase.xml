@@ -5,7 +5,7 @@
   <fileName>BaseController.java</fileName>
   <content><![CDATA[
 package ${packageName}<#if moduleName != "">.${moduleName}</#if>.controller.base;
-<#if components?seq_contains("enablesecurity")>
+<#if components?seq_contains("enablesecurity") || components?seq_contains("ressecurity")>
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +19,17 @@ import ${packageName}.security.dto.UserInfo;
  */
 public class BaseController {
   <#if components?seq_contains("enablesecurity")>
+  public UserInfo getUser() {   
+    SecurityContext ctx = SecurityContextHolder.getContext();
+    Authentication auth = ctx.getAuthentication();
+    try {
+      return (UserInfo) auth.getPrincipal();
+    } catch (Exception e) {
+      throw new CodeCommonException("401", "获取登录用户信息错误!");
+    }
+  }
+  </#if>
+  <#if components?seq_contains("ressecurity")>
   public UserInfo getUser() {   
     SecurityContext ctx = SecurityContextHolder.getContext();
     Authentication auth = ctx.getAuthentication();

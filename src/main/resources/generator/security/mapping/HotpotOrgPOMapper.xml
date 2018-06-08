@@ -39,14 +39,12 @@
 		order by sort
 	</select>
 
-	<select id="searchOrg" parameterType="${packageName}.security.entity.HotpotOrganizationPO" resultMap="BaseResultMap">
+	<select id="searchOrg" parameterType="java.lang.String" resultMap="BaseResultMap">
 		select
 		<include refid="Base_Column_List" />
 		from hotpot_organization
 		where del_flag = '0'
-		<if test="id != null and id != ''">
-			and org_full_id like CONCAT('%',${r'#'}{id},'%')
-		</if>
+		and org_full_id like ${r'#'}{id}
 	</select>
 
 	<insert id="saveOrg" parameterType="${packageName}.security.entity.HotpotOrganizationPO">

@@ -10,12 +10,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-<#if ((transferObj.inheritObjName)??) && transferObj.inheritObjName != "" >
-	<#list BaseDTO as b>
-		<#if b == transferObj.inheritObjName>
-import ${b.getPackageName()};
-		</#if>
-	</#list>
+<#if ((extendImport)??) && extendImport != "" >
+import ${extendImport};
 </#if>
 <#list typeImports as t>
 import ${packageName}.${t};
@@ -80,7 +76,7 @@ import org.hotpotmaterial.annotation.SeniorDto;
     </#list>
 })
 </#if>
-public class ${transferObj.name} <#if (transferObj.inheritObjName) ?? && transferObj.inheritObjName != "">extends ${transferObj.inheritObjName}</#if>{
+public class ${transferObj.name} <#if (extendName) ?? && extendName != "">extends ${extendName}</#if>{
 
 	<#list transferObjFileds as t>
 	<#if (t.isNullable)?? && t.isNullable == "1">

@@ -147,7 +147,7 @@ public interface IGenerateService {
    * @param projectName
    */
   public void generateUIFiles(String projectDescription, String projectName, String projecTitle,
-      String appId);
+      String appId, List<String> components);
 
   /**
    * 生成前台文件
