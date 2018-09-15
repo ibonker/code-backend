@@ -4,9 +4,6 @@
 package org.hotpotmaterial.code.config;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -20,7 +17,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -55,7 +51,7 @@ public class DatasourceConfig implements TransactionManagementConfigurer {
     try {
       dataSource.setFilters("stat,wall");
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
     return dataSource;
   }

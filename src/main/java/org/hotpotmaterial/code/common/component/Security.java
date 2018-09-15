@@ -11,7 +11,7 @@ import org.hotpotmaterial.code.common.Constants;
  */
 public enum Security {
   
-  nosecurity("无安全配置"), enablesecurity("安全配置（该配置将创建完整认证和组织体系及相关表）");
+  nosecurity("无安全配置"), enablesecurity("安全配置（该配置将创建完整认证和组织体系及相关表）"), ressecurity("资源中心安全配置");
   
   private final String cname;
 

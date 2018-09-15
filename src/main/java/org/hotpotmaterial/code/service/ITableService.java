@@ -242,4 +242,21 @@ public interface ITableService {
    * @param datasource
    */
   public void creatDictValue(DatasourcePO datasource);
+  
+  /**
+   * 获取该数据库下被激活的实体以及它的关联实体和组件
+   * @param datasourceId
+   * @param projectId
+   * @return
+   */
+  public List<TablePO> findByDatasourceId(String datasourceId, String projectId);
+
+  /**
+   * 获取激活PO与关联PO对应的Class
+   * @param datasourceId
+   * @param projectId
+   * @return
+   */
+  List<SimpleDataObj> findClassnameByDatasourceIdAndProjectId(String datasourceId, String projectId);
+  
 }

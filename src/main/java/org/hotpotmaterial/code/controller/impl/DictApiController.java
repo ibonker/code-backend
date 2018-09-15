@@ -34,6 +34,9 @@ public class DictApiController implements DictApi {
   @Autowired
   IDictService dictService;
   
+  /**
+   * 注入IColumnService
+   */
   @Autowired
   IColumnService columnService;
 

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>UserServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>UserServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import ${packageName}.security.ResProperties;
+import ${packageName}.security.dao.UserPOMapper;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.service.IUserService;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class UserServiceImpl implements IUserService {
+  
+  @Autowired
+  private UserPOMapper userDao;
+    
+  @Autowired
+  private ResProperties res;
+  
+  @Override
+  public List<HotpotFunctionPO> selectFuncByPartyIdList(UserInfo user) {
+    // 添加用户id
+    List<String> partyIdList = new ArrayList<>();
+    partyIdList.add(user.getId());
+    
+    // 添加用户所有组织id
+    RestTemplate rest = new RestTemplate();
+    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://"+ res.getServer() +"/rescenter-rest/ResCenterApi/getParentDepartmentList").queryParam("identityToken", user.getToken()).queryParam("departmentId", user.getOrgId());
+    ResponseEntity<String> result = rest.getForEntity(builder.toUriString(), String.class);
+    
+    List<String> orgIds = new ArrayList<>();
+    orgIds.add(user.getOrgId());
+    try {
+      JSONObject jo = new JSONObject(result.getBody());
+      JSONArray array = jo.getJSONObject("data").getJSONArray("departmentList");
+      if (array != null && array.length() > 0) {
+        for (int i = 0; i < array.length(); i++) {
+          orgIds.add(array.getJSONObject(i).getString("departmentId"));
+        }
+      }
+      
+    } catch (JSONException e) {
+       log.error(e.getMessage());
+    }
+    
+    partyIdList.addAll(orgIds);
+    
+    return userDao.selectFunctionByPartyIdList(partyIdList);
+  }
+
+}
+]]>
+  </content>
+</template>

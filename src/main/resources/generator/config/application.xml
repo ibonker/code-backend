@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.changan.otp.app.config.EnableTitanAppService;
 
 /** 
  * 主类 
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.ComponentScan;
     DataSourceTransactionManagerAutoConfiguration.class<#if dbcount gt 1>,
     MybatisAutoConfiguration.class, PageHelperAutoConfiguration.class</#if>})
 @ComponentScan(value={"${packageName}<#if moduleName != "">.${moduleName}</#if>"})
+@EnableTitanAppService
 public class Application {
   
   /**

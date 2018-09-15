@@ -71,7 +71,7 @@ public class ${datasource.upperCamelPackageName}DatasourceConfiguration implemen
    * @throws Exception
    */
   @Bean(name = "${datasource.lowerCamelPackageName}DataSource")
-  @ConfigurationProperties("spring.datasource.druid.${datasource.name}")
+  @ConfigurationProperties("spring.datasource.druid.${datasource.name?replace('_','')}")
   public DataSource dataSource() {
     DruidDataSource dataSource = DruidDataSourceBuilder.create().build();
 

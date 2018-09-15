@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HotpotFuncPOMapper</name>
+  <filePath>src/main/resources/mappings/security</filePath>
+  <fileName>HotpotFuncPOMapper.xml</fileName>
+  <content><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.security.dao.FuncPOMapper">
+  <resultMap id="BaseResultMap" type="${packageName}.security.entity.HotpotFunctionPO">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="function_name" jdbcType="VARCHAR" property="functionName" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="is_menu" jdbcType="VARCHAR" property="isMenu" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="enabled" jdbcType="VARCHAR" property="enabled" />
+    <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
+    <result column="image1_id" jdbcType="VARCHAR" property="image1Id" />
+    <result column="image2_id" jdbcType="VARCHAR" property="image2Id" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${r'$'}{criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${r'$'}{criterion.condition} ${r'#'}{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${r'$'}{criterion.condition} ${r'#'}{criterion.value} and ${r'#'}{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${r'$'}{criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    ${r'#'}{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, function_name, code, url, is_menu, description, enabled, parent_id, image1_id, 
+    image2_id, created_at, updated_at, created_by, updated_by
+  </sql>
+  
+  <select id="getAllFunc" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from hotpot_function
+    ORDER BY
+		CODE
+  </select>
+  
+  <select id="getAllChildren" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from hotpot_function
+    where
+    	parent_id = ${r'#'}{id,jdbcType=VARCHAR}
+    ORDER BY
+		CODE
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.String">
+    delete from hotpot_function
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="${packageName}.security.entity.HotpotFunctionPO">
+    insert into hotpot_function (id, function_name, code, 
+      url, is_menu, description, 
+      enabled, parent_id,
+      image1_id, image2_id, created_at, 
+      updated_at, created_by, updated_by
+      )
+    values (${r'#'}{id,jdbcType=VARCHAR}, ${r'#'}{functionName,jdbcType=VARCHAR}, ${r'#'}{code,jdbcType=VARCHAR}, 
+      ${r'#'}{url,jdbcType=VARCHAR}, ${r'#'}{isMenu,jdbcType=VARCHAR}, ${r'#'}{description,jdbcType=VARCHAR}, 
+      ${r'#'}{enabled,jdbcType=VARCHAR}, ${r'#'}{parentId,jdbcType=VARCHAR},
+      ${r'#'}{image1Id,jdbcType=VARCHAR}, ${r'#'}{image2Id,jdbcType=VARCHAR}, ${r'#'}{createdAt,jdbcType=TIMESTAMP}, 
+      ${r'#'}{updatedAt,jdbcType=TIMESTAMP}, ${r'#'}{createdBy,jdbcType=VARCHAR}, ${r'#'}{updatedBy,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <update id="update" parameterType="${packageName}.security.entity.HotpotFunctionPO">
+    update hotpot_function
+    <set>
+      <if test="functionName != null">
+        function_name = ${r'#'}{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        code = ${r'#'}{code,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = ${r'#'}{url,jdbcType=VARCHAR},
+      </if>
+      <if test="isMenu != null">
+        is_menu = ${r'#'}{isMenu,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = ${r'#'}{description,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null">
+        enabled = ${r'#'}{enabled,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        parent_id = ${r'#'}{parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="image1Id != null">
+        image1_id = ${r'#'}{image1Id,jdbcType=VARCHAR},
+      </if>
+      <if test="image2Id != null">
+        image2_id = ${r'#'}{image2Id,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null">
+        created_at = ${r'#'}{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null">
+        updated_at = ${r'#'}{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = ${r'#'}{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = ${r'#'}{updatedBy,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = ${r'#'}{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="selectRoleListByFuncId" parameterType="java.lang.String" resultType="${packageName}.security.entity.HotpotRolePO">
+  	SELECT
+		r.id as id,
+		r.role_name as roleName,
+		r.description as description
+	FROM
+		hotpot_role_function f
+	INNER JOIN
+		hotpot_role r
+	ON
+		f.role_id = r.id
+	AND
+		r.del_flag = '0'
+	WHERE
+		f.function_id = ${r'#'}{functionId}
+  </select>
+  
+</mapper>
+]]>
+  </content>
+</template>

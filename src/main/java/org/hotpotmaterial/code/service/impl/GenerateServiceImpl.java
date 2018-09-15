@@ -5,9 +5,9 @@ package org.hotpotmaterial.code.service.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +46,7 @@ import org.hotpotmaterial.code.common.template.UiFile;
 import org.hotpotmaterial.code.config.property.GenerateProperties;
 import org.hotpotmaterial.code.dto.ApiServiceName;
 import org.hotpotmaterial.code.dto.RelationAnnotation;
+import org.hotpotmaterial.code.dto.ResultOfAppDTO;
 import org.hotpotmaterial.code.dto.SeniorDtoAttribute;
 import org.hotpotmaterial.code.dto.SeniorDtoRelation;
 import org.hotpotmaterial.code.dto.Template;
@@ -62,9 +63,19 @@ import org.hotpotmaterial.code.entity.TransferObjFieldPO;
 import org.hotpotmaterial.code.entity.TransferObjPO;
 import org.hotpotmaterial.code.service.IGenerateService;
 import org.hotpotmaterial.code.utils.GeneratorUtils;
+import org.mybatis.generator.api.MyBatisGenerator;
+import org.mybatis.generator.config.Configuration;
+import org.mybatis.generator.config.xml.ConfigurationParser;
+import org.mybatis.generator.exception.InvalidConfigurationException;
+import org.mybatis.generator.exception.XMLParserException;
+import org.mybatis.generator.internal.DefaultShellCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.changan.otp.app.property.TitanServiceProperties;
+import com.changan.otp.app.util.CryptionUtil;
+import com.changan.otp.app.util.KeyUtil;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -82,6 +93,12 @@ public class GenerateServiceImpl implements IGenerateService {
 
   @Autowired
   private GenerateProperties genProperties;
+  
+  @Autowired
+  private RestTemplate restTemplate;
+  
+  @Autowired
+  private TitanServiceProperties titanProperties;
 
   /**
    * 
@@ -106,11 +123,10 @@ public class GenerateServiceImpl implements IGenerateService {
                 new String[] {"//", "/", "."},
                 new String[] {File.separator, File.separator, File.separator})
             + FreeMarkerUtils.renderString(tpl.getFileName(), model);
-    log.debug(" fileName === " + fileName);
+    log.info(" fileName === " + fileName);
 
     // 获取生成文件内容
     String content = FreeMarkerUtils.renderString(StringUtils.trimToEmpty(tpl.getContent()), model);
-    log.debug(" content === \r\n" + content);
 
     // 如果选择替换文件，则删除原文件
     if (isReplaceFile) {
@@ -127,7 +143,7 @@ public class GenerateServiceImpl implements IGenerateService {
       return "文件已存在：" + fileName + "<br/>";
     }
   }
-  
+
   /**
    * 生成前台配置文件
    */
@@ -162,7 +178,7 @@ public class GenerateServiceImpl implements IGenerateService {
       return "文件已存在：" + fileName + "<br/>";
     }
   }
-  
+
   /**
    * 生成config包下的文件
    */
@@ -194,6 +210,21 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("hasOracle", "0");
     model.put("components", project.getComponents().split(","));
     model.put("dbcount", null == datasources ? 0 : datasources.size());
+    
+    if (!StringUtils.isEmpty(project.getAppId())) {
+      Map<String, String> param = new HashMap<>();
+      param.put("appName", project.getName());
+      param.put("authedAppId", titanProperties.getAppid());
+      param.put("authedAppSeccode", CryptionUtil.encrypt(titanProperties.getAppid(), KeyUtil.publicKeyBase64ToKey(titanProperties.getAppPubkey())));
+      ResultOfAppDTO result = restTemplate.postForObject("http://10.64.26.40:8020/app_manage/v1/app_infos/auth_info", param, ResultOfAppDTO.class);
+      if (!StringUtils.isEmpty(result.getAppId())) {
+        model.put("appId", result.getAppId());
+        model.put("appPubkey", result.getAppPublicKey());
+      }
+    }
+//    model.put("appId", Constants.TEST_APP_ID);
+//    model.put("appPubkey", Constants.TEST_PUB_KEY);
+    
     // 生成数据库配置文件
     if (null != datasources) {
       Template dbTpl =
@@ -254,6 +285,13 @@ public class GenerateServiceImpl implements IGenerateService {
     if (components.contains(Security.enablesecurity.toString())) {
       // 生成本地权限模块文件
       for (SecurityFile secFile : SecurityFile.values()) {
+        this.generateToFile(pathPostfix, null,
+            GeneratorUtils.fileToObject(secFile.getPath(), Template.class), model, true);
+      }
+    }
+    if (components.contains(Security.ressecurity.toString())) {
+      // 生成本地权限模块文件
+      for (ResSecurityFile secFile : ResSecurityFile.values()) {
         this.generateToFile(pathPostfix, null,
             GeneratorUtils.fileToObject(secFile.getPath(), Template.class), model, true);
       }
@@ -427,10 +465,10 @@ public class GenerateServiceImpl implements IGenerateService {
         imports.add("array");
       }
     }
-    
+
     if (StringUtils.isNotEmpty(transferObj.getInheritObjName())) {
       boolean flag = true;
-      for (BaseDTO base: BaseDTO.values()) {
+      for (BaseDTO base : BaseDTO.values()) {
         if (base.name().equals(transferObj.getInheritObjName())) {
           model.put("extendImport", base.getPackageName());
           model.put("extendName", base.name());
@@ -439,11 +477,13 @@ public class GenerateServiceImpl implements IGenerateService {
         }
       }
       if (flag) {
-        model.put("extendImport", packageName.concat(".dto.").concat(transferObj.getInheritObjName()));
-        model.put("extendName", transferObj.getInheritObjName().substring(transferObj.getInheritObjName().lastIndexOf(".") + 1));
+        model.put("extendImport",
+            packageName.concat(".dto.").concat(transferObj.getInheritObjName()));
+        model.put("extendName", transferObj.getInheritObjName()
+            .substring(transferObj.getInheritObjName().lastIndexOf(".") + 1));
       }
     }
-    
+
     model.put("packageName", packageName);
     model.put("transferObj", transferObj);
     model.put("transferObjFileds", transferObjFileds);
@@ -463,7 +503,7 @@ public class GenerateServiceImpl implements IGenerateService {
    * 自动生成DAO
    */
   @Override
-  public void generateDAOFiles(String pathPostfix, String moduleName, String projectName,
+  public void generateDAOFiles(String dbtype, String pathPostfix, String moduleName, String projectName,
       String packageName, String tableName, List<TableSeniorRelationPO> relations,
       List<SeniorDtoAttribute> attrs, List<SeniorDtoRelation> relationMethods) {
     // 添加model
@@ -471,6 +511,7 @@ public class GenerateServiceImpl implements IGenerateService {
     String className =
         CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName.toLowerCase());
     model.put("className", className);
+    model.put("dbtype", dbtype);
     // 首字母小写驼峰
     model.put("lowerName", StringUtils.uncapitalize(className));
     model.put("packageName", packageName);
@@ -652,7 +693,7 @@ public class GenerateServiceImpl implements IGenerateService {
         }
         break;
       case PO:
-        importPackSet.add(project.getPackages().toLowerCase().concat(".entity.").concat(format));
+    	  importPackSet.add(project.getPackages().toLowerCase().concat(".entity.").concat(format));
         break;
       default:
         break;
@@ -678,11 +719,7 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("packageName", packageName);
     model.put("dataSource", datasource);
     model.put("tables", tables);
-    String projectPath = genProperties.getProjectPath();
-    if (!projectPath.startsWith("/") && projectPath.indexOf(":") < 0) {
-    	projectPath = ".." + File.separator + projectPath;
-    }
-    model.put("projectPath", projectPath);
+    model.put("projectPath", genProperties.getProjectPath());
     // 生成xml文件
     this.generateToFile(pathPostfix, genProperties.getMybatisGenlibsPath(), GeneratorUtils
         .fileToObject(GeneratorConfigFile.generatorConfigFile.getPath(), Template.class), model,
@@ -702,37 +739,35 @@ public class GenerateServiceImpl implements IGenerateService {
             + File.separator + projectName.concat("_").concat(pathPostfix));
     List<String> configfiles = FileUtils.findChildrenList(projectConfigDir, false);
     // 循环执行mybatis generator
-    String os = System.getProperty("os.name");
-    String cmd = "";
-    String shFile = "";
     for (String filename : configfiles) {
-      InputStream inputStream = null;
       // 配置文件路径
       String filepath = Constants.MYBATIS_GEN_CONFIG_ROOT + File.separator
           + projectName.concat("_").concat(pathPostfix) + File.separator + filename;
       try {
-        if (os.toLowerCase().startsWith("win")) {
-          // windows环境执行代码生成
-          shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.bat").toAbsolutePath()
-              .toString();
-          cmd = "cmd /c start /b " + shFile + " " + filepath;
-        } else {
-          // linux环境执行代码生成
-          shFile = Paths.get(genProperties.getMybatisGenlibsPath() + "rungen.sh").toAbsolutePath()
-              .toString();
-          cmd = "/bin/sh " + shFile + " " + filepath;
-        }
-        log.info("开始进行mybatis代码生成任务: {}", cmd);
-        Process ps =
-            Runtime.getRuntime().exec(cmd, null, new File(genProperties.getMybatisGenlibsPath()));
-        inputStream = ps.getInputStream();
-        byte[] by = new byte[1024];
-        while (inputStream.read(by) != -1) {
-          if ((new String(by, "utf-8")).contains("finished successfully")) {
-            break;
+        List<String> warnings = new ArrayList<String>();
+        boolean overwrite = true;
+        File configFile = new File(genProperties.getMybatisGenlibsPath() + filepath);
+        ConfigurationParser cp = new ConfigurationParser(warnings);
+        try {
+          Configuration config = cp.parseConfiguration(configFile);
+          DefaultShellCallback callback = new DefaultShellCallback(overwrite);
+          MyBatisGenerator myBatisGenerator = null;
+          myBatisGenerator = new MyBatisGenerator(config, callback, warnings);
+          myBatisGenerator.generate(null);
+          
+          for (String warning : warnings) {
+            log.warn(warning);
           }
+        } catch (InvalidConfigurationException e) {
+          log.error(e.getMessage());
+        } catch (SQLException e) {
+          log.error(e.getMessage());
+        } catch (InterruptedException e) {
+          log.error(e.getMessage());
+          Thread.currentThread().interrupt();
+        } catch (XMLParserException e) {
+          log.error(e.getMessage());
         }
-        inputStream.close();
         log.info("mybatis代码生成任务完成");
       } catch (IOException e) {
         log.error("任务发生错误", e);
@@ -811,15 +846,22 @@ public class GenerateServiceImpl implements IGenerateService {
     model.put("projectDescription", projectDescription);
     model.put("projectTitle", title[title.length - 1]);
     model.put("appId", appId);
-    
+
     // 本地用户、权限
     if (components.contains(Security.enablesecurity.toString())) {
       model.put("security", "local");
+      // 引用资源中心
+    } else if (components.contains(Security.ressecurity.toString())) {
+      // 生成本地权限模块文件
+      model.put("security", "res");
     }
-    
+
     // 生成模板文件
     this.generateToUIFile(genProperties.getProjectUiTempPath().concat(projectName),
         GeneratorUtils.fileToObject(UiCode.uiUitl.getPath(), Template.class), model, true);
+    
+    this.generateToUIFile(genProperties.getProjectUiTempPath().concat(projectName),
+        GeneratorUtils.fileToObject(UiCode.gitlabCi.getPath(), Template.class), model, true);
   }
 
 }

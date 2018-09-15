@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>ResultServiceDTO</name>
+  <filePath>src/main/java/${packageName}/dto/titanServices</filePath>
+  <fileName>ResultServiceDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.dto.titanServices;
+
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+
+import com.changan.otp.app.client.TokenDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@JsonInclude(Include.NON_NULL)
+public class ResultServiceDTO extends ResultDTO{
+  
+  @JsonProperty("tokenDTO")
+  @JsonPropertyDescription("返回tokenDTO")
+  @ApiModelProperty(value = "返回tokenDTO")
+  private TokenDTO tokenDTO;
+  
+  public ResultServiceDTO tokenDTO(TokenDTO tokenDTO){
+    this.tokenDTO = tokenDTO;
+    return this;
+  }
+}
+
+]]>
+  </content>
+</template>

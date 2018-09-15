@@ -1,5 +1,25 @@
--- 导出  表 new_titancode_test.api_base 结构
-CREATE TABLE IF NOT EXISTS `api_base` (
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : 10.64.11.73
+Source Server Version : 50712
+Source Host           : 10.64.11.73:3306
+Source Database       : new_titancode_test
+
+Target Server Type    : MYSQL
+Target Server Version : 50712
+File Encoding         : 65001
+
+Date: 2018-09-15 12:30:45
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for api_base
+-- ----------------------------
+DROP TABLE IF EXISTS `api_base`;
+CREATE TABLE `api_base` (
   `id` varchar(64) NOT NULL,
   `project_id` varchar(64) NOT NULL,
   `version_name` varchar(64) NOT NULL,
@@ -11,9 +31,11 @@ CREATE TABLE IF NOT EXISTS `api_base` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.api_obj 结构
-CREATE TABLE IF NOT EXISTS `api_obj` (
+-- ----------------------------
+-- Table structure for api_obj
+-- ----------------------------
+DROP TABLE IF EXISTS `api_obj`;
+CREATE TABLE `api_obj` (
   `id` varchar(64) NOT NULL,
   `api_base_id` varchar(64) NOT NULL,
   `uri` varchar(255) NOT NULL,
@@ -37,9 +59,11 @@ CREATE TABLE IF NOT EXISTS `api_obj` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.api_param 结构
-CREATE TABLE IF NOT EXISTS `api_param` (
+-- ----------------------------
+-- Table structure for api_param
+-- ----------------------------
+DROP TABLE IF EXISTS `api_param`;
+CREATE TABLE `api_param` (
   `id` varchar(64) NOT NULL,
   `api_obj_id` varchar(64) NOT NULL,
   `name` varchar(200) NOT NULL,
@@ -56,9 +80,11 @@ CREATE TABLE IF NOT EXISTS `api_param` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.api_view 结构
-CREATE TABLE IF NOT EXISTS `api_view` (
+-- ----------------------------
+-- Table structure for api_view
+-- ----------------------------
+DROP TABLE IF EXISTS `api_view`;
+CREATE TABLE `api_view` (
   `id` varchar(64) NOT NULL,
   `project_id` varchar(64) NOT NULL COMMENT '项目id',
   `table_config` text COMMENT '表格配置',
@@ -80,9 +106,11 @@ CREATE TABLE IF NOT EXISTS `api_view` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.api_view_form_config 结构
-CREATE TABLE IF NOT EXISTS `api_view_form_config` (
+-- ----------------------------
+-- Table structure for api_view_form_config
+-- ----------------------------
+DROP TABLE IF EXISTS `api_view_form_config`;
+CREATE TABLE `api_view_form_config` (
   `id` varchar(64) NOT NULL,
   `columnd_id` varchar(64) NOT NULL COMMENT '字段Id',
   `table_id` varchar(64) NOT NULL COMMENT '表Id',
@@ -100,9 +128,11 @@ CREATE TABLE IF NOT EXISTS `api_view_form_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.api_view_table_config 结构
-CREATE TABLE IF NOT EXISTS `api_view_table_config` (
+-- ----------------------------
+-- Table structure for api_view_table_config
+-- ----------------------------
+DROP TABLE IF EXISTS `api_view_table_config`;
+CREATE TABLE `api_view_table_config` (
   `id` varchar(64) NOT NULL,
   `columnd_id` varchar(64) NOT NULL COMMENT '字段Id',
   `table_id` varchar(64) NOT NULL COMMENT '表Id',
@@ -115,9 +145,11 @@ CREATE TABLE IF NOT EXISTS `api_view_table_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.columnd 结构
-CREATE TABLE IF NOT EXISTS `columnd` (
+-- ----------------------------
+-- Table structure for columnd
+-- ----------------------------
+DROP TABLE IF EXISTS `columnd`;
+CREATE TABLE `columnd` (
   `id` varchar(64) NOT NULL,
   `table_id` varchar(64) NOT NULL,
   `name` varchar(200) NOT NULL,
@@ -138,9 +170,27 @@ CREATE TABLE IF NOT EXISTS `columnd` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.datasource 结构
-CREATE TABLE IF NOT EXISTS `datasource` (
+-- ----------------------------
+-- Table structure for context
+-- ----------------------------
+DROP TABLE IF EXISTS `context`;
+CREATE TABLE `context` (
+  `id` varchar(64) NOT NULL,
+  `directory_id` varchar(64) DEFAULT NULL COMMENT '目录菜单ID',
+  `content` mediumtext COMMENT '文档内容',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `created_by` varchar(128) DEFAULT NULL COMMENT '创建人',
+  `updated_at` datetime DEFAULT NULL COMMENT '修改时间',
+  `updated_by` varchar(128) DEFAULT NULL COMMENT '修改人',
+  `del_flag` char(1) DEFAULT NULL COMMENT '删除标识  0:无标识 显示  1:有标识不显示',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for datasource
+-- ----------------------------
+DROP TABLE IF EXISTS `datasource`;
+CREATE TABLE `datasource` (
   `id` varchar(64) NOT NULL,
   `project_id` varchar(64) NOT NULL,
   `name` varchar(32) NOT NULL COMMENT '数据库名称（用于package）',
@@ -157,9 +207,11 @@ CREATE TABLE IF NOT EXISTS `datasource` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.dict_type 结构
-CREATE TABLE IF NOT EXISTS `dict_type` (
+-- ----------------------------
+-- Table structure for dict_type
+-- ----------------------------
+DROP TABLE IF EXISTS `dict_type`;
+CREATE TABLE `dict_type` (
   `id` varchar(64) NOT NULL,
   `code` varchar(64) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -172,9 +224,11 @@ CREATE TABLE IF NOT EXISTS `dict_type` (
   KEY `code_index` (`code`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.dict_value 结构
-CREATE TABLE IF NOT EXISTS `dict_value` (
+-- ----------------------------
+-- Table structure for dict_value
+-- ----------------------------
+DROP TABLE IF EXISTS `dict_value`;
+CREATE TABLE `dict_value` (
   `id` varchar(64) NOT NULL,
   `name` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
@@ -188,9 +242,27 @@ CREATE TABLE IF NOT EXISTS `dict_value` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.equipment_detail 结构
-CREATE TABLE IF NOT EXISTS `equipment_detail` (
+-- ----------------------------
+-- Table structure for directory
+-- ----------------------------
+DROP TABLE IF EXISTS `directory`;
+CREATE TABLE `directory` (
+  `id` varchar(64) NOT NULL,
+  `pid` varchar(64) DEFAULT NULL COMMENT '该目录父ID',
+  `name` varchar(128) DEFAULT NULL COMMENT '目录名称',
+  `sort` varchar(16) DEFAULT NULL COMMENT '排序',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '修改时间',
+  `content_flag` char(1) DEFAULT NULL COMMENT '文档标识  0:该目录无文档 1:该目录有文档',
+  `del_flag` char(1) DEFAULT NULL COMMENT '删除标识  0:未标识删除  1:标识删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜单目录';
+
+-- ----------------------------
+-- Table structure for equipment_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `equipment_detail`;
+CREATE TABLE `equipment_detail` (
   `id` varchar(64) NOT NULL,
   `intranet_ip` varchar(64) NOT NULL COMMENT '内网ip',
   `mapping_ip` varchar(64) NOT NULL,
@@ -204,9 +276,121 @@ CREATE TABLE IF NOT EXISTS `equipment_detail` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.project 结构
-CREATE TABLE IF NOT EXISTS `project` (
+-- ----------------------------
+-- Table structure for file_resources
+-- ----------------------------
+DROP TABLE IF EXISTS `file_resources`;
+CREATE TABLE `file_resources` (
+  `id` varchar(64) NOT NULL,
+  `path` varchar(255) NOT NULL COMMENT '文件上传的真实路径',
+  `small` varchar(255) DEFAULT NULL COMMENT '缩略图的生成路径',
+  `filename` varchar(255) DEFAULT NULL COMMENT '文件上传前的真实名字',
+  `uploadname` varchar(255) DEFAULT NULL COMMENT '上传到本地服务器的文件名字',
+  `created_at` datetime NOT NULL COMMENT '创建时间',
+  `update_at` datetime DEFAULT NULL COMMENT '修改时间',
+  `user_id` varchar(255) DEFAULT NULL COMMENT '文件上传的用户',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+-- Table structure for hotpot_function
+-- ----------------------------
+DROP TABLE IF EXISTS `hotpot_function`;
+CREATE TABLE `hotpot_function` (
+  `id` varchar(36) NOT NULL,
+  `function_name` varchar(255) DEFAULT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `is_menu` varchar(3) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `enabled` varchar(3) DEFAULT NULL,
+  `parent_id` varchar(36) DEFAULT NULL,
+  `image1_id` varchar(255) DEFAULT NULL,
+  `image2_id` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `updated_by` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for hotpot_role
+-- ----------------------------
+DROP TABLE IF EXISTS `hotpot_role`;
+CREATE TABLE `hotpot_role` (
+  `id` varchar(36) NOT NULL,
+  `role_name` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `updated_by` varchar(255) DEFAULT NULL,
+  `del_flag` varchar(3) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for hotpot_role_function
+-- ----------------------------
+DROP TABLE IF EXISTS `hotpot_role_function`;
+CREATE TABLE `hotpot_role_function` (
+  `function_id` varchar(36) NOT NULL,
+  `role_id` varchar(36) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`function_id`,`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for hotpot_role_user
+-- ----------------------------
+DROP TABLE IF EXISTS `hotpot_role_user`;
+CREATE TABLE `hotpot_role_user` (
+  `role_id` varchar(36) NOT NULL,
+  `party_id` varchar(36) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `type` varchar(3) NOT NULL COMMENT '0.人员 1.组织 2.团队',
+  PRIMARY KEY (`role_id`,`party_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for party_project
+-- ----------------------------
+DROP TABLE IF EXISTS `party_project`;
+CREATE TABLE `party_project` (
+  `id` varchar(64) NOT NULL,
+  `project_id` varchar(64) NOT NULL COMMENT '项目ID',
+  `party_id` varchar(64) NOT NULL COMMENT '组织ID或用户ID',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `flag` char(1) DEFAULT NULL COMMENT '权限标识 0:该项目是用户自己创建的  1:该项目权限是用户加入的',
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for plugs_info
+-- ----------------------------
+DROP TABLE IF EXISTS `plugs_info`;
+CREATE TABLE `plugs_info` (
+  `id` varchar(64) NOT NULL,
+  `pic_id` varchar(64) DEFAULT NULL COMMENT '插件对应的图片id',
+  `pic_name` varchar(255) DEFAULT NULL COMMENT '图片名称',
+  `download_url` varchar(255) DEFAULT NULL COMMENT '插件下载地址',
+  `plugs_name` varchar(255) DEFAULT NULL COMMENT '插件名称',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '修改时间',
+  `del_flag` char(1) DEFAULT NULL COMMENT '删除标识 0:未标识 1:标识',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for project
+-- ----------------------------
+DROP TABLE IF EXISTS `project`;
+CREATE TABLE `project` (
   `id` varchar(64) NOT NULL,
   `name` varchar(100) NOT NULL,
   `packages` varchar(100) NOT NULL,
@@ -217,6 +401,7 @@ CREATE TABLE IF NOT EXISTS `project` (
   `updated_at` datetime DEFAULT NULL,
   `del_flag` char(1) DEFAULT NULL,
   `app_id` varchar(64) DEFAULT NULL,
+  `app_pub_key` varchar(500) DEFAULT NULL,
   `user_id` varchar(64) DEFAULT NULL,
   `user_name` varchar(64) DEFAULT NULL,
   `department_name` varchar(255) DEFAULT NULL,
@@ -224,28 +409,16 @@ CREATE TABLE IF NOT EXISTS `project` (
   `modify_name` varchar(100) DEFAULT NULL,
   `modify_ip` varchar(100) DEFAULT NULL,
   `created_by` varchar(32) DEFAULT NULL COMMENT '创建人',
+  `flag` char(1) DEFAULT NULL COMMENT '星星标识 0:未标识 1:标识',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_project_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.tabled 结构
-CREATE TABLE IF NOT EXISTS `tabled` (
-  `id` varchar(64) NOT NULL,
-  `datasource_id` varchar(64) NOT NULL,
-  `name` varchar(200) NOT NULL,
-  `comments` varchar(255) DEFAULT NULL,
-  `class_name` varchar(100) NOT NULL,
-  `is_auto_crud` char(1) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `del_flag` char(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.table_relation 结构
-CREATE TABLE IF NOT EXISTS `table_relation` (
+-- ----------------------------
+-- Table structure for table_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `table_relation`;
+CREATE TABLE `table_relation` (
   `id` varchar(64) NOT NULL,
   `master_table_id` varchar(64) NOT NULL COMMENT '主表id',
   `slave_table_id` varchar(64) NOT NULL COMMENT '从表id',
@@ -260,9 +433,11 @@ CREATE TABLE IF NOT EXISTS `table_relation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.table_senior_column 结构
-CREATE TABLE IF NOT EXISTS `table_senior_column` (
+-- ----------------------------
+-- Table structure for table_senior_column
+-- ----------------------------
+DROP TABLE IF EXISTS `table_senior_column`;
+CREATE TABLE `table_senior_column` (
   `id` varchar(64) NOT NULL,
   `senior_slave_id` varchar(64) NOT NULL,
   `master_column_name` varchar(255) NOT NULL,
@@ -276,9 +451,11 @@ CREATE TABLE IF NOT EXISTS `table_senior_column` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.table_senior_relation 结构
-CREATE TABLE IF NOT EXISTS `table_senior_relation` (
+-- ----------------------------
+-- Table structure for table_senior_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `table_senior_relation`;
+CREATE TABLE `table_senior_relation` (
   `id` varchar(64) NOT NULL,
   `master_table_id` varchar(64) NOT NULL,
   `master_table_name` varchar(255) DEFAULT NULL,
@@ -288,9 +465,11 @@ CREATE TABLE IF NOT EXISTS `table_senior_relation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.table_senior_slave 结构
-CREATE TABLE IF NOT EXISTS `table_senior_slave` (
+-- ----------------------------
+-- Table structure for table_senior_slave
+-- ----------------------------
+DROP TABLE IF EXISTS `table_senior_slave`;
+CREATE TABLE `table_senior_slave` (
   `id` varchar(64) NOT NULL,
   `senior_id` varchar(64) NOT NULL,
   `slave_table_id` varchar(64) DEFAULT NULL,
@@ -302,9 +481,28 @@ CREATE TABLE IF NOT EXISTS `table_senior_slave` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.transfer_obj 结构
-CREATE TABLE IF NOT EXISTS `transfer_obj` (
+-- ----------------------------
+-- Table structure for tabled
+-- ----------------------------
+DROP TABLE IF EXISTS `tabled`;
+CREATE TABLE `tabled` (
+  `id` varchar(64) NOT NULL,
+  `datasource_id` varchar(64) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `comments` varchar(255) DEFAULT NULL,
+  `class_name` varchar(100) NOT NULL,
+  `is_auto_crud` char(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for transfer_obj
+-- ----------------------------
+DROP TABLE IF EXISTS `transfer_obj`;
+CREATE TABLE `transfer_obj` (
   `id` varchar(64) NOT NULL,
   `project_id` varchar(64) NOT NULL COMMENT '项目id',
   `name` varchar(200) NOT NULL COMMENT '实体名称',
@@ -320,9 +518,11 @@ CREATE TABLE IF NOT EXISTS `transfer_obj` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
--- 导出  表 new_titancode_test.transfer_obj_field 结构
-CREATE TABLE IF NOT EXISTS `transfer_obj_field` (
+-- ----------------------------
+-- Table structure for transfer_obj_field
+-- ----------------------------
+DROP TABLE IF EXISTS `transfer_obj_field`;
+CREATE TABLE `transfer_obj_field` (
   `id` varchar(64) NOT NULL,
   `transfer_obj_id` varchar(64) NOT NULL COMMENT '实体id',
   `name` varchar(200) NOT NULL COMMENT '属性名',
@@ -342,7 +542,39 @@ CREATE TABLE IF NOT EXISTS `transfer_obj_field` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 数据导出被取消选择。
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+-- ----------------------------
+-- Table structure for ui_config
+-- ----------------------------
+DROP TABLE IF EXISTS `ui_config`;
+CREATE TABLE `ui_config` (
+  `id` varchar(64) NOT NULL,
+  `json_schema_url` varchar(255) DEFAULT NULL,
+  `config_name` varchar(255) DEFAULT NULL,
+  `pathmag` mediumtext,
+  `tab_config_data` mediumtext,
+  `form_config_data` mediumtext,
+  `table_mapping_name` varchar(255) DEFAULT NULL,
+  `table_btn_configs` mediumtext,
+  `table_row_btn_configs` mediumtext,
+  `form_btn_configs` mediumtext,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for version
+-- ----------------------------
+DROP TABLE IF EXISTS `version`;
+CREATE TABLE `version` (
+  `id` varchar(64) NOT NULL,
+  `flag` char(1) NOT NULL,
+  `version` varchar(64) NOT NULL,
+  `descriptions` varchar(256) DEFAULT NULL COMMENT '属性描述',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

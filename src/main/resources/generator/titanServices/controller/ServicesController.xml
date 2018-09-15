@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>ServicesController</name>
+  <filePath>src/main/java/${packageName}/controller/titanServices</filePath>
+  <fileName>ServicesController.java</fileName>
+  <content><![CDATA[
+package ${packageName}.controller.titanServices;
+
+import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.changan.otp.app.client.TokenCache;
+import com.changan.otp.app.client.TokenDTO;
+import ${packageName}.common.RestStatus;
+import ${packageName}.dto.titanServices.ResultServiceDTO;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+/**
+ * 
+ * @author Administrator
+ *
+ */
+@Controller
+@Api(value = "Services", description = "the Services API")
+@RequestMapping(value = "/api/services")
+public class ServicesController {
+  
+  @ApiOperation(value = "服务调用token", notes = "服务调用token", response = ResultDTO.class)
+  @ApiResponses(
+      value = {@ApiResponse(code = 200, message = "返回结果信息", response = ResultDTO.class),
+          @ApiResponse(code = 401, message = "返回认证错误信息")})
+  @GetMapping("/token/{serviceName}")
+  public ResponseEntity<ResultDTO> getServiceToken(@PathVariable String serviceName){
+    TokenDTO tokendto = TokenCache.getAppTokenDTOByServiceName(serviceName);
+    return new ResponseEntity<ResultDTO>(new ResultServiceDTO().tokenDTO(tokendto)
+        .message(RestStatus.RESULT_SUCCESS.message()),HttpStatus.OK);
+  }
+
+}
+]]>
+  </content>
+</template>

@@ -1,5 +1,10 @@
 package org.hotpotmaterial.code.common.template;
 
+/**
+ * dao文件
+ * @author Administrator
+ *
+ */
 public enum DAOFile {
   dao("service/dao.xml"),
   mapper("service/mapper.xml");

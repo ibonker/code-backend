@@ -2,6 +2,11 @@ package org.hotpotmaterial.code.common.component;
 
 import org.hotpotmaterial.code.common.Constants;
 
+/**
+ * 字典插件
+ * @author Administrator
+ *
+ */
 public enum Dictionary {
   
   dictionary("是(将创建dict_value和dict_type数据库表)"), undictionary("否");

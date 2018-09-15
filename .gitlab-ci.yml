@@ -1,0 +1,12 @@
+stages:
+  - analysis
+
+sonarqube:
+  tags: 
+    - sonar-scan
+  stage: analysis
+  variables:
+    SONAR_URL: http://10.64.18.140:9000
+    SONAR_ANALYSIS_MODE: publish
+  script:
+  - /home/sonar-scanner-2.8/bin/sonar-scanner

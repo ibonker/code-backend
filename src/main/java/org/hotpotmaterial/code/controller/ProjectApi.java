@@ -14,6 +14,7 @@ import org.hotpotmaterial.code.dto.ResultOfComponentsDTO;
 import org.hotpotmaterial.code.dto.ResultOfMsgDataDTO;
 import org.hotpotmaterial.code.dto.ResultOfProjectDTO;
 import org.hotpotmaterial.code.dto.ResultOfTypeDTO;
+import org.hotpotmaterial.code.entity.DatasourcePO;
 import org.hotpotmaterial.code.entity.ProjectPO;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -144,4 +145,29 @@ public interface ProjectApi {
       method = RequestMethod.POST)
   ResponseEntity<ResultDTO> projectPost(
       @ApiParam(value = "id", required = true) @PathVariable String id);
+
+  @ApiOperation(value = "修改项目星标", notes = "修改项目星标", response = ResultOfProjectDTO.class,
+	      tags = {"Project"})
+	  @ApiResponses(
+	      value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfProjectDTO.class),
+	          @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfProjectDTO.class)})
+	  @RequestMapping(value = "/project/star/update", produces = {"application/json"},
+	      method = RequestMethod.POST)
+ResponseEntity<ResultDTO> projectStar(@RequestBody ProjectPO projectPO);
+  
+  /**
+   * 保存项目以及数据库信息,同步数据库以及激活勾选的表
+   * @param projectPO
+   * @return
+   */
+  @ApiOperation(value = "保存项目以及数据库信息,同步数据库以及激活勾选的表", notes = "保存项目以及数据库信息,同步数据库以及激活勾选的表", response = ResultOfProjectDTO.class,
+		  tags = {"Project"})
+  @ApiResponses(
+		  value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfProjectDTO.class),
+				  @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfProjectDTO.class)})
+  @RequestMapping(value = "/project/save/sync", produces = {"application/json"},
+  method = RequestMethod.POST)
+  ResponseEntity<ResultDTO> projectSaveAndSync(@RequestBody ProjectPO projectPO);
+  
+  
 }

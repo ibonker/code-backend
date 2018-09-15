@@ -15,6 +15,8 @@ import org.hotpotmaterial.code.dto.ResultOfPreviewDTO;
 import org.hotpotmaterial.code.entity.DatasourcePO;
 import org.hotpotmaterial.code.entity.ProjectPO;
 import org.hotpotmaterial.code.entity.TablePO;
+import org.hotpotmaterial.code.security.dto.HotpotUserSeniorDTO;
+import org.hotpotmaterial.code.security.dto.UserInfo;
 import org.springframework.data.domain.Page;
 
 /**
@@ -28,6 +30,15 @@ public interface IProjectService extends IComponentService {
    * @return
    */
   public Page<ProjectPO> findProjecsPage(PageDTO searchParams, String usercode);
+  
+  /**
+   * 根据权限分页查询
+   * @param searchParams
+   * @param string
+   * @param user
+   * @return
+   */
+  public Page<ProjectPO> findProjecsPage(PageDTO searchParams, String string, UserInfo user);
   
   /**
    * 新建project
@@ -67,6 +78,13 @@ public interface IProjectService extends IComponentService {
    * @return
    */
   public RefObjDTO getProjectPO(String id);
+  
+  /**
+   * 获取激活的项目po以及关联PO
+   * @param id
+   * @return
+   */
+  public RefObjDTO getProjectIsAutoPO(String id);
   
   /**
    * 生成代码
@@ -119,4 +137,32 @@ public interface IProjectService extends IComponentService {
    */
   public ResultOfPreviewDTO generateCodeFilesPreview(TablePO mainTable, ProjectPO project,
       DatasourcePO datasource);
+  /**
+   * 新建project,同时创建project的查看权限
+   * @param project
+   * @param token
+   * @param request
+   * @param string
+   * @param user
+   * @return
+   */
+  public ProjectPO createProject(ProjectPO project, String token, HttpServletRequest request, String string,
+		UserInfo user);
+
+  /**
+   * 修改项目星标
+   * @param projectPO
+   */
+  public void updateProjectStar(ProjectPO projectPO);
+
+  /**
+   * 保存项目以及数据库信息,同步数据库以及激活勾选的表
+   * @param projectPO
+   * @param datasourcePO
+   */
+  public void saveSyncProject(ProjectPO projectPO,UserInfo userInfo);
+  
+ 
+
+
 }

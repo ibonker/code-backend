@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>AdminUserInfo</name>
+  <filePath>src/main/java/${packageName}/security/dto</filePath>
+  <fileName>AdminUserInfo.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.dto;
+
+import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+
+ /**
+  * @author Hotpotmaterial-Code2
+  * Spring Boot Admin认证信息
+  */
+@Data
+public class AdminUserInfo implements UserDetails {
+
+	/**
+	* serialVersionUID
+	*/
+	private static final long serialVersionUID = 1L;
+
+    /**
+     * 密码
+     */
+    private String password;
+    /**
+     * 登录名
+     */
+    private String username;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+}
+
+]]>
+  </content>
+</template>

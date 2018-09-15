@@ -12,7 +12,10 @@ import java.util.List;
  *
  */
 public class Constants {
-
+  
+  /**
+   * 构造方法
+   */
   private Constants() {
 
   }
@@ -29,6 +32,16 @@ public class Constants {
   public final static String IS_ACTIVE = "1";
   // 数据有效标识
   public final static String IS_INACTIVE = "0";
+  // 后端版本信息标识
+  public final static String CODE_VERSION = "1";
+  // 前端版本信息标识
+  public final static String UI_VERSION = "0";
+  //描述内容分隔符
+  public final static String DESCRIPTION_SPILT = "@";
+  // 数据激活标识
+  public final static String IS_CRUD = "1";
+  // 数据未激活标识
+  public final static String IS_NOT_CRUD = "0";
   // 默认时间格式
   public final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
   // 数据库测试
@@ -94,16 +107,39 @@ public class Constants {
   public final static String Proxy_Client_IP = "Proxy-Client-IP";
   // WL-Proxy-Client-IP
   public final static String WL_Proxy_Client_IP = "WL-Proxy-Client-IP";
-  // 不显示的表
-  public final static List<String> TABLE_UNSHOWN = Arrays.asList("ui_config", "dict_type",
-      "dict_value", "hotpot_function", "hotpot_organization", "hotpot_role", "hotpot_role_function",
-      "hotpot_role_user", "hotpot_user");
-  // 不创建实体的表
-  public final static List<String> TABLE_NOENTITY =
-      Arrays.asList("hotpot_function", "hotpot_organization", "hotpot_role", "hotpot_role_function",
-          "hotpot_role_user", "hotpot_user");
-  // 不创建实体的表
-  public final static List<String> RES_TABLE_NOENTITY =
-      Arrays.asList("hotpot_function", "hotpot_role", "hotpot_role_function",
-          "hotpot_role_user");
+  
+//  public final static String APP_ID = "fc613a5b5f1f42e6b092e5fc7699001a";
+//  
+//  public final static String APP_PUB_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxxHLlhvmOF6QcGMbyV4YvoMVpzCzXPRJdM2FNgS38CGaAxy23UixVE3pill7bywrAVM2eH0zF9Vx6mWO+kynPPbYdIA0cK4iM7ejf/735YhgeSih6+kBncy43tNVQWHCV+LYkyvV3NLjL6yTRRY3iYZTBCBZhD7fuLDmg3wXYJYrRq2GDOr6ZXVIwnqewXPWapHkXdfxKF+tG9NHQCoRqIF56bMUgZ1hMc7DsF7zSLD53a0DhoBrXMKa6833KjuY/h2hjMI/+K/1wnLSF8RQ1hh9Vj3iSl82EjYSRiQBO4+ofNY/h3tJOU5+ndOo7ReQCbKX/Ak65Vy0BAVlI/p70QIDAQAB";
+//  
+//  public final static String TEST_APP_ID = "8b376f64d21f474d856916ce0922fb35";
+//  
+//  public final static String TEST_PUB_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkcjv2jh4oL1cI43wtgcheiityUj6TD5+CjxSzfLpxj6h51HJKLrxXJgq5b0wJ8H4OMJQvLcKxRUQWGivGadQTUrE4J9gL36sZy9sB9FI7gROXPscUo1eXTPLCe7Ng3HgywWaZxE8wKPaUdhmFRtVTaxCcxCBOIrKvt0Rnc2N/iRYDEstzautvfzmf9ZK14/Cer2nYAcx4Go8FtqfbHH2sy47ZO/ACe8O8mCXkYkOoNW2YGipaBXgkG/StHEbv+46cCZi15LETF2PdIzxMDuFpzXaswBzz+1vjStF55Nb632ln+lOFIPRi6pKy+fiJ5aYfl9Hu8xx9vvQbzg0+S8irQIDAQAB";
+  /**
+   * 不显示的表
+   * @return
+   */
+  public static List<String> getTableUnshown(){
+    return Arrays.asList("ui_config", "dict_type",
+        "dict_value", "hotpot_function", "hotpot_organization", "hotpot_role", "hotpot_role_function",
+        "hotpot_role_user", "hotpot_user");
+  }
+  
+  /**
+   * 不创建实体的表
+   * @return
+   */
+  public static List<String> getTableNoEntity(){
+    return Arrays.asList("hotpot_function", "hotpot_organization", "hotpot_role", "hotpot_role_function",
+        "hotpot_role_user", "hotpot_user");
+  }
+  
+  /**
+   * 不创建实体的表
+   * @return
+   */
+  public static List<String> getResTableNoEntity(){
+    return  Arrays.asList("hotpot_function", "hotpot_role", "hotpot_role_function",
+        "hotpot_role_user");
+  }
 }

@@ -1,5 +1,10 @@
 package org.hotpotmaterial.code.common.template;
 
+/**
+ * 
+ * @author Administrator
+ *
+ */
 public enum AdviceFile {
 
   advice("service/advice.xml");

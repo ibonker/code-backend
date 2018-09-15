@@ -23,6 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CodeHandlerAdvice {
   
+  /**
+   * 异常捕获
+   * @param exception
+   * @return
+   */
   @ExceptionHandler(value = CodeCommonException.class)
   public ResponseEntity<ResultDTO> exception(CodeCommonException exception) {
     String errorMsg;
@@ -34,6 +39,11 @@ public class CodeHandlerAdvice {
     return resultDto;
   }
   
+  /**
+   * 数据异常
+   * @param exception
+   * @return
+   */
   @ExceptionHandler(value = DataAccessException.class)
   public ResponseEntity<ResultDTO> msqlException(DataAccessException exception) {
     String errorMsg;

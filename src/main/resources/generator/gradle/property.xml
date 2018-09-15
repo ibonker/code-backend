@@ -4,51 +4,39 @@
     <filePath>/</filePath>
     <fileName>gradle.properties</fileName>
     <content><![CDATA[
-aliyun_repo = http://maven.aliyun.com/nexus/content/groups/public
-
-hotpotmaterial_common_version = 0.0.3
-
-hotpotmaterial_jsonmeta_version = 0.0.3
-
-spring_boot_version = 1.5.4.RELEASE
-
+#maven仓库地址
+maven_repo = http://172.16.1.188:8082/content/groups/public
+#springboot版本
+spring_boot_version = 2.0.3.RELEASE
+#spring dependency
+spring_dep_version = 1.0.5.RELEASE
+#包名
+group_name = ${packageName}
+#jdk
 java_version = 1.8
-
-group_name = org.hotpotmaterial
-
-jar_name = ${projectName}
-
-jar_version = 0.0.1-SNAPSHOT
-
-druid_version = 1.1.0
-
-usertype_version = 5.0.0.GA
-
-lombok_version = 1.16.16
-
-guava_version = 23.0
-
+#mybatis
 mybatis_spring_version = 1.2.0
-
-hibernate_java8_version = 5.0.11.Final
-
-mybatis_typehandlers_jsr310_version = 1.0.2
-
-pagehelper_version = 5.1.0
-
-pagehelper_spring_boot_starter_version = 1.1.0
-
-gradle_version = 4.3.1
-
-jackson_version = 2.8.8
-
+#swagger
 swagger_version = 2.7.0
-
-jwt_version = 0.7.0
-
-<#if components?seq_contains("rescentersecurity")>
-rescenter_rest_version = 3.6.0-SNAPSHOT
-</#if>
+#druid
+druid_version = 1.1.10
+#guava
+guava_version = 23.0
+#lombok
+lombok_version = 1.16.16
+#hotpotmaterial
+hotpotmaterial_common_version = 0.0.3
+hotpotmaterial_jsonmeta_version = 0.0.3
+#jsr310
+mybatis_typehandlers_jsr310_version = 1.0.2
+#pagehelper
+pagehelper_version = 5.1.4
+pagehelper_spring_boot_starter_version = 1.2.5
+#jar
+jar_name = ${projectName}
+jar_version = 0.0.1-SNAPSHOT
+#gradle
+gradle_version = 4.3.1
 
 <#if hasOracle == "1">
 oracle_version = 12.1.0.1-atlassian-hosted

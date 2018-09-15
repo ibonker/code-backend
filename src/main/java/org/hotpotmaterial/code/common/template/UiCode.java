@@ -9,7 +9,8 @@ package org.hotpotmaterial.code.common.template;
  */
 public enum UiCode {
   
-  uiUitl("uicode/util.xml");
+  uiUitl("uicode/util.xml"),
+  gitlabCi("uicode/gitlab-ci.xml");
   
   private String path;
   

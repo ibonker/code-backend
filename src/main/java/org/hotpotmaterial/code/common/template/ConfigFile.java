@@ -17,13 +17,18 @@ public enum ConfigFile {
   metaConfiguration("config/metaConfiguration.xml"),
   buildGradle("gradle/build.xml"), 
   propertiesGradle("gradle/property.xml"), 
-//  mvcConfig("config/mvcConfiguration.xml"),
+  sonar("gradle/sonar.xml"),
+  dockerfile("gradle/dockerfile.xml"), 
+  gitlab_ci("gradle/gitlab-ci.xml"), 
+  gitignore("gradle/gitignore.xml"),
   swaggerConfig("config/swaggerConfiguration.xml"),
   basecontroller("controller/controllerBase.xml"),
   commonException("exception/commonException.xml"),
   baseEntity("common/baseEntity.xml"),
   commonConstants("common/constants.xml"),
-  restStatus("common/restStatus.xml");
+  restStatus("common/restStatus.xml"),
+  servicesController("titanServices/controller/ServicesController.xml"),
+  servicesDTO("titanServices/dto/ResultServiceDTO.xml");
   
   private String path;
   

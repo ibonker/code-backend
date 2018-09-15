@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>ResultOfUserSeniorDTO</name>
+  <filePath>src/main/java/${packageName}/security/dto</filePath>
+  <fileName>ResultOfUserSeniorDTO.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.dto;
+
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * ResultDTO
+ */
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-07T11:56:38.621+08:00")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "ResultDTOType", visible = true)
+@JsonSubTypes({})
+
+public class ResultDTO {
+	/**
+	 * 返回值
+	 */
+	@JsonProperty("result")
+	private String result = null;
+	/**
+	 * 错误信息
+	 */
+	@JsonProperty("errorMsg")
+	private String errorMsg = null;
+
+	/**
+	 * 数据
+	 */
+	@JsonProperty("data")
+	private Object data = null;
+
+	/**
+	 * 返回值
+	 * 
+	 * @param result
+	 * @return
+	 */
+	public ResultDTO result(String result) {
+		//设置返回值
+		this.result = result;
+		//返回值
+		return this;
+	}
+
+	/**
+	 * 返回编码
+	 * 
+	 * @return result
+	 **/
+	@ApiModelProperty(value = "返回编码")
+	public String getResult() {
+		//返回值
+		return result;
+	}
+
+	/**
+	 * 设置返回值
+	 * 
+	 * @param result
+	 */
+	public void setResult(String result) {
+		//赋值
+		this.result = result;
+	}
+
+	/**
+	 * 错误信息
+	 * 
+	 * @param errorMsg
+	 * @return
+	 */
+	public ResultDTO errorMsg(String errorMsg) {
+		//设置错误信息
+		this.errorMsg = errorMsg;
+		//返回错误信息
+		return this;
+	}
+
+	/**
+	 * 返回错误信息
+	 * 
+	 * @return errorMsg
+	 **/
+	@ApiModelProperty(value = "返回错误信息")
+	public String getErrorMsg() {
+		//返回错误信息
+		return errorMsg;
+	}
+
+	/**
+	 * 设置错误信息
+	 * 
+	 * @param errorMsg
+	 */
+	public void setErrorMsg(String errorMsg) {
+		//设置错误信息
+		this.errorMsg = errorMsg;
+	}
+
+	/**
+	 * 数据
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public ResultDTO data(Object data) {
+		//设置数据
+		this.data = data;
+		//返回数据
+		return this;
+	}
+
+	/**
+	 * 流程返回值对象
+	 * 
+	 * @return data
+	 **/
+	@ApiModelProperty(value = "流程返回值对象")
+	public Object getData() {
+		//返回数据
+		return data;
+	}
+
+	/**
+	 * 设置数据
+	 * 
+	 * @param data
+	 */
+	public void setData(Object data) {
+		//设置数据
+		this.data = data;
+	}
+
+	/**
+	 * 重写equal
+	 */
+	@Override
+	public boolean equals(java.lang.Object o) {
+		//若this等于o则返回true
+		if (this == o) {
+			//返回true
+			return true;
+		}
+		//若o为空则返回false
+		if (o == null || getClass() != o.getClass()) {
+			//返回false
+			return false;
+		}
+		//将o转换成ResultDTO对象
+		ResultDTO resultDTO = (ResultDTO) o;
+		//返回重写的equal对象
+		return Objects.equals(this.result, resultDTO.result) && Objects.equals(this.errorMsg, resultDTO.errorMsg)
+				&& Objects.equals(this.data, resultDTO.data);
+	}
+
+	/**
+	 * 重写hashcode
+	 */
+	@Override
+	public int hashCode() {
+		//返回重写的hashCode
+		return Objects.hash(result, errorMsg, data);
+	}
+
+	/**
+	 * 重写toString
+	 */
+	@Override
+	public String toString() {
+		//构建一个stringbuilder对象 sb
+		StringBuilder sb = new StringBuilder();
+		//给sb对象追加字符串
+		sb.append("class ResultDTO {\n");
+		//给sb对象追加字符串
+		sb.append("    result: ").append(toIndentedString(result)).append("\n");
+		//给sb对象追加字符串
+		sb.append("    errorMsg: ").append(toIndentedString(errorMsg)).append("\n");
+		//给sb对象追加字符串
+		sb.append("    data: ").append(toIndentedString(data)).append("\n");
+		//给sb对象追加字符串
+		sb.append("}");
+		//返回重写的toString对象
+		return sb.toString();
+	}
+
+	/**
+	 * Convert the given object to string with each line indented by 4 spaces
+	 * (except the first line).
+	 */
+	private String toIndentedString(java.lang.Object o) {
+		//若o为空，则返回null
+		if (o == null) {
+			//返回null
+			return "null";
+		}
+		//字符串替换
+		return o.toString().replace("\n", "\n    ");
+	}
+}
+
+]]>
+  </content>
+</template>

@@ -1,5 +1,10 @@
 package org.hotpotmaterial.code.common.template;
 
+/**
+ * 实体类文件
+ * @author Administrator
+ *
+ */
 public enum EntityFile {
   
   entity("service/entity.xml");

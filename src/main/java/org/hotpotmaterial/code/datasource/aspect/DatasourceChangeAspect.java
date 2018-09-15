@@ -60,8 +60,9 @@ public class DatasourceChangeAspect {
     lock.lock();
     try {
       connectDB(datasource);
-    } catch (SQLException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      this.afterChangeDb();
     }
   }
 

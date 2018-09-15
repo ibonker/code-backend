@@ -6,6 +6,7 @@
   <content><![CDATA[
 package ${packageName}.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import ${packageName}.security.filter.AuthenLogoutFilter;
 import ${packageName}.security.filter.AuthenticationFilter;
@@ -23,8 +25,13 @@ import ${packageName}.security.service.IUserTokenService;
 import ${packageName}.security.service.impl.UserDetailsServiceImpl;
 import ${packageName}.security.service.impl.UserTokenServiceImpl;
 
+import de.codecentric.boot.admin.client.config.InstanceProperties;
+
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Autowired
+  private InstanceProperties instance;
   
   @Bean
   public IUserTokenService tokenService(){
@@ -48,12 +55,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
               .and().logout().logoutUrl("/logout").addLogoutHandler(new AuthenLogoutFilter(tokenService()))
               .and()
               .addFilter(new LoginFilter(authenticationManager(), tokenService()))  
-              .addFilter(new AuthenticationFilter(authenticationManager(), tokenService()));  
+              .addFilter(new AuthenticationFilter(authenticationManager(), tokenService(), instance));  
   }  
 
   @Override  
   public void configure(AuthenticationManagerBuilder auth) throws Exception {  
-      auth.userDetailsService(userDetailsServiceBean());  
+      auth.userDetailsService(userDetailsServiceBean()).passwordEncoder(new BCryptPasswordEncoder());
   }
   
   @Override

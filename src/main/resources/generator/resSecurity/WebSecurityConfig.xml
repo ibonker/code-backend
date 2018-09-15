@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>WebSecurityConfig</name>
+  <filePath>src/main/java/${packageName}/security</filePath>
+  <fileName>WebSecurityConfig.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import ${packageName}.security.filter.AuthenLogoutFilter;
+import ${packageName}.security.filter.AuthenticationFilter;
+import ${packageName}.security.filter.LoginFilter;
+import ${packageName}.security.filter.RescenterUserProvider;
+import ${packageName}.security.filter.UnauthorizedEntryPoint;
+import ${packageName}.security.service.IUserTokenService;
+import ${packageName}.security.service.impl.UserTokenServiceImpl;
+
+import de.codecentric.boot.admin.client.config.InstanceProperties;
+
+@Configuration
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Autowired
+  private ResProperties res;
+  
+  @Autowired
+  private InstanceProperties instance;
+
+  @Bean
+  public IUserTokenService tokenService() {
+    return new UserTokenServiceImpl();
+  }
+
+  @Bean
+  public RescenterUserProvider provider() {
+    RescenterUserProvider rescenterUserProvider = new RescenterUserProvider();
+    return rescenterUserProvider;
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.cors().and().csrf().disable().authorizeRequests().antMatchers("/logout").anonymous()
+        .anyRequest().authenticated().and().exceptionHandling()
+        .authenticationEntryPoint(new UnauthorizedEntryPoint()).and().formLogin()
+        .loginProcessingUrl("/login").usernameParameter("username").passwordParameter("password")
+        .and().logout().logoutUrl("/logout")
+        .addLogoutHandler(new AuthenLogoutFilter(tokenService())).and()
+        .addFilter(new LoginFilter(authenticationManager(), tokenService(), res))
+        .addFilter(new AuthenticationFilter(authenticationManager(), tokenService(), instance));
+  }
+
+  @Override
+  public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.authenticationProvider(provider());
+  }
+
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    // ignore
+    web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**",
+        "/configuration/**", "/swagger-ui.html", "/webjars/**");
+  }
+
+}
+
+]]>
+  </content>
+</template>

@@ -37,7 +37,8 @@ util.ajax = axios.create({
 util.url = ajaxUrl;
 util.indexUrl = '/';
 util.personInput = PersonInput;
-util.serializable = ['pathmag', 'tabConfigData', 'formConfigData', 'tableBtnConfigs', 'tableRowBtnConfigs', 'formBtnConfigs'] //序列化用
+util.serializable = ['pathmag', 'tabConfigData', 'formConfigData', 'tableBtnConfigs', 'tableRowBtnConfigs', 'formBtnConfigs']; //序列化用
+util.appId= '${appId}';
 <#if security?? && security == "res">
 util.resUrl = resUrl;
 </#if>

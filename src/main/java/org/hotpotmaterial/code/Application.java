@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.changan.otp.app.config.EnableTitanAppService;
+
 /**
  * @author wenxing
  *
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.ComponentScan;
     HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class,
     DataSourceTransactionManagerAutoConfiguration.class})
 @ComponentScan(value={"org.hotpotmaterial.code"})
+@EnableTitanAppService
 public class Application {
 
   /**

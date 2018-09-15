@@ -17,7 +17,11 @@ import com.github.pagehelper.PageInterceptor;
  *
  */
 public class MybatisConfig {
-
+  
+  /**
+   * mybatis 初始化配置
+   * @return
+   */
   public Configuration mybatisConfig() {
     Configuration configuration = new Configuration();
 

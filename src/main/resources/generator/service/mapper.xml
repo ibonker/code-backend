@@ -13,9 +13,17 @@
 		<association property="${attr.name}" javaType="${attr.type}">
 				<#list attr.columns as column>
 					<#if column.isPk == "1">
-			<id property="${column.javaField}" column="_${attr.tableName}_${column.name}"/>
+			<#if column.name?length gt 24>
+			<id property="${column.javaField}" column="T${attr_index}_${column.name?substring(0,24)}${column_index}"/>
+			<#else>
+			<id property="${column.javaField}" column="T${attr_index}_${column.name}"/>
+			</#if>
 					<#else>
-			<result property="${column.javaField}" column="_${attr.tableName}_${column.name}"/>
+			<#if column.name?length gt 24>
+			<result property="${column.javaField}" column="T${attr_index}_${column.name?substring(0,24)}${column_index}"/>
+			<#else>
+			<result property="${column.javaField}" column="T${attr_index}_${column.name}"/>
+			</#if>
 					</#if>
 				</#list>
 		</association>
@@ -27,7 +35,11 @@
 		select
 		<#list method.attrs as attr>
 			<#list attr.columns as column>
-			${attr.name}.${column.name} as _${attr.tableName}_${column.name}<#if !attr_has_next && !column_has_next><#else>,</#if>
+			<#if column.name?length gt 24>
+			${attr.name}.${column.name} as T${attr_index}_${column.name?substring(0,24)}${column_index}<#if !attr_has_next && !column_has_next><#else>,</#if>
+			<#else>
+			${attr.name}.${column.name} as T${attr_index}_${column.name}<#if !attr_has_next && !column_has_next><#else>,</#if>
+			</#if>
 			</#list>
 		</#list>
 		from
@@ -37,7 +49,7 @@
 		    ${slave.slaveTableName} ${slave.slaveTableAttrName} 
 		on 
 		    <#list slave.relationColumns as relationColumn>
-		    ${masterTableAttrName}.${relationColumn.masterColumnName} = ${slave.slaveTableAttrName}.${relationColumn.slaveColumnName} 
+		    ${masterTableAttrName}.${relationColumn.masterColumnName} = <#if dbtype == "oracle" && relationColumn.slaveColumnType != "String" && relationColumn.masterColumnType == "String">to_char(${slave.slaveTableAttrName}.${relationColumn.slaveColumnName})<#else>${slave.slaveTableAttrName}.${relationColumn.slaveColumnName}</#if> 
 		    <#if relationColumn_has_next>
 		    and 
 		    </#if>

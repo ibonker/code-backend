@@ -10,8 +10,8 @@
   "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
 <!-- 数据库驱动-->
-	<classPathEntry location = "<#if dataSource.dbtype == "oracle">ojdbc6-12.1.0.1-atlassian-hosted.jar</#if><#if dataSource.dbtype == "mysql">mysql-connector-java-5.1.43.jar</#if>" />
-	<context id = "DB2Tables" targetRuntime = "MyBatis3">
+	<!-- <classPathEntry location = "<#if dataSource.dbtype == "oracle">ojdbc6-12.1.0.1-atlassian-hosted.jar</#if><#if dataSource.dbtype == "mysql">mysql-connector-java-5.1.43.jar</#if>" /> -->
+	<context id = "DB2Tables" defaultModelType= "flat" targetRuntime = "MyBatis3">
 		<commentGenerator>
 			<property name="suppressDate" value="true"/>
 			<!-- 是否去除自动生成的注释 true：是 ： false:否 -->
@@ -22,7 +22,7 @@
 		connectionURL = "${dataSource.dburl}"
 		userId = "${dataSource.dbuser}"
 		password = "${dataSource.dbpassword}"/>
-		<javaTypeResolver>
+		<javaTypeResolver type="org.hotpotmaterial.code.service.impl.JavaTypeResolver">
 			<property name = "forceBigDecimals" value = "false" />
 		</javaTypeResolver>
 		<!-- 生成模型的包名和位置-->

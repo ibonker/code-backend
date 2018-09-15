@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+	<name>gitignore</name>
+	<filePath>/</filePath>
+	<fileName>.gitignore</fileName>
+	<content><![CDATA[
+.git
+.gradle
+.settings
+bin
+build
+logs
+work
+.classpath
+.project
+]]>
+	</content>
+</template>

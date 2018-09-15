@@ -5,7 +5,7 @@ package org.hotpotmaterial.code.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.web.client.RestTemplate;
 import org.hotpotmaterial.anywhere.common.springsupport.SpringContextHolder;
 
 /**
@@ -23,6 +23,11 @@ public class SpringContentConfig {
   @Bean(name = "springContent")
   public SpringContextHolder springContextHolder() {
     return new SpringContextHolder();
+  }
+  
+  @Bean
+  public RestTemplate restTemplate(){
+    return new RestTemplate();
   }
 
 }

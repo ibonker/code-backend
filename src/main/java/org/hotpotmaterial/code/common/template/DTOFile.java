@@ -1,5 +1,10 @@
 package org.hotpotmaterial.code.common.template;
 
+/**
+ * dto文件
+ * @author Administrator
+ *
+ */
 public enum DTOFile {
   dto("service/dto.xml");
   

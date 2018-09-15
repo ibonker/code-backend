@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>IUserService</name>
+  <filePath>src/main/java/${packageName}/security/service</filePath>
+  <fileName>IUserService.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service;
+
+import java.util.List;
+
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.entity.HotpotFunctionPO;
+
+public interface IUserService {
+  
+  /**
+   * 用户获取对应菜单
+   * @param user
+   * @return
+   */
+  public List<HotpotFunctionPO> selectFuncByPartyIdList(UserInfo user);
+  
+}
+]]>
+  </content>
+</template>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+    <name>sonarProperty</name>
+    <filePath>/</filePath>
+    <fileName>sonar-project.properties</fileName>
+    <content><![CDATA[
+sonar.projectKey=${projectName}
+sonar.projectName=${projectName}
+sonar.projectVersion=0.0.1-SNAPSHOT
+sonar.sources=src
+sonar.language=java
+sonar.exclusions=**/*Example.java,**/*POMapper.java,**/*PO.java,**/ResultOf*DTO.java,**/*Test.java
+sonar.sourceEncoding=UTF-8
+]]>
+    </content>
+</template>

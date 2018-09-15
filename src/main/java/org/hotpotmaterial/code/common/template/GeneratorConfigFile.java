@@ -1,5 +1,10 @@
 package org.hotpotmaterial.code.common.template;
 
+/**
+ * 
+ * @author Administrator
+ *
+ */
 public enum GeneratorConfigFile {
   generatorConfigFile("service/generatorConfig.xml");
   

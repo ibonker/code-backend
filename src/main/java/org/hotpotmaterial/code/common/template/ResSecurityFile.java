@@ -8,6 +8,8 @@ package org.hotpotmaterial.code.common.template;
  *
  */
 public enum ResSecurityFile {
+  
+  Base64Util("resSecurity/utils/Base64Util.xml"),
 
   HtFuncController("resSecurity/controller/HtFuncController.xml"),
   HtRoleController("resSecurity/controller/HtRoleController.xml"),
@@ -17,6 +19,7 @@ public enum ResSecurityFile {
   RolePOMapper("resSecurity/dao/RolePOMapper.xml"),
   UserPOMapper("resSecurity/dao/UserPOMapper.xml"),
   
+  AdminUserInfo("resSecurity/dto/AdminUserInfo.xml"),
   CurrentUserDTO("resSecurity/dto/CurrentUserDTO.xml"),
   HotpotUserSeniorDTO("resSecurity/dto/HotpotUserSeniorDTO.xml"),
   LoginResponseDTO("resSecurity/dto/LoginResponseDTO.xml"),
@@ -51,6 +54,7 @@ public enum ResSecurityFile {
 
   //initsql("resSecurity/initsql.xml"),
   
+  ResProperties("resSecurity/ResProperties.xml"),
   WebSecurityConfig("resSecurity/WebSecurityConfig.xml");
   
   private String path;

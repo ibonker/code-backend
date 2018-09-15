@@ -1,0 +1,25 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+bin
+.settings
+.project
+.classpath
+.metadata
+.recommenders
+.gradle
+*.log
+.svn
+build
+work
+Servers
+logs
+node_modules
+cache
+built
+RemoteSystemsTempFiles
+sso_new.sql
+*.jar
+bower_components
+code-gen/*
+!code-gen/ui-code
+!code-gen/version
+mybatis-genlibs/configfiles

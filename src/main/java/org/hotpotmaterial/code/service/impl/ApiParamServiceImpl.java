@@ -101,7 +101,7 @@ public class ApiParamServiceImpl implements IApiParamService {
     // 获取所有Api参数
     List<ApiParamPO> apiParams =
         apiParamRepo.findByApiObjIdAndDelFlag(apiObjId, Constants.DATA_IS_NORMAL);
-    if(!apiParams.isEmpty() || apiParams != null){
+    if(apiParams != null && apiParams.size() > 0){
       for (ApiParamPO apiParam : apiParams) {
         // 执行删除
         apiParam.setDelFlag(Constants.DATA_IS_INVALID);

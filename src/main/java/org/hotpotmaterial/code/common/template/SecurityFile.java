@@ -9,6 +9,8 @@ package org.hotpotmaterial.code.common.template;
  */
 public enum SecurityFile {
 
+  Base64Util("security/utils/Base64Util.xml"),
+  AdminUserInfo("security/dto/AdminUserInfo.xml"),
   HtFuncController("security/controller/HtFuncController.xml"),
   HtOrgController("security/controller/HtOrgController.xml"),
   HtRoleController("security/controller/HtRoleController.xml"),

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>UserDetailsServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>UserDetailsServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import ${packageName}.security.ResProperties;
+import ${packageName}.security.dto.UserInfo;
+
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+  @Autowired
+  private ResProperties res;
+  
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    
+    RestTemplate rest = new RestTemplate();
+    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://"+ res.getServer() +"/rescenter-rest/ResCenterApi/getUserByToken").queryParam("identityToken", username);
+    ResponseEntity<String> result = rest.getForEntity(builder.toUriString(), String.class);
+    
+    try {
+      JSONObject resUserInfo = new JSONObject(result.getBody()).getJSONObject("data");
+      if (resUserInfo != null) {
+        return new UserInfo(resUserInfo, username, new ArrayList<>());
+      }
+    } catch (JSONException e) {
+      return null;
+    }
+    return null;
+  }
+
+}
+
+]]>
+  </content>
+</template>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>UserTokenServiceImpl</name>
+  <filePath>src/main/java/${packageName}/security/service/impl</filePath>
+  <fileName>UserTokenServiceImpl.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import ${packageName}.security.ResProperties;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.service.IUserTokenService;
+
+@Service
+public class UserTokenServiceImpl implements IUserTokenService{
+
+  @Autowired
+  private ResProperties res;
+
+  /**
+   * 保存token到缓存
+   */
+  public void put(String token, UserInfo user) {
+  }
+  
+  @Autowired
+  private UserDetailsService userDetailsService;
+
+  public UserInfo getUser(String token) {
+    return (UserInfo) userDetailsService.loadUserByUsername(token);
+  }
+	
+  public String createToken(UserInfo user) {
+    return user.getToken();
+  }
+  
+  /**
+   * 从缓存中国删除token
+   */
+  @Override
+  public void deleteToken(String token) {
+    RestTemplate rest = new RestTemplate();
+    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://" +  res.getServer() + "/rescenter-rest/ResCenterApi/userLogout").queryParam("identityToken", token);
+    rest.getForEntity(builder.toUriString(), String.class);
+  }
+}
+
+]]>
+  </content>
+</template>

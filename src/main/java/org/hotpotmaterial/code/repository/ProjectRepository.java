@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import org.hotpotmaterial.code.entity.PartyProjectPO;
 import org.hotpotmaterial.code.entity.ProjectPO;
 
 /**
@@ -32,4 +35,16 @@ public interface ProjectRepository
    * @param delFlag
    */
   ProjectPO findByIdAndDelFlag(String id, String delFlag);
+  
+  /**
+   * 根据项目id修改项目星标识
+   * @param projectId
+   * @param delFlag
+   */
+  @Transactional
+  @Modifying
+  @Query(value = "UPDATE ProjectPO p SET p.flag = :flag WHERE p.id = :id")
+  void updateStarByProjectIdAndFlag(@Param("id")String id, @Param("flag")String flag);
+  
 }
+ 

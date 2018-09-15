@@ -3,6 +3,7 @@ package org.hotpotmaterial.code.dto;
 import java.util.List;
 
 import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+import org.hotpotmaterial.code.entity.VersionPO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -23,14 +24,14 @@ public class ResultOfVersionDTO extends ResultDTO{
   @JsonProperty("versionList")
   @JsonPropertyDescription("versionList")
   @ApiModelProperty(value = "versionList")
-  private List<Object> versionList;
+  private List<VersionPO> versionList;
   
   /**
    * 版本明细
    * @param versionList
    * @return
    */
-  public ResultOfVersionDTO versionList(List<Object> versionList) {
+  public ResultOfVersionDTO versionList(List<VersionPO> versionList) {
     this.versionList = versionList;
     return this;
   }

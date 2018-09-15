@@ -1,31 +1,19 @@
 buildscript {
-    repositories {
-        maven {
-            url "http://maven.aliyun.com/nexus/content/groups/public"
-        }
+  repositories {
+    mavenLocal()
+    maven {
+	    url anywhere_repo
+        // url "http://maven.aliyun.com/nexus/content/groups/public" 
     }
-
+  }
   dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE"
   }
 }
 
-plugins {
-  id "org.sonarqube" version "2.6"
-}
-//plugins {
-//    id 'org.springframework.boot' version '1.5.4.RELEASE'
-//}
-
 apply plugin: 'org.springframework.boot'
 apply plugin: 'java'
 apply plugin: 'eclipse'
-
-repositories {
-    maven {
-        url "http://maven.aliyun.com/nexus/content/groups/public"
-    }
-}
 
 jar {
     baseName = jar_name
@@ -35,22 +23,22 @@ jar {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+repositories {
+	mavenLocal()
+    maven { 
+        url anywhere_repo
+        // url "http://maven.aliyun.com/nexus/content/groups/public" 
+    }
+}
+
 group = group_name
 version = jar_version
 
 configurations {
-    // replaced with jcl-over-slf4j
     all*.exclude group: 'commons-logging', module: 'commons-logging'
-    // replaced with log4j-over-slf4j
     all*.exclude group: 'log4j', module: 'log4j'
-    // replaced
-    // all*.exclude group: 'org.jboss.logging', module: 'jboss-logging'
-    // replaced with custom
-    // all*.exclude group: 'org.slf4j', module: 'slf4j-api'
-
     all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     all*.exclude group: 'org.jadira.usertype', module: 'usertype.core'
-    //all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-security'
 }
 
 dependencies {
@@ -59,6 +47,7 @@ dependencies {
 	compile "org.springframework.boot:spring-boot-starter-aop"
 	compile "org.springframework.boot:spring-boot-starter-actuator"
 	compile "org.springframework.boot:spring-boot-starter-data-jpa"
+	compile 'org.springframework.boot:spring-boot-starter-security'
 	
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:${jackson_version}"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jackson_version}"
@@ -68,18 +57,31 @@ dependencies {
 	compile "com.alibaba:druid-spring-boot-starter:1.1.9"
     compile "mysql:mysql-connector-java:5.1.43"
     compile "com.oracle:ojdbc6:12.1.0.1-atlassian-hosted"
-    compile "com.github.pagehelper:pagehelper:5.0.0"
+    compile "com.github.pagehelper:pagehelper:5.1.4"
     compile "org.hibernate:hibernate-java8:5.0.11.Final"
     compile "org.projectlombok:lombok:1.16.16"
     compile "org.json:json:20160810"
 
     compile "org.mybatis:mybatis:3.4.1"
+    compile "org.mybatis.generator:mybatis-generator-core:1.3.5"
+    compile group: 'org.mybatis', name: 'mybatis-typehandlers-jsr310', version: '1.0.2'
     compile "org.mybatis:mybatis-spring:1.3.0"
     compile "org.apache.commons:commons-lang3:3.1"
     
     compile "org.hotpotmaterial:hotpotmaterial-common:0.0.3"
+    compile("com.changan:titan-app-manage-sdk:0.0.10-SNAPSHOT"){
+    	exclude group: 'org.springframework.cloud'
+    }
     
     testCompile "org.springframework.boot:spring-boot-starter-test"
-    testCompile "org.powermock:powermock-module-junit4:1.7.4"
-    testCompile "org.powermock:powermock-api-mockito:1.7.4"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.changan:titan-dependencies:${titan_version}"
+    }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '3.1'
 }

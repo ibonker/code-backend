@@ -24,35 +24,60 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import com.alibaba.druid.util.StringUtils;
 import ${packageName}.security.dto.LoginResponseDTO;
 import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.dto.AdminUserInfo;
+import ${packageName}.security.utils.Base64Util;
 import ${packageName}.security.service.IUserTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import de.codecentric.boot.admin.client.config.InstanceProperties;
 
 @Slf4j
 public class AuthenticationFilter extends BasicAuthenticationFilter {
   
   private IUserTokenService tokenService;
+  
+  private InstanceProperties instance;
+
+  private String userName;
+
+  private String passWord;
 
   public AuthenticationFilter(AuthenticationManager authenticationManager) {
     super(authenticationManager);
   }
   
-  public AuthenticationFilter(AuthenticationManager authenticationManager, IUserTokenService tokenService) {
+  public AuthenticationFilter(AuthenticationManager authenticationManager, IUserTokenService tokenService, InstanceProperties instance) {
     super(authenticationManager);
     this.tokenService = tokenService;
+    this.instance = instance;
+    this.userName = instance.getMetadata().get("user.name");
+    this.passWord = instance.getMetadata().get("user.password");
   }
   
   @Override  
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {  
       String header = request.getHeader("AUTH_TOKEN");  
 
-      if (StringUtils.isEmpty(header)) {  
-        chain.doFilter(request, response);
-        return;
-      }  
+      UsernamePasswordAuthenticationToken authentication = null;
 
-      UsernamePasswordAuthenticationToken authentication = getAuthentication(request);  
+      if (request.getRequestURI().startsWith("/actuator")) {
+          String userkey = request.getHeader("Authorization");
+          String[] encode = Base64Util.decode(userkey.substring(userkey.indexOf(" ")+1,userkey.length())).split(":");
+          if(userName.equals(encode[0]) && passWord.equals(encode[1])){
+              AdminUserInfo user = new AdminUserInfo();
+              user.setUsername(userName);
+              user.setPassword(passWord);
+              authentication = new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+          }
+      } else {
+          if (StringUtils.isEmpty(header)) {
+              chain.doFilter(request, response);
+              return;
+          }
+
+          authentication = getAuthentication(request);
+      }
 
       SecurityContextHolder.getContext().setAuthentication(authentication);  
       chain.doFilter(request, response);  

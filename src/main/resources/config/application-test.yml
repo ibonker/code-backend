@@ -1,24 +1,45 @@
 spring:
   profiles: test
   datasource:
+    schema: classpath:schema.sql
+    security: classpath:securitysql/security.sql
+    resSecurity: classpath:securitysql/resSecurity.sql
+    securityOracle: classpath:securitysql/securityOracle.sql
+    resSecurityOracle: classpath:securitysql/resSecurityOracle.sql
     druid:
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://${DB_URL}/${DB_NAME}?useUnicode=true&characterEncoding=utf-8
-      username: ${DB_USER}
-      password: ${DB_PWD}
+      url: jdbc:mysql://10.64.11.73:3306/new_titancode_test?useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: Root123456
       type: com.alibaba.druid.pool.DruidDataSource
       filters: stat,wall
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   jpa:
+    generate-ddl: false
     show-sql: true
+    hibernate: 
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
 generate:
-  projectPath: /home/titan-code2/codedir/
-  projectZipPath: /home/titan-code2/codedir/zip/
-  projectUiPath: /home/titan-code2/ui-code/
-  projectUiTempPath: /home/titan-code2/ui-code-temp/
   mybatisGenlibsPath: /home/titan-code2/mybatis-genlibs/
-  entityZipPath: /home/titan-code2/codeir/entity/zip/
-  entityPath: /home/titan-code2/codeir/entity/
+  rootPath: /home/titan-code2/
+  projectPath: ${generate.rootPath}codedir/
+  projectZipPath: ${generate.rootPath}codedir/zip/
+  projectUiPath: ${generate.rootPath}ui-code/
+  projectUiTempPath: ${generate.rootPath}ui-code-temp/
+  versionPath: ${generate.rootPath}version/
+res:
+  center:
+    server: cmpuat.changan.com
+titan:
+  service:
+    appid: fc613a5b5f1f42e6b092e5fc7699001a
+    appPubkey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxxHLlhvmOF6QcGMbyV4YvoMVpzCzXPRJdM2FNgS38CGaAxy23UixVE3pill7bywrAVM2eH0zF9Vx6mWO+kynPPbYdIA0cK4iM7ejf/735YhgeSih6+kBncy43tNVQWHCV+LYkyvV3NLjL6yTRRY3iYZTBCBZhD7fuLDmg3wXYJYrRq2GDOr6ZXVIwnqewXPWapHkXdfxKF+tG9NHQCoRqIF56bMUgZ1hMc7DsF7zSLD53a0DhoBrXMKa6833KjuY/h2hjMI/+K/1wnLSF8RQ1hh9Vj3iSl82EjYSRiQBO4+ofNY/h3tJOU5+ndOo7ReQCbKX/Ak65Vy0BAVlI/p70QIDAQAB 
+    platform:
+      # 平台服务url
+      service-url: 10.64.26.26:30080
+      service-map:
+        # 文件服务测试环境 
+        file-service: 54dcb9d5d85a43a0953a61751c5622b7

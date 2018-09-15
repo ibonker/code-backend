@@ -119,7 +119,8 @@ public class ColumnPO extends BaseEntity {
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "MEDIUMBLOB") // 当数据库中该字段类型为MEDIUMBLOB型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "MEDIUMTEXT") // 当数据库中该字段类型为MEDIUMTEXT型时
         || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "LONGBLOB") // 当数据库中该字段类型为LONGBLOB型时
-        || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "LONGTEXT")) { // 当数据库中该字段类型为LONGTEXT型时
+        || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "LONGTEXT") // 当数据库中该字段类型为LONGTEXT型时
+        || StringUtils.startsWithIgnoreCase(this.getJdbcType(), "NVARCHAR")) { // 当数据库中该字段类型为LONGTEXT型时
       // 设置该字段的Java类型为String型
       this.javaType = "String";
     } else if (StringUtils.startsWithIgnoreCase(this.getJdbcType(), "DATE") // 当数据库中该字段类型为DATE型时
@@ -163,6 +164,10 @@ public class ColumnPO extends BaseEntity {
         // 设置该字段的java类型为Long数据类型
         this.javaType = "Long";
       }
+    } else if (StringUtils.startsWithIgnoreCase(this.getJdbcType(), "RAW")) {
+      this.javaType = "byte[]";
+    } else {
+      this.javaType = "String";
     }
 
     return this;

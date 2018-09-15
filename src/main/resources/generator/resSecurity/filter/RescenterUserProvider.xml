@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>RescenterUserProvider</name>
+  <filePath>src/main/java/${packageName}/security/filter</filePath>
+  <fileName>RescenterUserProvider.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.filter;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
+
+import ${packageName}.security.dto.UserInfo;
+
+public class RescenterUserProvider implements AuthenticationProvider {
+  
+  @Autowired
+  private UserDetailsService userDetailsService;
+
+  @Override
+  public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    String token = (String) authentication.getPrincipal();
+    UserInfo user = (UserInfo)userDetailsService.loadUserByUsername(token);
+    if (user == null) {
+      throw new BadCredentialsException("login failed");
+    }
+    return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+  }
+
+  @Override
+  public boolean supports(Class<?> authentication) {
+    return true;
+  }
+
+}
+]]>
+  </content>
+</template>

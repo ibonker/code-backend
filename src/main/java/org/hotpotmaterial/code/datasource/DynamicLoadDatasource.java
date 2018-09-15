@@ -49,6 +49,7 @@ public class DynamicLoadDatasource extends ApplicationObjectSupport {
     dataSourceBuider.addPropertyValue("driverClassName", datasource.getDbdriver());
     dataSourceBuider.addPropertyValue("username", datasource.getDbuser());
     dataSourceBuider.addPropertyValue("password", datasource.getDbpassword());
+    dataSourceBuider.addPropertyValue("maxWait", "5000");
 
     return dataSourceBuider;
   }

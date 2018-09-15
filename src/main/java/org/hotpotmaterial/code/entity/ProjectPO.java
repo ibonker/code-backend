@@ -83,6 +83,11 @@ public class ProjectPO extends BaseEntity {
   @JsonPropertyDescription("应用id")
   private String appId;//应用id
   
+  @Column(name = "app_pub_key")
+  @JsonProperty("appPubKey")
+  @JsonPropertyDescription("应用公钥")
+  private String appPubKey;//应用公钥
+  
   @Column(name = "user_id")
   @JsonProperty("userId")
   @JsonPropertyDescription("用户id")
@@ -117,6 +122,16 @@ public class ProjectPO extends BaseEntity {
   @JsonProperty("createdBy")
   @JsonPropertyDescription("创建人")
   private String createdBy; //创建人
+  
+  @Column(name = "flag")
+  @JsonProperty("flag")
+  @JsonPropertyDescription("星星标识 0:未标识 1:标识")
+  private String flag = "0"; 
+  
+  @Transient
+  @JsonProperty("tableNames")
+  @JsonPropertyDescription("数据源表名")
+  private List<String> tableNames; //该项目对应数据库下的所有表名
   
   /**
    * 可以更新的属性

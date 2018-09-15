@@ -70,6 +70,15 @@ public interface TransferObjRespository
   List<String> findIdByGenBasedTableIdIn(List<String> genBasedTableIds);
   
   /**
+   * 根据genBasedTableId获取TransferObj对象
+   * 
+   * @param genBasedTableId
+   * @return
+   */
+  @Query("SELECT t FROM TransferObjPO t WHERE t.genBasedTableId in ?1")
+  List<TransferObjPO> findByGenBasedTableIdIn(List<String> genBasedTableIds);
+  
+  /**
    * 根据genBasedTableId获取数据id
    * 
    * @param genBasedTableId
@@ -149,4 +158,28 @@ public interface TransferObjRespository
    */
   public List<TransferObjPO> findByGenBasedTableIdAndIsSeniorAndDelFlag(String genBasedTableId,
       String isSenior, String delFlag);
+
+
+  /**
+   * 根据项目ID和TableId找到对应的DTO
+   * @param projectId
+   * @param tableId
+   */
+  @Query("select t from TransferObjPO t where t.projectId = ?1 and t.genBasedTableId = ?2 and t.delFlag = '0'")
+  public TransferObjPO findByProjectIdAndTableId(String projectId, String tableId);
+  
+  /**
+   * 根据项目ID和transferObj的名字找到对应的DTO
+   * @param projectId
+   * @param transferObjName
+   */
+  @Query("select t from TransferObjPO t where t.projectId = ?1 and t.name = ?2 and t.delFlag = '0'")
+  public TransferObjPO findByProjectIdAndTransferObjName(String projectId, String transferObjName);
+  
+  /**
+   * 根据项目ID查询Dto实体类
+   * @param projectId
+   */
+  @Query("select t from TransferObjPO t where t.projectId = ?1 and t.genBasedTableId is null and t.delFlag = '0'")
+  public List<TransferObjPO> findCustomClass(String projectId);
 }

@@ -5,6 +5,7 @@ package org.hotpotmaterial.code.service.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.hotpotmaterial.code.common.BaseType;
 import org.hotpotmaterial.code.common.Constants;
 import org.hotpotmaterial.code.common.PredictUtils;
 import org.hotpotmaterial.code.common.component.Dictionary;
+import org.hotpotmaterial.code.common.component.UiConfig;
 import org.hotpotmaterial.code.config.property.GenerateProperties;
 import org.hotpotmaterial.code.dao.DatabaseDao;
 import org.hotpotmaterial.code.dto.RequestOfTableIdsDTO;
@@ -45,6 +47,7 @@ import org.hotpotmaterial.code.repository.TableRepository;
 import org.hotpotmaterial.code.repository.TableSeniorColumnRepository;
 import org.hotpotmaterial.code.repository.TableSeniorRelationRepository;
 import org.hotpotmaterial.code.repository.TableSeniorSlaveRepository;
+import org.hotpotmaterial.code.repository.TransferObjRespository;
 import org.hotpotmaterial.code.service.IApiBaseService;
 import org.hotpotmaterial.code.service.IApiObjService;
 import org.hotpotmaterial.code.service.IColumnService;
@@ -84,7 +87,7 @@ public class TableServiceImpl implements ITableService {
 
   @Autowired
   private TableRepository tableRepository;
-
+  
   @Autowired
   private DatabaseDao databaseDao;
 
@@ -202,7 +205,7 @@ public class TableServiceImpl implements ITableService {
     this.saveNewTables(newTables);
     // 新建实体
     for (TablePO table : newTables) {
-      if (!Constants.TABLE_NOENTITY.contains(table.getName().toLowerCase())) {
+      if (!Constants.getTableNoEntity().contains(table.getName().toLowerCase())) {
         transobjService.createAutoCrudDTO(datasource.getProjectId(), table.getId(), table.getName(),
             datasource.getPackageName(),
             datasource.getPackageName().concat(".").concat(table.getClassName()));
@@ -292,7 +295,7 @@ public class TableServiceImpl implements ITableService {
         // datasource id
         predicates.add(cb.equal(root.get("datasourceId"), datasourceId));
         // 排除表
-        predicates.add(cb.not(cb.lower(root.get("name")).in(Constants.TABLE_UNSHOWN)));
+        predicates.add(cb.not(cb.lower(root.get("name")).in(Constants.getTableUnshown())));
         return cb.and(predicates.toArray(new Predicate[predicates.size()]));
       }
     };
@@ -331,6 +334,21 @@ public class TableServiceImpl implements ITableService {
       dataobjs.add(dataobj);
     }
     return dataobjs;
+  }
+  
+  /**
+   * 获取数据库激活的PO以及关联PO对应class
+   */
+  @Override
+  public List<SimpleDataObj> findClassnameByDatasourceIdAndProjectId(String datasourceId,String projectId) {
+	  List<TablePO> results = findByDatasourceId(datasourceId, projectId);
+	  List<SimpleDataObj> dataobjs = Lists.newArrayList();
+	  for (TablePO data : results) {
+		  SimpleDataObj dataobj = new SimpleDataObj(data.getId(), data.getClassName(),
+				  Constants.IS_INACTIVE, null, data.getComments());
+		  dataobjs.add(dataobj);
+	  }
+	  return dataobjs;
   }
 
   @Override
@@ -865,4 +883,51 @@ public class TableServiceImpl implements ITableService {
       databaseDao.insertResAdminUser("ef26e88b-a4e3-45ee-be28-d1b94031e622"); //000003 用户id
     }
   }
+  
+  
+  @Override
+	public List<TablePO> findByDatasourceId(String datasourceId, String projectId) {
+		List<TablePO> tables = tableRepository.findByDatasourceIdAndIsAutoCrudAndDelFlag(datasourceId,Constants.IS_CRUD,Constants.DATA_IS_NORMAL);
+		// 创建一个用来装关联表的集合
+		List<TablePO> relationTables = new ArrayList<>();
+		for (TablePO tablePO : tables) {
+			List<TablePO> relationTable = tableRepository.findByRelationTableId(tablePO.getId());
+			if(relationTable!=null||relationTable.size()>0) {
+				relationTables.addAll(relationTable);
+			}
+		}
+		tables.addAll(relationTables);
+
+		// 找到对应的项目
+		ProjectPO project = projectRepo.findByIdAndDelFlag(projectId, Constants.DATA_IS_NORMAL);
+		
+		// 判断是否启用字典表
+		for (String compoent : project.getComponents().split(",")) {
+			if (Dictionary.dictionary.toString().equals(compoent)) {
+				//获取dict_type
+				List<TablePO> dictType = tableRepository.findByDatasourceAndTableName(datasourceId, Constants.Table_Dict_Type);
+				if(dictType!=null&&dictType.size()>0) {
+					tables.add(dictType.get(0));
+				}
+				//获取dict_value
+				List<TablePO> dictValue = tableRepository.findByDatasourceAndTableName(datasourceId, Constants.Table_Dict_Value);
+				if(dictValue!=null&&dictValue.size()>0) {
+					tables.add(dictValue.get(0));
+				}
+				break;
+			}
+		}
+		// 判断是否启用前端配置表
+		for (String compoent : project.getComponents().split(",")) {
+			if (UiConfig.uiConfigEnabled.toString().equals(compoent)) {
+				List<TablePO> uiConfig = tableRepository.findByDatasourceAndTableName(datasourceId, Constants.Table_UICONFIG);
+				if(uiConfig!=null&&uiConfig.size()>0) {
+					tables.add(uiConfig.get(0));
+				}
+				break;
+			}
+		}
+
+		return tables;
+	}
 }

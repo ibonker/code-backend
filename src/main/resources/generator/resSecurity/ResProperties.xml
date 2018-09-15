@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>WebSecurityConfig</name>
+  <filePath>src/main/java/${packageName}/security</filePath>
+  <fileName>ResProperties.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+import lombok.Data;
+
+@Configuration
+@ConfigurationProperties("res.center")
+@Data
+public class ResProperties {
+  
+  private String server;
+
+}
+
+
+]]>
+  </content>
+</template>

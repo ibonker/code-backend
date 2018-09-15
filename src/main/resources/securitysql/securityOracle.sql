@@ -22,10 +22,12 @@ INSERT  INTO hotpot_function VALUES ('111', '接口列表配置', '111', '{"path
 INSERT  INTO hotpot_function VALUES ('112', '高级查询配置', '112', '{"path":"/menuConfig/tabConfig", "component": "common/menuConfig/tabConfig.vue", "type": "div", "openMethod": "default"}', 'N', null, 'Y', '11', null, null, null, null, null, null);
 INSERT  INTO hotpot_function VALUES ('113', '模板配置', '113', '{"path":"/menuConfig/framework", "component": "common/menuConfig/frameworkConfig.vue", "type": "div", "openMethod": "default"}', 'N', null, 'Y', '11', null, null, null, null, null, null);
 INSERT  INTO hotpot_function VALUES ('12', '字典管理', '12', '{"path":"/dictionary", "component": "common/dictionary/dictionary.vue", "type": "div", "openMethod": "default"}', 'Y', null, 'Y', '1', null, null, null, null, null, null);
-INSERT  INTO hotpot_function VALUES ('13', '角色管理', '13', '{"component":"common/roleEdit/roleConfig.vue","openMethod":"default","path":"/roleConfig2","type":"div","url":""}', 'Y', null, 'Y', '1', null, null, null, null, null, null);
+INSERT  INTO hotpot_function VALUES ('13', '角色管理', '13', '{"component":"common/roleEdit/roleConfig.vue","openMethod":"default","path":"/roleConfig","type":"div","url":""}', 'Y', null, 'Y', '1', null, null, null, null, null, null);
 INSERT  INTO hotpot_function VALUES ('131', '角色配置', '131', '{"path":"/roleConfig/editRole", "component": "common/roleEdit/addRole.vue", "type": "div", "openMethod": "default"}', 'N', null, 'Y', '13', null, null, null, null, null, null);
 INSERT  INTO hotpot_function VALUES ('14', '组织管理', '14', '{"component":"common/organization.vue","openMethod":"default","path":"/organization","type":"div","url":""}', 'Y', null, 'Y', '1', null, null, null, null, null, null);
 INSERT  INTO hotpot_function VALUES ('15', '人员管理', '15', '{"component":"common/personMag.vue","openMethod":"default","path":"/users","type":"div","url":""}', 'Y', null, 'Y', '1', null, null, null, null, null, null);
+INSERT  INTO hotpot_function VALUES ('16', '文件管理', '16', '{"component":"common/fileMag.vue","openMethod":"default","path":"/fileMag","type":"div","url":""}', 'Y', null, 'Y', '1', null, '', null, null, null, null);
+INSERT  INTO hotpot_function VALUES ('17', '应用监控', '17', '{"component":"common/sba.vue","openMethod":"default","path":"/bootAdmin","type":"div","url":""}', 'Y', null, 'Y', '1', null, '', null, null, null, null);
 INSERT  INTO hotpot_function VALUES ('2', '个人信息', '2', '{"component":"common/personSet.vue","openMethod":"","path":"/p/setting","type":"div","url":""}', 'N', null, 'Y', '0', null, null, null, null, null, null);
 
 CREATE TABLE hotpot_organization (
@@ -85,6 +87,8 @@ INSERT  INTO hotpot_role_function VALUES ('13', '9999', null, 'admin');
 INSERT  INTO hotpot_role_function VALUES ('131', '9999', null, 'admin');
 INSERT  INTO hotpot_role_function VALUES ('14', '9999', null, 'admin');
 INSERT  INTO hotpot_role_function VALUES ('15', '9999', null, 'admin');
+INSERT  INTO hotpot_role_function VALUES ('16', '9999', null, 'admin');
+INSERT  INTO hotpot_role_function VALUES ('17', '9999', null, 'admin');
 INSERT  INTO hotpot_role_function VALUES ('2', '1', null, 'admin');
 INSERT  INTO hotpot_role_function VALUES ('2', '9999', null, 'admin');
 
@@ -115,5 +119,5 @@ CREATE TABLE hotpot_user (
   PRIMARY KEY (id)
 ) ;
 
-INSERT  INTO hotpot_user VALUES ('1', 'admin', 'admin', 'admin', '10004', null, null, '0');
-INSERT  INTO hotpot_user VALUES ('2', 'test', 'test', '123456', '10004', null, null, '0');
+INSERT  INTO hotpot_user VALUES ('1', 'admin', 'admin', '$2a$10$nyz7qCWgD/LuXEIXZRxcIuUBA3vHn7axEEoquoMEW9xF16u0q4w1u', '10004', null, null, '0');
+INSERT  INTO hotpot_user VALUES ('2', 'test', 'test', '$2a$10$WVnMN3fbUB/dAz8DTCSJ0uMMRAgd/lsX2HcuZHGDU5d1NozveYXiS', '10004', null, null, '0');

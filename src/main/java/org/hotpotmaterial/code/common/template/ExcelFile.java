@@ -1,5 +1,10 @@
 package org.hotpotmaterial.code.common.template;
 
+/**
+ * excel模板文件
+ * @author Administrator
+ *
+ */
 public enum ExcelFile {
 
   excelDTO("excel/excelDTO.xml"),

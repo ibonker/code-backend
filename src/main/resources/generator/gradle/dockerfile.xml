@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+	<name>dockerfile</name>
+	<filePath>/</filePath>
+	<fileName>Dockerfile</fileName>
+	<content><![CDATA[
+FROM 10.64.250.16/changan/java8:pinpoint-1.7
+
+WORKDIR /home
+
+ENV PRO_NAME='${projectName}'
+
+COPY build/libs/${projectName}-0.0.1-SNAPSHOT.jar /home/App.jar
+
+CMD ["/bin/sh","/home/start.sh"]
+]]>
+	</content>
+</template>

@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8081
 #  tomcat:
 #    remote-ip-header: x-forwarded-for
 #    protocol-header: x-forwarded-proto
@@ -10,7 +10,7 @@ server:
 #      pattern: '%h %t "%r" %s %b %{Location}o'
 spring:
   application:
-    name: hotpotmaterial-code2
+    name: titan-code2
   profiles:
     active: ${PRO_ENV:local}
     include: api

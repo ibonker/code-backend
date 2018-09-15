@@ -18,13 +18,29 @@ server:
     backgroundProcessorDelay: 1
     accessLogEnabled: true
     accessLogPattern: '%h %l %u %t "%r" %s %b %{Host}i %{Location}o'
-  port: 8080
+  port: ${r'$'}{PRO_PORT:8080}
   session:
     timeout: 1000000
 # spring配置    
 spring:
+  boot:
+    admin:
+      client: 
+        instance:
+          service-base-url: http://${r'$'}{PRO_IP:localhost}:${r'$'}{server.port}
+  application:
+    name: ${projectName}
   profiles:
     active: local
+# actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
 <#if dbcount == 1>
 mybatis:
   type-aliases-package: ${packageName}.entity
@@ -32,10 +48,20 @@ mybatis:
 </#if>
 <#else>
 spring:
+# spring boot admin注册
+  boot:
+    admin:
+      client: 
+        url: http://10.64.26.26:30080/bootadmin
+        instance:
+          metadata:
+            user.name: bootadmin
+            user.password: hotpotbootadmin2018!
+# 数据源  
   datasource:
     <#list datasourcelist as datasource>
     druid:
-      ${datasource.name}:
+      ${datasource.name?replace('_', '')}:
         driverClassName: ${datasource.dbdriver}
         url: ${datasource.dburl}
         username: ${datasource.dbuser}
@@ -52,6 +78,23 @@ logging:
     org.hotpotmaterial.anywhere: DEBUG
 excel:
   importPath: ./importExcel/
+<#if components?seq_contains("ressecurity")>
+res:
+  center:
+    server: cmpdev.changan.com
+</#if>
+titan:
+  service:
+    appid: <#if appId??>${appId}</#if>
+    appPubkey: <#if appPubkey??>${appPubkey}</#if> 
+    platform:
+      # 平台服务url
+      service-url: 10.64.26.26:30080
+      service-map:
+        # 文件服务测试环境 
+        file-service: 54dcb9d5d85a43a0953a61751c5622b7
+        # apm服务测试环境
+        admin-service: platform_service_test
 </#if>
 ]]>
     </content>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>AuthenticationFilter</name>
+  <filePath>src/main/java/${packageName}/security/filter</filePath>
+  <fileName>AuthenticationFilter.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.filter;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import com.alibaba.druid.util.StringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ${packageName}.security.dto.LoginResponseDTO;
+import ${packageName}.security.dto.UserInfo;
+import ${packageName}.security.dto.AdminUserInfo;
+import ${packageName}.security.utils.Base64Util;
+import ${packageName}.security.service.IUserTokenService;
+
+import lombok.extern.slf4j.Slf4j;
+import de.codecentric.boot.admin.client.config.InstanceProperties;
+
+@Slf4j
+public class AuthenticationFilter extends BasicAuthenticationFilter {
+  
+  private IUserTokenService tokenService;
+  
+  private InstanceProperties instance;
+
+  private String userName;
+
+  private String passWord;
+
+  public AuthenticationFilter(AuthenticationManager authenticationManager) {
+    super(authenticationManager);
+  }
+  
+  public AuthenticationFilter(AuthenticationManager authenticationManager, IUserTokenService tokenService, InstanceProperties instance) {
+    super(authenticationManager);
+    this.tokenService = tokenService;
+    this.instance = instance;
+    this.userName = instance.getMetadata().get("user.name");
+    this.passWord = instance.getMetadata().get("user.password");
+  }
+  
+  @Override  
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {  
+      String header = request.getHeader("AUTH_TOKEN");  
+
+      UsernamePasswordAuthenticationToken authentication = null;
+
+      if (request.getRequestURI().startsWith("/actuator")) {
+          String userkey = request.getHeader("Authorization");
+          String[] encode = Base64Util.decode(userkey.substring(userkey.indexOf(" ")+1,userkey.length())).split(":");
+          if(userName.equals(encode[0]) && passWord.equals(encode[1])){
+              AdminUserInfo user = new AdminUserInfo();
+              user.setUsername(userName);
+              user.setPassword(passWord);
+              authentication = new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+          }
+      } else {
+          if (StringUtils.isEmpty(header)) {
+              chain.doFilter(request, response);
+              return;
+          }
+
+          authentication = getAuthentication(request);
+      }
+
+      SecurityContextHolder.getContext().setAuthentication(authentication);  
+      chain.doFilter(request, response);  
+
+  }  
+
+  private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {  
+      String token = request.getHeader("AUTH_TOKEN");  
+      if (token != null && tokenService != null) {  
+          UserInfo user = tokenService.getUser(token);
+          if (user != null) {  
+            return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+          }  
+          return null;
+      }  
+      return null;  
+  }
+ 
+  @Override
+  protected void onUnsuccessfulAuthentication(HttpServletRequest request,
+      HttpServletResponse response, AuthenticationException failed)
+              throws IOException {
+
+    SecurityContextHolder.clearContext();
+
+    //设置ContentType
+    response.setContentType("application/json;charset=UTF-8");
+    //设置HTTP协议CODE
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    //初始化RESPONSE消息体的对象
+    LoginResponseDTO result = new LoginResponseDTO();
+    result.setSuccess(true);
+    //返回状态403
+    result.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    //设置错误消息
+    result.setErrorMessage(failed.getMessage());
+    //写入RESPONSE
+    PrintWriter out = null;
+    //转JSON
+    ObjectMapper mapper = new ObjectMapper();
+    //将RESULT对象转为JSON字符串
+    String resultJson = mapper.writeValueAsString(result);
+    try {
+      //写入RESPONSE
+      out = response.getWriter();
+      out.append(resultJson);
+    } catch (IOException e) {
+      log.error("", e);
+    } finally {
+      if (out != null) {
+        //关闭WRITER
+        out.close();
+      }
+    }
+  
+  }
+
+}
+
+
+]]>
+  </content>
+</template>

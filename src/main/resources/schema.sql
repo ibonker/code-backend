@@ -217,6 +217,7 @@ CREATE TABLE IF NOT EXISTS `project` (
   `updated_at` datetime DEFAULT NULL,
   `del_flag` char(1) DEFAULT NULL,
   `app_id` varchar(64) DEFAULT NULL,
+  `app_pub_key` varchar(256) DEFAULT NULL,
   `user_id` varchar(64) DEFAULT NULL,
   `user_name` varchar(64) DEFAULT NULL,
   `department_name` varchar(255) DEFAULT NULL,
@@ -224,6 +225,7 @@ CREATE TABLE IF NOT EXISTS `project` (
   `modify_name` varchar(100) DEFAULT NULL,
   `modify_ip` varchar(100) DEFAULT NULL,
   `created_by` varchar(32) DEFAULT NULL COMMENT '创建人',
+  `flag` char(1) DEFAULT NULL COMMENT '星星标识 0:未标识 1:标识',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_project_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -341,6 +343,44 @@ CREATE TABLE IF NOT EXISTS `transfer_obj_field` (
   `is_nullable` char(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 版本信息
+CREATE TABLE IF NOT EXISTS `version` (
+  `id` varchar(64) NOT NULL,
+  `flag` char(1) NOT NULL,
+  `version` varchar(64) NOT NULL,
+  `descriptions` varchar(256) DEFAULT NULL COMMENT '属性描述',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 项目管理表
+CREATE TABLE IF NOT EXISTS `party_project` (
+  `id` varchar(64) NOT NULL,
+  `project_id` varchar(64) NOT NULL COMMENT '项目ID',
+  `party_id` varchar(64) NOT NULL COMMENT '组织ID或用户ID',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `style` char(1) DEFAULT NULL COMMENT '用户标识  0:用户 1:组织',
+  `flag` char(1) DEFAULT NULL COMMENT '权限标识 0:该项目是用户自己创建的  1:该项目权限是用户加入的',
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 用户登陆信息
+CREATE TABLE IF NOT EXISTS `login_info` (
+  `id` varchar(64) NOT NULL,
+  `user_id` varchar(64) NOT NULL COMMENT '登陆用户ID',
+  `user_name` varchar(64) DEFAULT NULL COMMENT '用户名称',
+  `ip` varchar(64) NOT NULL COMMENT '登陆ip',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `del_flag` char(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 -- 数据导出被取消选择。
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

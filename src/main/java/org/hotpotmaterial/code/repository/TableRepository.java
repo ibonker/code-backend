@@ -7,8 +7,9 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.hotpotmaterial.code.entity.TablePO;
 
 /**
@@ -62,5 +63,33 @@ public interface TableRepository
    * @return
    */
   List<TablePO> findByDatasourceIdAndIsAutoCrudAndDelFlag(String datasourceId, String isAutoCrud, String delFlag);
+  
+  /**
+   * 根据关联表ID获取table
+   * @param datasourceId
+   * @return
+   */
+  @Query("select t from TablePO t where id in (select tr.slaveTableId from TableRelationPO tr where tr.masterTableId = ?1)")
+  List<TablePO> findByRelationTableId(String tableId);
+  
+  /**
+   * 根据数据库与表名找到对应的table
+   * @param dataSourceId
+   * @param tableName
+   * @return
+   */
+  @Query("select t from TablePO t where t.datasourceId = ?1 and t.name = ?2 order by t.createdAt desc")
+  List<TablePO> findByDatasourceAndTableName(String dataSourceId,String tableName);
+  
+  /**
+   * 根据数据源ID以及数据库表名查询对应的TablePO的id
+   * @param datasourceId  数据源ID
+   * @param tableNames  数据库表名
+   * @author liujialin 
+   */
+  @Transactional
+  @Modifying
+  @Query("select t.id from TablePO t where t.datasourceId = ?1 and t.name IN ?2")
+  List<String> selectIsAutoCrud(String datasourceId, List<String> tableNames);
 
 }

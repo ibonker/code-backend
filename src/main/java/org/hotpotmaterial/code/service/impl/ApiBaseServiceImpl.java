@@ -117,7 +117,7 @@ public class ApiBaseServiceImpl implements IApiBaseService {
       //查询apiBase下所有的方法
       List<ApiObjPO> apiObjs = apiObjService.findAllApiObj(id);
       //如果apiobj不为空则执行apiParam删除
-      if(!apiObjs.isEmpty() && apiObjs != null){
+      if(apiObjs != null && !apiObjs.isEmpty()){
         for(ApiObjPO apiObj : apiObjs){
           //删除apiObj下所有的参数s
           apiObjService.deleteApiObj(apiObj.getId());

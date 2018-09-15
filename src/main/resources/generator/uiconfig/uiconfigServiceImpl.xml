@@ -19,6 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ${packageName}.service.uiconfig.IUiConfigService;
 import ${packageName}.dao.uiconfig.UiconfigMapper;
 import ${packageName}.service.uiconfig.impl.UICache;
+
+import lombok.extern.slf4j.Slf4j;
+
 import ${packageName}.entity.${datasourceName}.UiConfigPO;
 
 /**
@@ -26,6 +29,7 @@ import ${packageName}.entity.${datasourceName}.UiConfigPO;
  * @author Hotpotmaterial-Code2
  */
 @Service("UiConfigService")
+@Slf4j
 public class UiConfigServiceImpl implements IUiConfigService {
   
   // 注入缓存bean
@@ -36,7 +40,9 @@ public class UiConfigServiceImpl implements IUiConfigService {
   @Autowired
   private UiconfigMapper uiConfigPOMapper;
 
-  // 根据版本获取ui配置
+  /**
+   * 根据版本获取ui配置
+   */
   @Override
   public Map<String, Object> getUiConfig(String version) {
     // 如果版本号相同返回空,否则返回内存数据
@@ -47,7 +53,9 @@ public class UiConfigServiceImpl implements IUiConfigService {
     }
   }
   
-  // 保存数据
+  /**
+   * 保存数据
+   */
   @Override
   public void saveUiConfig(String data) {
     ObjectMapper om = new ObjectMapper();
@@ -59,7 +67,7 @@ public class UiConfigServiceImpl implements IUiConfigService {
         this.insertUiConfig(uipo);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
     // 获取内存版本号
     int version = Integer.valueOf(uiCache.getUIMap().get("version").toString());
@@ -67,7 +75,9 @@ public class UiConfigServiceImpl implements IUiConfigService {
     uiCache.getUIMap().put("version", version + 1);
   }
 
-  //新增
+  /**
+   * 新增
+   */
   @Override
   public int insertUiConfig(UiConfigPO uiConfig) {
     // 设置值
@@ -75,7 +85,9 @@ public class UiConfigServiceImpl implements IUiConfigService {
     return uiConfigPOMapper.insertSelective(uiConfig);
   }
 
-  //修改
+  /**
+   * 修改
+   */
   @Override
   public int updateUiConfig(String id, UiConfigPO uiConfig) {
     uiConfig.preUpdate();
@@ -83,7 +95,9 @@ public class UiConfigServiceImpl implements IUiConfigService {
     return uiConfigPOMapper.updateByPrimaryKeySelective(uiConfig);
   }
   
-  // 获取详情
+  /**
+   * 获取详情
+   */
   @Override
   public UiConfigPO findById(String id) {
     return uiConfigPOMapper.selectByPrimaryKey(id);

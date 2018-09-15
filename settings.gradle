@@ -1,0 +1,2 @@
+include 'titan-common'
+project(':titan-common').projectDir = new File(settingsDir, '../titan-common')

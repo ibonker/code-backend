@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+  <name>HtUserController</name>
+  <filePath>src/main/java/${packageName}/security/controller</filePath>
+  <fileName>HtUserController.java</fileName>
+  <content><![CDATA[
+package ${packageName}.security.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import ${packageName}.controller.base.BaseController;
+import ${packageName}.security.entity.HotpotFunctionPO;
+import ${packageName}.security.service.IUserService;
+
+@Controller
+@RequestMapping("/security")
+public class HtUserController extends BaseController{
+  
+  @Autowired
+  private IUserService userService;
+  
+  /**
+   * 用户获取对应目录
+   * @return
+   */
+  @GetMapping("/functions")
+  @ResponseBody
+  public List<HotpotFunctionPO> fucntions(){
+    return userService.selectFuncByPartyIdList(getUser());
+  }
+  
+}
+]]>
+  </content>
+</template>

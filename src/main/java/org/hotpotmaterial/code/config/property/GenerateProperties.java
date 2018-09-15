@@ -31,4 +31,6 @@ public class GenerateProperties {
   
   private String entityPath;
   
+  private String versionPath;
+  
 }

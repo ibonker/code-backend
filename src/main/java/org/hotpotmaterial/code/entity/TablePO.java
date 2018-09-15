@@ -19,9 +19,11 @@ import org.hotpotmaterial.anywhere.common.utils.StringUtils;
 import org.hotpotmaterial.code.common.Constants;
 import org.hotpotmaterial.code.dto.SeniorDtoRelation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 
@@ -37,6 +39,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "tabled")
 @Entity
 @EntityListeners(value = {AuditingEntityListener.class})
+@JsonInclude(Include.NON_NULL)
 public class TablePO extends BaseEntity {
   /**
    * 

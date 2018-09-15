@@ -73,7 +73,7 @@ public interface IGenerateService {
    * @param table
    * @param columns
    */
-  public void generateDAOFiles(String pathPostfix, String moduleName, String projectName,
+  public void generateDAOFiles(String dbtype, String pathPostfix, String moduleName, String projectName,
       String packageName, String tableName, List<TableSeniorRelationPO> relations,
       List<SeniorDtoAttribute> attrs, List<SeniorDtoRelation> relationMethods);
 

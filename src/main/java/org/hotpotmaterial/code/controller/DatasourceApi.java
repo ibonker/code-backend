@@ -6,6 +6,7 @@ package org.hotpotmaterial.code.controller;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.request.PageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.page.rest.response.ResultPageDTO;
 import org.hotpotmaterial.anywhere.common.mvc.rest.basic.ResultDTO;
+import org.hotpotmaterial.code.dto.ResultOfMsgDataDTO;
 import org.hotpotmaterial.code.entity.DatasourcePO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,5 +64,16 @@ public interface DatasourceApi {
   ResponseEntity<ResultDTO> projectsGet(
       @ApiParam(value = "数据源id", required = false) @PathVariable String id,
       @ApiParam(value = "查询参数", required = false) @RequestBody PageDTO searchParams);
+  
+  /**
+   * 查询数据库表名与描述
+   */
+  @ApiOperation(value = "查询数据库表名与描述", notes = "查询数据库表名与描述", response = ResultPageDTO.class, tags = {"Datasource"})
+  @ApiResponses(
+		  value = {@ApiResponse(code = 200, message = "返回操作成功信息", response = ResultOfMsgDataDTO.class),
+				  @ApiResponse(code = 200, message = "返回错误信息", response = ResultOfMsgDataDTO.class)})
+  @RequestMapping(value = "/datasources/tableNames", produces = {"application/json"},
+  method = RequestMethod.POST)
+  ResponseEntity<ResultDTO> tableNamesGet(@ApiParam(value = "数据源") @RequestBody DatasourcePO datasource);
 
 }
