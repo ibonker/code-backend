@@ -1,1 +1,1 @@
-﻿# Titan Code - Restful风格的项目代码生成器
+﻿# Hotpotmaterial Code - Restful风格的项目代码生成器
